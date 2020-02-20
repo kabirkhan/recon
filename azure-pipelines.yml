@@ -1,0 +1,90 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+  paths:
+    exclude:
+    - 'docs/*'
+    - '*.md'
+  tags:
+    include:
+    - v*
+pr:
+  paths:
+    exclude:
+    - 'docs/*'
+    - '*.md'
+
+stages:
+- stage: test_and_validate
+  displayName: 'Validate and Test'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  jobs:
+  - job: 'Validate'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.7'
+    - script: |
+        pip install flake8
+        python -m flake8 reconner --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+      displayName: 'flake8'
+  - job: 'Test'
+    dependsOn: 'Validate'
+    strategy:
+      matrix:
+        Python36Linux:
+          imageName: 'ubuntu-16.04'
+          python.version: '3.6'
+        Python37Linux:
+          imageName: 'ubuntu-16.04'
+          python.version: '3.7'
+      maxParallel: 4
+
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
+        architecture: 'x64'
+
+    - script: |
+        pip install flit
+        flit install --deps=all --symlink
+      displayName: 'Install dependencies'
+
+    - script: |
+        bash scripts/test.sh
+      displayName: Test
+    - script: |
+        bash <(curl -s https://codecov.io/bash)
+      displayName: codecov.io
+      env:
+        CODECOV_TOKEN: $(CODECOV_TOKEN)
+
+- stage: Publish
+  displayName: 'Publish to PyPI'
+  dependsOn: test_and_validate
+  condition: and(succeeded(), startsWith(variables['build.sourceBranch'], 'refs/tags'))
+  pool:
+    vmImage: 'ubuntu-16.04'
+  jobs:
+    - job: 'Publish'
+      steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.7'
+          architecture: 'x64'
+      - script: |
+          pip install flit
+          flit install --deps=develop --symlink
+        displayName: 'Install dependencies'
+      - script: |
+          bash scripts/deploy.sh
+        displayName: Deploy
+        env:
+          FLIT_USERNAME: $(FLIT_USERNAME)
+          FLIT_PASSWORD: $(FLIT_PASSWORD)

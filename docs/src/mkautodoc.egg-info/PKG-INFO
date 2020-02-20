@@ -1,0 +1,19 @@
+Metadata-Version: 1.2
+Name: mkautodoc
+Version: 0.1.0
+Summary: AutoDoc for MarkDown
+Home-page: https://github.com/tomchristie/mkautodoc
+Author: Tom Christie
+Author-email: tom@tomchristie.com
+License: BSD
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.6
