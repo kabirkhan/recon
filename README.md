@@ -2,11 +2,11 @@
     <em>ReconNER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>
 </p>
 <p align="center">
-<a href="https://dev.azure.com/kabirkhan1137/reconer/_build" target="_blank">
-    <img src="https://dev.azure.com/kabirkhan1137/reconer/_apis/build/status/kabirkhan.reconner?branchName=master" alt="Build Status">
+<a href="https://dev.azure.com/kabirkhan1137/reconner/_build" target="_blank">
+    <img src="https://dev.azure.com/kabirkhan1137/reconner/_apis/build/status/kabirkhan.reconner?branchName=master" alt="Build Status">
 </a>
-<a href="https://codecov.io/gh/kabirkhan/reconner">
-  <img src="https://codecov.io/gh/kabirkhan/reconner/branch/master/graph/badge.svg" alt="Coverage"/>
+<a href="https://codecov.io/gh/microsoft/reconner">
+  <img src="https://codecov.io/gh/microsoft/reconner/branch/master/graph/badge.svg" alt="Coverage"/>
 </a>
 <a href="https://pypi.org/project/reconner" target="_blank">
     <img src="https://badge.fury.io/py/reconner.svg" alt="Package version">
