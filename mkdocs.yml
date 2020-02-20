@@ -17,8 +17,9 @@ edit_uri: 'https://github.com/kabirkhan/reconner'
 nav:
     - Introduction: 'index.md'
     - Tutorial:
-        - Loading your data: 'tutorial/loading.md'
+        - Loading your data: 'tutorial/loading_data.md'
         - Validation: 'tutorial/validation.md'
+        - Custom EntityRecognizer: 'tutorial/validation.md'
     - API:
         - Dataset: 'api/dataset.md'
         - Insights: 'api/insights.md'
