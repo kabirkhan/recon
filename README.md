@@ -2,8 +2,8 @@
     <em>ReconNER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>
 </p>
 <p align="center">
-<a href="https://dev.azure.com/kabirkhan1137/reconner/_build" target="_blank">
-    <img src="https://dev.azure.com/kabirkhan1137/reconner/_apis/build/status/kabirkhan.reconner?branchName=master" alt="Build Status">
+<a href="https://dev.azure.com/microsoft1137/ReconNER/_build" target="_blank">
+    <img src="https://dev.azure.com/microsoft1137/ReconNER/_apis/build/status/microsoft.reconner?branchName=master" alt="Build Status">
 </a>
 <a href="https://codecov.io/gh/microsoft/reconner">
   <img src="https://codecov.io/gh/microsoft/reconner/branch/master/graph/badge.svg" alt="Coverage"/>
@@ -15,9 +15,9 @@
 
 ---
 
-**Documentation**: <a href="https://kabirkhan.github.io/reconner" target="_blank">https://kabirkhan.github.io/reconner</a>
+**Documentation**: <a href="https://microsoft.github.io/reconner" target="_blank">https://microsoft.github.io/reconner</a>
 
-**Source Code**: <a href="https://github.com/kabirkhan/reconner" target="_blank">https://github.com/kabirkhan/reconner</a>
+**Source Code**: <a href="https://github.com/microsoft/reconner" target="_blank">https://github.com/microsoft/reconner</a>
 
 ---
 
