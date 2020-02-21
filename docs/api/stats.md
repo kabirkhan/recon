@@ -6,5 +6,7 @@ It's useful for getting a quick overview of your data and checking that you have
 ---
 ## API
 
+### ner_stats
+
 ::: reconner.stats.ner_stats
     :docstring:

@@ -1,6 +1,6 @@
 site_name: ReconNER
 site_description: Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.
-site_url: https://kabirkhan.github.io/reconner/
+site_url: https://microsoft.github.io/reconner/
 
 theme:
     name: 'material'
@@ -8,18 +8,18 @@ theme:
         primary: 'orange'
         accent: 'deep-orange'
     logo: 'img/icon-white.svg'
-    favicon: 'img/favicon.png'
+    favicon: 'img/favicon.ico'
 
-repo_name: 'kabirkhan/reconner'
-repo_url: 'https://github.com/kabirkhan/reconner'
-edit_uri: 'https://github.com/kabirkhan/reconner'
+repo_name: 'microsoft/reconner'
+repo_url: 'https://github.com/microsoft/reconner'
+edit_uri: 'https://github.com/microsoft/reconner'
 
 nav:
     - Introduction: 'index.md'
     - Tutorial:
         - Loading your data: 'tutorial/loading_data.md'
-        - Validation: 'tutorial/validation.md'
-        - Custom EntityRecognizer: 'tutorial/validation.md'
+        - NER Stats: 'tutorial/ner_stats.md'
+        - Custom EntityRecognizer: 'tutorial/custom_entity_recognizer.md'
     - API:
         - Dataset: 'api/dataset.md'
         - Insights: 'api/insights.md'
@@ -43,7 +43,7 @@ markdown_extensions:
 extra:
     social:
         - type: 'github'
-          link: 'https://github.com/kabirkhan/reconner'
+          link: 'https://github.com/microsoft/reconner'
         - type: 'twitter'
           link: 'https://twitter.com/kabir_khan14'
 

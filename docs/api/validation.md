@@ -6,11 +6,17 @@ These functions are useful to run before any of the functionality in `reconner.i
 ---
 ## API
 
+### **`json_to_examples`**
+
 ::: reconner.validation.json_to_examples
     :docstring:
 
+### **`fix_annotations_format`**
+
 ::: reconner.validation.fix_annotations_format
     :docstring:
+
+### **`filter_overlaps`**
 
 ::: reconner.validation.filter_overlaps
     :docstring:
