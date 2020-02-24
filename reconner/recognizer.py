@@ -66,7 +66,6 @@ class SpacyEntityRecognizer(EntityRecognizer):
 
         return sorted(list(all_labels))
 
-
     def predict(self, texts: List[StrictStr]) -> List[Example]:
         """Run spaCy nlp.pipe on a batch of raw texts.
         

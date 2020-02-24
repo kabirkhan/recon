@@ -12,13 +12,15 @@ theme:
 
 repo_name: 'microsoft/reconner'
 repo_url: 'https://github.com/microsoft/reconner'
-edit_uri: 'https://github.com/microsoft/reconner'
+edit_uri: 'https://github.com/microsoft/reconner/tree/master/docs'
 
 nav:
     - Introduction: 'index.md'
     - Tutorial:
         - Loading your data: 'tutorial/loading_data.md'
         - NER Stats: 'tutorial/ner_stats.md'
+        - Dataset Apply: 'tutorial/dataset_apply.md'
+        - Getting Insights: 'tutorial/getting_insights.md'
         - Custom EntityRecognizer: 'tutorial/custom_entity_recognizer.md'
     - API:
         - Dataset: 'api/dataset.md'
