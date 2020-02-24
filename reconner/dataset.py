@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Any, Callable, Dict, List
+from spacy.util import ensure_path
 from reconner.loaders import read_jsonl, read_json
 from reconner.types import Example
-
 
 class Dataset:
     """Container for a full dataset with train/dev/test splits.
@@ -22,16 +22,9 @@ class Dataset:
                  train: List[Example],
                  dev: List[Example],
                  test: List[Example] = None):
-        self.datasets = {
-            'train': train,
-            'dev': dev,
-            'all': train + dev
-        }
-        if test:
-            self.datasets.update({
-                'test': test,
-                'all': train + dev + test
-            })
+        self._train = train
+        self._dev = dev
+        self._test = test
     
     @classmethod
     def from_disk(cls, path: Path, loader_func: Callable = read_jsonl):
@@ -45,16 +38,34 @@ class Dataset:
         **loader_func**: (Callable, optional), Defaults to read_jsonl.
             Loader function (TODO: Make this a bit more generic)
         """
+
+        path = ensure_path(path)
         return Dataset(
             loader_func(path / 'train.jsonl'),
             loader_func(path / 'dev.jsonl'),
             test=loader_func(path / 'test.jsonl')
         )
+    
+    @property
+    def train(self) -> List[Example]:
+        return self._train
+    
+    @property
+    def dev(self) -> List[Example]:
+        return self._dev
+    
+    @property
+    def test(self) -> List[Example]:
+        return self._test or []
+    
+    @property
+    def all(self) -> List[Example]:
+        return self.train + self.dev + self.test
 
     def apply(self,
               func: Callable[[List[Example]], Any],
               *args: Any,
-              **kwargs: Any) -> Dict[str, List[Example]]:
+              **kwargs: Any) -> Dict[str, Any]:
         """Apply an existing function to all datasets
         
         ### Parameters
@@ -64,10 +75,14 @@ class Dataset:
         
         ### Returns
         -----------
-        (Dict[str, List[Example]]): 
-            Dictionary mapping dataset names to List[Example], same as the internal datasets property
+        (Dict[str, Any): 
+            Dictionary mapping dataset names to return type of func Callable
         """
-        res = {}
-        for k, dataset in self.datasets.items():
-            res[k] = func(dataset, *args, **kwargs)
+        res = {
+            'train': func(self.train, *args, **kwargs),
+            'dev': func(self.dev, *args, **kwargs),
+            'test': func(self.test, *args, **kwargs),
+            'all': func(self.all, *args, **kwargs)
+        }
+
         return res
