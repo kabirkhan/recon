@@ -1,7 +1,8 @@
 from pathlib import Path
+
 import typer
-from reconner.dataset import Dataset
-from reconner.stats import ner_stats
+from recon.dataset import Dataset
+from recon.stats import ner_stats
 
 
 def main(data_dir: Path):

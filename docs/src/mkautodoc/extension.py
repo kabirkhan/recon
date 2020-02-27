@@ -1,12 +1,12 @@
-from markdown import Markdown
-from markdown.extensions import Extension
-from markdown.blockprocessors import BlockProcessor
-from markdown.util import etree
 import importlib
 import inspect
 import re
 import typing
 
+from markdown import Markdown
+from markdown.blockprocessors import BlockProcessor
+from markdown.extensions import Extension
+from markdown.util import etree
 
 # Fuzzy regex for determining source lines in __init__ that look like
 # attribute assignments.  Eg. `self.counter = 0`

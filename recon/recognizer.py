@@ -1,11 +1,11 @@
-from typing import List
-from pydantic import StrictStr
+from typing import Iterable, Iterator, List, Set
+
 from spacy.language import Language
+
 from .types import Example, TextSpanLabel
 
 
 class EntityRecognizer:
-
     @property
     def labels(self) -> List[str]:
         """Return List of String Labels
@@ -22,12 +22,12 @@ class EntityRecognizer:
         """
         raise NotImplementedError
 
-    def predict(self, texts: List[StrictStr]) -> List[Example]:
+    def predict(self, texts: Iterable[str]) -> Iterator[Example]:
         """Run model inference on a batch of raw texts.
         
         ### Parameters
         --------------
-        **texts**: (List[StrictStr]), required.
+        **texts**: (List[str]), required.
             Raw text examples
         
         ### Raises
@@ -37,18 +37,17 @@ class EntityRecognizer:
         
         ### Returns
         -----------
-        (List[Example]): 
-            List of Examples constructed from Model predictions
+        (Iterator[Example]): 
+            Examples constructed from Model predictions
         """
         raise NotImplementedError
 
 
 class SpacyEntityRecognizer(EntityRecognizer):
-
     def __init__(self, nlp: Language):
         super().__init__()
         self.nlp = nlp
-    
+
     @property
     def labels(self) -> List[str]:
         """Return List of spaCy ner labels
@@ -58,36 +57,37 @@ class SpacyEntityRecognizer(EntityRecognizer):
         (List[str]): 
             List of labels from spaCy ner pipe
         """
-        all_labels = set()
+        all_labels: Set[str] = set()
 
-        for pipe in ['ner', 'entity_ruler']:
+        for pipe in ["ner", "entity_ruler"]:
             if self.nlp.has_pipe(pipe):
                 all_labels = all_labels | set(self.nlp.get_pipe(pipe).labels)
 
         return sorted(list(all_labels))
 
-    def predict(self, texts: List[StrictStr]) -> List[Example]:
+    def predict(self, texts: Iterable[str]) -> Iterator[Example]:
         """Run spaCy nlp.pipe on a batch of raw texts.
         
         ### Parameters
         --------------
-        **texts**: (List[StrictStr]), required.
+        **texts**: (List[str]), required.
             Raw text examples
         
-        ### Returns
-        -----------
-        (List[Example]): 
-            List of Examples constructed from spaCy Model predictions
+        ### yields
+        ----------
+        (Iterator[Example]): 
+            Examples constructed from spaCy Model predictions
         """
+
         examples: List[Example] = []
 
         for doc in self.nlp.pipe(texts):
-            examples.append(Example(
+            yield Example(
                 text=doc.text,
-                spans=[TextSpanLabel(text=e.text,
-                                     start=e.start_char,
-                                     end=e.end_char,
-                                     label=e.label_)
-                                     for e in doc.ents]
-            ))
-        return examples
+                spans=[
+                    TextSpanLabel(
+                        text=e.text, start=e.start_char, end=e.end_char, label=e.label_
+                    )
+                    for e in doc.ents
+                ],
+            )

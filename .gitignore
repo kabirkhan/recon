@@ -10,3 +10,4 @@ dist
 site
 .coverage
 htmlcov
+examples/cs_data_test.ipynb

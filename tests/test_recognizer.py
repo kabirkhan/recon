@@ -1,5 +1,5 @@
 import pytest
-from reconner.recognizer import *
+from recon.recognizer import *
 
 
 def test_base_recognizer(test_texts):
@@ -9,16 +9,18 @@ def test_base_recognizer(test_texts):
         recognizer.labels
     with pytest.raises(NotImplementedError):
         recognizer.predict(test_texts)
-            
+
 
 def test_spacy_recognizer(nlp, test_texts):
-    ruler = nlp.create_pipe('entity_ruler')
-    ruler.add_patterns([
-        {'label': 'SKILL', 'pattern': 'Machine learning'},
-        {'label': 'SKILL', 'pattern': 'researched'},
-        {'label': 'SKILL', 'pattern': 'AI'},
-        {'label': 'JOB_ROLE', 'pattern': 'Software Engineer'},
-    ])
+    ruler = nlp.create_pipe("entity_ruler")
+    ruler.add_patterns(
+        [
+            {"label": "SKILL", "pattern": "Machine learning"},
+            {"label": "SKILL", "pattern": "researched"},
+            {"label": "SKILL", "pattern": "AI"},
+            {"label": "JOB_ROLE", "pattern": "Software Engineer"},
+        ]
+    )
 
     nlp.add_pipe(ruler)
 
