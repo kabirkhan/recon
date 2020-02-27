@@ -27,7 +27,7 @@ def test_spacy_recognizer(nlp, test_texts):
     recognizer = SpacyEntityRecognizer(nlp)
     assert recognizer.labels == ["JOB_ROLE", "SKILL"]
 
-    examples = recognizer.predict(test_texts)
+    examples = list(recognizer.predict(test_texts))
 
     assert examples[0].text == test_texts[0]
     assert len(examples[0].spans) == 3
