@@ -29,7 +29,7 @@ class Dataset:
         self._test = test
 
     @classmethod
-    def from_disk(cls, path: Path, loader_func: Callable = read_jsonl) -> Dataset:
+    def from_disk(cls, path: Path, loader_func: Callable = read_jsonl) -> "Dataset":
         """Load Dataset from disk given a directory with files 
         named explicitly train.jsonl, dev.jsonl, and test.jsonl
         
