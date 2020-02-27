@@ -9,7 +9,7 @@ git checkout $1
 git pull origin $1
 git push origin $1
 
-version=$(grep "__version__ = " reconner/__init__.py)
+version=$(grep "__version__ = " recon/__init__.py)
 version=${version/__version__ = }
 version=${version/\'/}
 version=${version/\'/}

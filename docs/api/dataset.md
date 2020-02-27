@@ -1,12 +1,12 @@
-# `reconner.dataset.Dataset`
+# `recon.dataset.Dataset`
 
-`reconner.dataset.Dataset` is a container to run other `reconner` operations across your train/dev/test split
-The `reconner.dataset.Dataset.apply` function takes any of the other reconner functions and runs them
+`recon.dataset.Dataset` is a container to run other `recon` operations across your train/dev/test split
+The `recon.dataset.Dataset.apply` function takes any of the other recon functions and runs them
 on all the datasets in sequence.
 
 ---
 ## API
 
-::: reconner.Dataset
+::: recon.Dataset
     :docstring:
     :members:

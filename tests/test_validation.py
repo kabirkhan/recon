@@ -1,6 +1,6 @@
 import pytest
-from reconner.types import Example, TextSpanLabel
-from reconner.validation import *
+from recon.types import Example, TextSpanLabel
+from recon.validation import *
 
 
 @pytest.fixture()
@@ -9,18 +9,10 @@ def messy_data():
         {
             "text": "Denver, Colorado is a city.",
             "spans": [
-                {
-                    "start": 0,
-                    "end": 6,
-                    "label": "GPE"
-                },
-                {
-                    "start": 0,
-                    "end": 16,
-                    "label": "LOC"
-                }
+                {"start": 0, "end": 6, "label": "GPE"},
+                {"start": 0, "end": 16, "label": "LOC"},
             ],
-            "meta": "Cities Data"
+            "meta": "Cities Data",
         }
     ]
 
@@ -32,15 +24,13 @@ def test_json_to_examples(messy_data):
 
     assert fixed_examples[0].spans[0].text == "Denver, Colorado"
     assert fixed_examples[0].spans[0].label == "LOC"
-    
+
 
 def test_fix_annotations_format(messy_data):
     fixed_data = fix_annotations_format(messy_data)
 
-    assert fixed_data[0]["spans"][0]['text'] == "Denver"
-    assert fixed_data[0]["meta"] == {
-        "source": "Cities Data"
-    }
+    assert fixed_data[0]["spans"][0]["text"] == "Denver"
+    assert fixed_data[0]["meta"] == {"source": "Cities Data"}
 
 
 # def test_remove_overlaps():

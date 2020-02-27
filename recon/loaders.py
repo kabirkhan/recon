@@ -1,6 +1,8 @@
-from typing import List
 from pathlib import Path
+from typing import List
+
 import srsly
+
 from .types import Example
 from .validation import json_to_examples
 
@@ -18,7 +20,7 @@ def read_jsonl(path: Path) -> List[Example]:
     (List[Example]): 
         List of Examples
     """
-    
+
     data = list(srsly.read_jsonl(path))
     return json_to_examples(data)
 
