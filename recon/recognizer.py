@@ -2,10 +2,15 @@ from typing import Iterable, Iterator, List, Set
 
 from spacy.language import Language
 
-from .types import Example, TextSpanLabel
+from .types import Example, Span
 
 
 class EntityRecognizer:
+    """Abstract Base class for recognizing entities in a batch of text.
+    Used in the `recon.insights` module for understanding the kinds
+    of examples your model is having the most trouble with.
+    """
+
     @property
     def labels(self) -> List[str]:
         """Return List of String Labels
@@ -44,7 +49,15 @@ class EntityRecognizer:
 
 
 class SpacyEntityRecognizer(EntityRecognizer):
+    """Create an EntityRecognizer from a spaCy Langauge instance"""
     def __init__(self, nlp: Language):
+        """Initialize a SpacyEntityRecognizer
+        
+        ### Parameters
+        --------------
+        **nlp**: (Language), required.
+            spaCy Language instance that can sets doc.ents
+        """        
         super().__init__()
         self.nlp = nlp
 
@@ -85,7 +98,7 @@ class SpacyEntityRecognizer(EntityRecognizer):
             yield Example(
                 text=doc.text,
                 spans=[
-                    TextSpanLabel(
+                    Span(
                         text=e.text, start=e.start_char, end=e.end_char, label=e.label_
                     )
                     for e in doc.ents

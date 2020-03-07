@@ -4,7 +4,7 @@ from typing import Any, DefaultDict, Dict, List, Optional, Union
 import srsly
 
 from .constants import NONE
-from .types import Example, TextSpanLabel
+from .types import Example, Span
 
 
 def ner_stats(
