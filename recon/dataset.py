@@ -29,24 +29,48 @@ class Dataset:
         self._test = test
 
     @classmethod
-    def from_disk(cls, path: Path, loader_func: Callable = read_jsonl) -> "Dataset":
+    def from_disk(cls,
+                  data_dir: Path,
+                  train_file: str = "train.jsonl",
+                  dev_file: str = "dev.jsonl",
+                  test_file: str = "test.jsonl",
+                  loader_func: Callable = read_jsonl) -> "Dataset":
         """Load Dataset from disk given a directory with files 
         named explicitly train.jsonl, dev.jsonl, and test.jsonl
         
         ### Parameters
         --------------
-        **path**: (Path), required.
+        **data_dir**: (Path), required.
             directory to load from
+        **train_file**: (str, optional), Defaults to train.jsonl.
+            Filename of train data under path
+        **dev_file**: (str, optional), Defaults to dev.jsonl.
+            Filename of dev data under path
+        **test_file**: (str, optional), Defaults to test.jsonl.
+            Filename of test data under path
         **loader_func**: (Callable, optional), Defaults to read_jsonl.
             Loader function (TODO: Make this a bit more generic)
         """
 
-        path = ensure_path(path)
-        return Dataset(
-            loader_func(path / "train.jsonl"),
-            loader_func(path / "dev.jsonl"),
-            test=loader_func(path / "test.jsonl"),
-        )
+        data_dir = ensure_path(data_dir)
+        
+        train_data = loader_func(data_dir / train_file)
+        dev_data = loader_func(data_dir / dev_file)
+
+        try:
+            test_data = loader_func(data_dir / test_file)
+            ds = Dataset(
+                train_data,
+                dev_data,
+                test=test_data
+            )
+        except ValueError as e:
+            ds = Dataset(
+                train_data,
+                dev_data
+            )
+        return ds
+        
 
     @property
     def train(self) -> List[Example]:

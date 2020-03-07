@@ -7,10 +7,11 @@ import srsly
 from spacy.language import Language
 from spacy.scorer import Scorer
 from tqdm import tqdm, tqdm_notebook
+from wasabi import Printer
 
 from .constants import NONE
 from .recognizer import EntityRecognizer
-from .types import Example, PredictionError
+from .types import EntityCoverage, Example, LabelDisparity, PredictionError
 
 
 def ents_by_label(
@@ -72,7 +73,7 @@ def get_label_disparities(
 
 def top_label_disparities(
     data: List[Example], use_lower: bool = True
-) -> List[Dict[str, object]]:
+) -> List[LabelDisparity]:
     """Identify annotated spans that have different labels
     in different examples for all label pairs in data.
     
@@ -82,12 +83,12 @@ def top_label_disparities(
         Input List of Examples
     **use_lower**: (bool, optional), Defaults to True.
         Use the lowercase form of the span text in ents_to_label
-        
     
     ### Returns
     -----------
-    (): 
-        [description]
+    (List[LabelDisparity]): 
+        List of LabelDisparity objects for each label pair combination
+        sorted by the number of disparities between them.
     """
     annotations = ents_by_label(data, use_lower=use_lower)
     label_disparities = {}
@@ -144,7 +145,8 @@ def top_prediction_errors(
     ### Returns
     -----------
     (List[PredictionError]): 
-        [description]
+        List of Prediction Errors your model is making sorted by the
+        spans your model has the most trouble with.
     """
 
     labels_ = labels or ner.labels
@@ -168,26 +170,28 @@ def top_prediction_errors(
 
         if fp_diff and not exclude_fp:
             for fp in fp_diff:
-                for gold_ent in gold:
-                    if fp[0] == gold_ent[0] and fp[1] == gold_ent[1]:
-                        start, end, label = gold_ent
-                        false_label = fp[2]
-                        text = pred.text[start:end]
-                        errors[label][text][false_label] += 1
-                        error_examples[text].append(orig_example)
+                gold_ent = None
+                for ge in gold:
+                    if fp[0] == ge[0] and fp[1] == ge[1]:
+                        gold_ent = ge
+                        break
+                if gold_ent:
+                    start, end, label = gold_ent
+                    text = pred.text[start:end]
+                    false_label = fp[2]
+                    errors[label][text][false_label] += 1
+                else:
+                    start, end, false_label = fp
+                    text = pred.text[start:end]
+                    errors[NONE][text][false_label] += 1
+                error_examples[text].append(orig_example)
 
         if fn_diff and not exclude_fn:
             for fn in fn_diff:
-                has_gold_ent = False
-                for gold_ent in gold:
-                    if fp[0] == gold_ent[0] and fp[1] == gold_ent[1]:
-                        has_gold_ent = True
-
-                if not has_gold_ent:
-                    start, end, label = fn
-                    text = pred.text[start:end]
-                    errors[label][text][NONE] += 1
-                    error_examples[text].append(orig_example)
+                start, end, label = fn
+                text = pred.text[start:end]
+                errors[label][text][NONE] += 1
+                error_examples[text].append(orig_example)
 
     ranked_errors: List[PredictionError] = []
 
@@ -207,4 +211,81 @@ def top_prediction_errors(
     ranked_errors = sorted(ranked_errors, key=lambda error: error.count, reverse=True)
     if k:
         ranked_errors = ranked_errors[:k]
+    error_texts = set()
+    for re in ranked_errors:
+        for e in re.examples:
+            error_texts.add(e.text)
+            
+    error_rate = round(len(error_texts) / len(data), 2)
+    if verbose:
+        error_summary = {
+            "N Examples": len(data),
+            "N Errors": len(ranked_errors),
+            "N Error Examples": len(error_texts),
+            "Error Rate": error_rate
+        }
+        msg = Printer()
+        msg.divider("Error Analysis")
+        msg.table(error_summary)
+    
     return ranked_errors
+
+
+def entity_coverage(data: List[Example],
+                    sep: str = "||",
+                    use_lower: bool = True,
+                    return_examples: bool = False) -> List[EntityCoverage]:
+    """Identify how well you dataset covers an entity type. Get insights
+    on the how many times certain text/label span combinations exist across your
+    data so that you can focus your annotation efforts better rather than
+    annotating examples your Model already understands well.
+    
+    ### Parameters
+    --------------
+    **data**: (List[Example]), required.
+        List of Examples
+    **sep**: (str, optional), Defaults to "||".
+        Separator used in coverage map, only change if || exists in your text
+        or label
+    **use_lower**: (bool, optional), Defaults to True.
+        Use the lowercase form of the span text in ents_to_label
+    **return_examples**: (bool, optional), Defaults to False.
+        If True, return Examples that contain the entity label annotation.
+    
+    ### Returns
+    -----------
+    (List[EntityCoverage]): 
+        Sorted List of EntityCoverage objects containing the text, label, count, and
+        an optional list of examples where that text/label annotation exists.
+        
+        e.g.
+        [
+            {
+                "text": "design",
+                "label": "SKILL",
+                "count": 243
+            }
+        ]
+    """    
+    coverage_map = defaultdict(int)
+    examples_map = defaultdict(list)
+
+    for example in data:
+        for span in example.spans:
+            text = span.text
+            if use_lower:
+                text = text.lower()
+            key = f"{text}{sep}{span.label}"
+            coverage_map[key] += 1
+            examples_map[key].append(example)
+
+    coverage = []
+    for key, count in coverage_map.items():
+        text, label = key.split(sep)
+        record = EntityCoverage(text=text, label=label, count=count)
+        if return_examples:
+            record['examples'] = examples_map[key]
+        coverage.append(record)
+
+    sorted_coverage = sorted(coverage, key=lambda x: x['count'], reverse=True)
+    return sorted_coverage
