@@ -50,6 +50,7 @@ class EntityRecognizer:
 
 class SpacyEntityRecognizer(EntityRecognizer):
     """Create an EntityRecognizer from a spaCy Langauge instance"""
+
     def __init__(self, nlp: Language):
         """Initialize a SpacyEntityRecognizer
         
@@ -57,7 +58,7 @@ class SpacyEntityRecognizer(EntityRecognizer):
         --------------
         **nlp**: (Language), required.
             spaCy Language instance that can sets doc.ents
-        """        
+        """
         super().__init__()
         self.nlp = nlp
 

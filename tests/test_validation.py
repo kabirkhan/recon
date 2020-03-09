@@ -1,5 +1,5 @@
 import pytest
-from recon.types import Example, TextSpanLabel
+from recon.types import Example, Span
 from recon.validation import *
 
 
@@ -20,7 +20,7 @@ def messy_data():
 def test_json_to_examples(messy_data):
     fixed_examples = json_to_examples(messy_data)
     assert isinstance(fixed_examples[0], Example)
-    assert isinstance(fixed_examples[0].spans[0], TextSpanLabel)
+    assert isinstance(fixed_examples[0].spans[0], Span)
 
     assert fixed_examples[0].spans[0].text == "Denver, Colorado"
     assert fixed_examples[0].spans[0].label == "LOC"

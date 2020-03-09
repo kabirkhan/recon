@@ -29,12 +29,14 @@ class Dataset:
         self._test = test
 
     @classmethod
-    def from_disk(cls,
-                  data_dir: Path,
-                  train_file: str = "train.jsonl",
-                  dev_file: str = "dev.jsonl",
-                  test_file: str = "test.jsonl",
-                  loader_func: Callable = read_jsonl) -> "Dataset":
+    def from_disk(
+        cls,
+        data_dir: Path,
+        train_file: str = "train.jsonl",
+        dev_file: str = "dev.jsonl",
+        test_file: str = "test.jsonl",
+        loader_func: Callable = read_jsonl,
+    ) -> "Dataset":
         """Load Dataset from disk given a directory with files 
         named explicitly train.jsonl, dev.jsonl, and test.jsonl
         
@@ -53,24 +55,16 @@ class Dataset:
         """
 
         data_dir = ensure_path(data_dir)
-        
+
         train_data = loader_func(data_dir / train_file)
         dev_data = loader_func(data_dir / dev_file)
 
         try:
             test_data = loader_func(data_dir / test_file)
-            ds = Dataset(
-                train_data,
-                dev_data,
-                test=test_data
-            )
+            ds = Dataset(train_data, dev_data, test=test_data)
         except ValueError as e:
-            ds = Dataset(
-                train_data,
-                dev_data
-            )
+            ds = Dataset(train_data, dev_data)
         return ds
-        
 
     @property
     def train(self) -> List[Example]:
