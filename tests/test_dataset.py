@@ -18,7 +18,7 @@ def test_dataset_initialize(example_data):
 
 
 def test_dataset_from_disk(example_data):
-    ds = Dataset.from_disk(Path(__file__).parent.parent / "examples/data")
+    ds = Dataset.from_disk(Path(__file__).parent.parent / "examples/data/skills")
     assert ds.train == example_data["train"]
     assert ds.dev == example_data["dev"]
     assert ds.test == example_data["test"]

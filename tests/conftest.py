@@ -30,7 +30,7 @@ def example_data() -> Dict[str, List[Example]]:
     (Dict[str, List[Example]]):
         Dataset containing the train/dev/test split
     """
-    base_path = Path(__file__).parent.parent / "examples/data"
+    base_path = Path(__file__).parent.parent / "examples/data/skills"
     return {
         "train": read_jsonl(base_path / "train.jsonl"),
         "dev": read_jsonl(base_path / "dev.jsonl"),

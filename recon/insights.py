@@ -12,7 +12,13 @@ from wasabi import Printer
 
 from .constants import NONE
 from .recognizer import EntityRecognizer
-from .types import EntityCoverage, Example, HardestExample, LabelDisparity, PredictionError
+from .types import (
+    EntityCoverage,
+    Example,
+    HardestExample,
+    LabelDisparity,
+    PredictionError,
+)
 
 
 def ents_by_label(
@@ -109,14 +115,10 @@ def top_label_disparities(
                         input_hash = "||".join([label1, label2])
 
                     label_disparities[input_hash] = LabelDisparity(
-                        label1=label1,
-                        label2=label2,
-                        count=n_disparities
+                        label1=label1, label2=label2, count=n_disparities
                     )
 
-    return sorted(
-        label_disparities.values(), key=lambda ld: ld.count, reverse=True
-    )
+    return sorted(label_disparities.values(), key=lambda ld: ld.count, reverse=True)
 
 
 def top_prediction_errors(
@@ -170,7 +172,7 @@ def top_prediction_errors(
     n_errors = 0
 
     for orig_example, pred, ann in zip(data, ner.predict(texts), anns):
-        if n_errors > k:
+        if k is not None and n_errors > k:
             break
 
         cand = set([(s.start, s.end, s.label) for s in pred.spans])
@@ -224,28 +226,31 @@ def top_prediction_errors(
     ranked_errors = sorted(ranked_errors, key=lambda error: error.count, reverse=True)
     error_texts = set()
     for re in ranked_errors:
-        for e in re.examples:
-            error_texts.add(e.text)
-            
+        if re.examples:
+            for e in re.examples:
+                error_texts.add(e.text)
+
     error_rate = round(len(error_texts) / len(data), 2)
     if verbose:
         error_summary = {
             "N Examples": len(data),
             "N Errors": len(ranked_errors),
             "N Error Examples": len(error_texts),
-            "Error Rate": error_rate
+            "Error Rate": error_rate,
         }
         msg = Printer()
         msg.divider("Error Analysis")
         msg.table(error_summary)
-    
+
     return ranked_errors
 
 
-def entity_coverage(data: List[Example],
-                    sep: str = "||",
-                    use_lower: bool = True,
-                    return_examples: bool = False) -> List[EntityCoverage]:
+def entity_coverage(
+    data: List[Example],
+    sep: str = "||",
+    use_lower: bool = True,
+    return_examples: bool = False,
+) -> List[EntityCoverage]:
     """Identify how well you dataset covers an entity type. Get insights
     on the how many times certain text/label span combinations exist across your
     data so that you can focus your annotation efforts better rather than
@@ -277,9 +282,9 @@ def entity_coverage(data: List[Example],
                 "count": 243
             }
         ]
-    """    
-    coverage_map = defaultdict(int)
-    examples_map = defaultdict(list)
+    """
+    coverage_map: DefaultDict[str, int] = defaultdict(int)
+    examples_map: DefaultDict[str, List[Example]] = defaultdict(list)
 
     for example in data:
         for span in example.spans:
@@ -295,16 +300,18 @@ def entity_coverage(data: List[Example],
         text, label = key.split(sep)
         record = EntityCoverage(text=text, label=label, count=count)
         if return_examples:
-            record['examples'] = examples_map[key]
+            record.examples = examples_map[key]
         coverage.append(record)
 
-    sorted_coverage = sorted(coverage, key=lambda x: x['count'], reverse=True)
+    sorted_coverage = sorted(coverage, key=lambda x: x.count, reverse=True)
     return sorted_coverage
 
 
-def get_hardest_examples(pred_errors: List[PredictionError],
-                         return_pred_errors: bool = True,
-                         remove_pred_error_examples: bool = True) -> List[HardestExample]:
+def get_hardest_examples(
+    pred_errors: List[PredictionError],
+    return_pred_errors: bool = True,
+    remove_pred_error_examples: bool = True,
+) -> List[HardestExample]:
     """Get the hardest Examples given a list of PredictionErrors.
     Useful to run before streaming Examples back through Prodigy
     to prioritize these examples and ensure they're annotated correctly.
@@ -330,34 +337,39 @@ def get_hardest_examples(pred_errors: List[PredictionError],
     (List[HardestExample]): 
         List of the HardestExample type that maps the Example to the number of 
         PredcitionErrors it contains as well as the optional list of PredcitionErrors
-    """    
-    
+    """
+
     has_examples = any([pe.examples for pe in pred_errors])
     if not has_examples:
-        raise ValueError("Each PredictionError in Parameter pred_errors must have examples attached.")
-    
-    examples_text_map = {}
-    example_pred_errors_map = defaultdict(list)
+        raise ValueError(
+            "Each PredictionError in Parameter pred_errors must have examples attached."
+        )
+
+    examples_text_map: Dict[str, Example] = {}
+    example_pred_errors_map: DefaultDict[str, List[PredictionError]] = defaultdict(list)
     for pe in pred_errors:
-        for example in pe.examples:
-            examples_text_map[example.text] = example
-            example_pred_errors_map[example.text].append(pe)
+        if pe.examples:
+            for example in pe.examples:
+                examples_text_map[example.text] = example
+                example_pred_errors_map[example.text].append(pe)
 
     hardest_examples = []
     for example_text, example_pred_errors in example_pred_errors_map.items():
         example = examples_text_map[example_text]
-        
+
         record = HardestExample(example=example, count=len(example_pred_errors))
         if return_pred_errors:
             if remove_pred_error_examples:
                 _example_pred_errors = copy.deepcopy(example_pred_errors)
                 for _pe in _example_pred_errors:
                     _pe.examples = []
-                
+
                 record.prediction_errors = _example_pred_errors
             else:
                 record.prediction_errors = example_pred_errors
         hardest_examples.append(record)
-        
-    sorted_hardest_examples = sorted(hardest_examples, key=lambda he: he.count, reverse=True)
+
+    sorted_hardest_examples = sorted(
+        hardest_examples, key=lambda he: he.count, reverse=True
+    )
     return sorted_hardest_examples

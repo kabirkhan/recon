@@ -41,4 +41,4 @@ class EntityCoverage(BaseModel):
 class HardestExample(BaseModel):
     example: Example
     count: int
-    prediction_errors: Optional[List[PredictionError]] 
+    prediction_errors: Optional[List[PredictionError]]
