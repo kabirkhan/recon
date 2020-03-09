@@ -1,5 +1,5 @@
-from collections import defaultdict
 import copy
+from collections import defaultdict
 from pathlib import Path
 from typing import DefaultDict, Dict, Generator, List, Set, Union
 
