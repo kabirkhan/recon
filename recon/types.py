@@ -36,3 +36,9 @@ class EntityCoverage(BaseModel):
     label: str
     count: int
     examples: Optional[List[Example]] = []
+
+
+class HardestExample(BaseModel):
+    example: Example
+    count: int
+    prediction_errors: Optional[List[PredictionError]] 
