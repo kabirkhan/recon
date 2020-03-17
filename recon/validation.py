@@ -6,15 +6,11 @@ from .types import Example
 def json_to_examples(data: List[Dict[str, Any]]) -> List[Example]:
     """Convert List of Dicts to List of typed Examples
     
-    ### Parameters
-    --------------
-    **data**: (List[Dict[str, Any]]), required.
-        Input List of Dicts to convert
+    Args:
+        data (List[Dict[str, Any]]): Input List of Dicts to convert
     
-    ### Returns
-    -----------
-    (List[Example]): 
-        List of typed Examples
+    Returns:
+        List[Example]: List of typed Examples
     """
     data = fix_annotations_format(data)
     data = filter_overlaps(data)
@@ -24,15 +20,11 @@ def json_to_examples(data: List[Dict[str, Any]]) -> List[Example]:
 def fix_annotations_format(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Fix annotations format for a consistent dataset
     
-    ### Parameters
-    --------------
-    **data**: (List[Dict[str, Any]]), required.
-        List of Examples
+    Args:
+        data (List[Dict[str, Any]]): List of Examples
     
-    ### Returns
-    -----------
-    (List[Dict[str, Any]]): 
-        List of Examples with corrected formatting
+    Returns:
+        List[Dict[str, Any]]: List of Examples with corrected formatting
     """
     for e in data:
         if "meta" not in e:
@@ -50,15 +42,11 @@ def fix_annotations_format(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 def filter_overlaps(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Filter overlapping entity spans by picking the longest one.
     
-    ### Parameters
-    --------------
-    **data**: (List[Dict[str, Any]]), required.
-        List of Examples
+    Args:
+        data (List[Dict[str, Any]]): List of Examples
     
-    ### Returns
-    -----------
-    (List[Dict[str, Any]]): 
-        List of Examples with fixed overlaps
+    Returns:
+        List[Dict[str, Any]]: List of Examples with fixed overlaps
     """
     out_data = []
     for e in data:

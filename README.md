@@ -45,13 +45,6 @@ Python 3.6+
 
 ## Installation
 
-freqs = Counter()
-for words, tags in train_sents:
-    for tag in tags:
-        tagmap.setdefault(tag, len(tagmap))
-    for word in words:
-        freqs[word] += 1
-vocab = {w: i for i, (w, freq) in enumerate(freqs.most_common()) if (freq >= 5)}
 <div class="termy">
 
 ```console

@@ -1,3 +1,5 @@
+"""Make corrections to your data."""
+
 import copy
 from collections import defaultdict
 from typing import DefaultDict, Dict, List
@@ -8,17 +10,12 @@ from .types import Example
 def rename_labels(data: List[Example], label_map: Dict[str, str]) -> List[Example]:
     """Rename labels in a copy of List[Example] data
     
-    ### Parameters
-    --------------
-    **data**: (List[Example]), required.
-        List of Examples
-    **label_map**: (Dict[str, str]), required.
-        One-to-one mapping of label names
+    Args:
+        data (List[Example]): List of Examples
+        label_map (Dict[str, str]): One-to-one mapping of label names
     
-    ### Returns
-    -----------
-    (List[Example]): 
-        Copy List of Examples with renamed labels
+    Returns:
+        List[Example]: Copy List of Examples with renamed labels
     """
     data_copy = copy.deepcopy(data)
     for example in data_copy:
@@ -31,24 +28,20 @@ def fix_annotations(
     data: List[Example], corrections: Dict[str, str], use_lower: bool = True
 ) -> List[Example]:
     """Fix annotations in a copy of List[Example] data.
+    
     This function will NOT add annotations to your data.
     It will only remove erroneous annotations and fix the
     labels for specific spans.
     
-    ### Parameters
-    --------------
-    **data**: (List[Example]), required.
-        List of Examples
-    **corrections**: (Dict[str, str]), required.
-        Dictionary of corrections mapping entity text to a new label.
+    Args:
+        data (List[Example]): List of Examples
+        corrections (Dict[str, str]): Dictionary of corrections mapping entity text to a new label.
         If the value is set to None, the annotation will be removed
-    **use_lower**: (bool, optional), Defaults to True.
-        Use the lowercase form of the span text for matching corrections
+        use_lower (bool, optional): Use the lowercase form of the span text 
+            for matching corrections. Defaults to True.
     
-    ### Returns
-    -----------
-    (List[Example]): 
-        Copy of list of Examples with corrections applied
+    Returns:
+        List[Example]: [description]
     """
     data_copy: List[Example] = copy.deepcopy(data)
     if use_lower:

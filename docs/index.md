@@ -1,5 +1,8 @@
 <p align="center">
-    <em>ReconNER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>
+  <a href="https://microsoft.github.io/reconner"><img src="/img/recon.svg" alt="Recon"></a>
+</p>
+<p align="center">
+    <em>Recon NER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>
 </p>
 <p align="center">
 <a href="https://dev.azure.com/kabirkhan1137/ReconNER/_build" target="_blank">
@@ -45,13 +48,6 @@ Python 3.6+
 
 ## Installation
 
-freqs = Counter()
-for words, tags in train_sents:
-    for tag in tags:
-        tagmap.setdefault(tag, len(tagmap))
-    for word in words:
-        freqs[word] += 1
-vocab = {w: i for i, (w, freq) in enumerate(freqs.most_common()) if (freq >= 5)}
 <div class="termy">
 
 ```console

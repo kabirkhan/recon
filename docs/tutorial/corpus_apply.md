@@ -1,13 +1,13 @@
-# Tutorial - Using `Dataset.apply`
+# Tutorial - Using `Corpus.apply`
 
-In the previous step, we used the `stats.ner_stats` function to some stats on our train_data. Now, we want to be able to get these same stats across our train/dev/test split. 
+In the previous step, we used the `stats.get_ner_stats` function to some stats on our train_data. Now, we want to be able to get these same stats across our train/dev/test split. 
 
-SO, ReconNER's `Dataset` class provides a useful method called [`apply`](../../api/dataset)
-that takes a `Callable` as a parameter that can run on a list of `Example`s (e.g. `stats.ner_stats`)
+SO, ReconNER's `Corpus` class provides a useful method called [`apply`](../../api/corpus)
+that takes a `Callable` as a parameter that can run on a list of `Example`s (e.g. `stats.get_ner_stats`)
 and run that `Callable` over all the datasets as well as a concatenation of all the datasets so you get the full picture. 
 
 !!! tip
-    You can pass arbitary `*args` and `**kwargs` to `Dataset.apply` and they will be passed along to the callable you provide as the required argument.
+    You can pass arbitary `*args` and `**kwargs` to `Corpus.apply` and they will be passed along to the callable you provide as the required argument.
 
 ## Update script to use `Dataset.apply`
 
