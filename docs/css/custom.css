@@ -22,14 +22,16 @@ a.internal-link::after {
     content: "\00A0↪";
 }
 
-/* Autodoc Extension */
-div.autodoc-docstring {
-    padding-left: 20px;
-    margin-bottom: 30px;
-    border-left: 5px solid rgba(230, 230, 230);
+/* mkdocstring plugin */
+.md-typeset__table {
+    width: 100%
 }
-  
-div.autodoc-members {
-    padding-left: 20px;
-    margin-bottom: 15px;
+
+.md-typeset__table > table > thead {
+    background-color: #546e7a
+}
+
+div.autodoc {
+    padding-left: 25px;
+    border-left: 4px solid rgba(230, 230, 230);
 }

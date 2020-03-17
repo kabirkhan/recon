@@ -57,9 +57,12 @@ doc = [
     "mkdocs",
     "mkdocs-material",
     "markdown-include",
-    "mkautodoc"
+    "mkdocstrings"
 ]
 all = [
     "colorama",
     "click-completion"
 ]
+
+[tool.flit.scripts]
+recon = "recon.cli:app"

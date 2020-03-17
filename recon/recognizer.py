@@ -15,36 +15,26 @@ class EntityRecognizer:
     def labels(self) -> List[str]:
         """Return List of String Labels
         
-        ### Raises
-        -----------
-        NotImplementedError: 
-            Not Implemented, override
+        Raises:
+            NotImplementedError: Not Implemented, override
         
-        ### Returns
-        -----------
-        (List[str]): 
-            List of labels the model can predict
+        Returns:
+            List[str]: List of labels the model can predict
         """
         raise NotImplementedError
 
     def predict(self, texts: Iterable[str]) -> Iterator[Example]:
         """Run model inference on a batch of raw texts.
         
-        ### Parameters
-        --------------
-        **texts**: (List[str]), required.
-            Raw text examples
+        Args:
+            texts (Iterable[str]): Raw text examples
         
-        ### Raises
-        -----------
-        NotImplementedError: 
-            Not implemented, override
+        Raises:
+            NotImplementedError: Not implemented, override
         
-        ### Returns
-        -----------
-        (Iterator[Example]): 
-            Examples constructed from Model predictions
-        """
+        Returns:
+            Iterator[Example]: Iterator of Examples
+        """        
         raise NotImplementedError
 
 
@@ -54,10 +44,8 @@ class SpacyEntityRecognizer(EntityRecognizer):
     def __init__(self, nlp: Language):
         """Initialize a SpacyEntityRecognizer
         
-        ### Parameters
-        --------------
-        **nlp**: (Language), required.
-            spaCy Language instance that can sets doc.ents
+        Args:
+            nlp (Language): spaCy Language instance that can sets doc.ents
         """
         super().__init__()
         self.nlp = nlp
@@ -66,10 +54,8 @@ class SpacyEntityRecognizer(EntityRecognizer):
     def labels(self) -> List[str]:
         """Return List of spaCy ner labels
         
-        ### Returns
-        -----------
-        (List[str]): 
-            List of labels from spaCy ner pipe
+        Returns:
+            List[str]: List of labels from spaCy ner pipe
         """
         all_labels: Set[str] = set()
 
@@ -82,17 +68,12 @@ class SpacyEntityRecognizer(EntityRecognizer):
     def predict(self, texts: Iterable[str]) -> Iterator[Example]:
         """Run spaCy nlp.pipe on a batch of raw texts.
         
-        ### Parameters
-        --------------
-        **texts**: (List[str]), required.
-            Raw text examples
+        Args:
+            texts (Iterable[str]): Raw text examples
         
-        ### yields
-        ----------
-        (Iterator[Example]): 
-            Examples constructed from spaCy Model predictions
+        Yields:
+            Iterator[Example]: Examples constructed from spaCy Model predictions
         """
-
         examples: List[Example] = []
 
         for doc in self.nlp.pipe(texts):

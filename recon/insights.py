@@ -13,11 +13,12 @@ from wasabi import Printer
 from .constants import NONE
 from .recognizer import EntityRecognizer
 from .types import (
-    EntityCoverage,
     Example,
     HardestExample,
     LabelDisparity,
     PredictionError,
+    PredictionErrorExamplePair,
+    Span,
 )
 
 
@@ -26,18 +27,13 @@ def ents_by_label(
 ) -> DefaultDict[str, List[str]]:
     """Get a dictionary of unique text spans by label for your data
     
-    ### Parameters
-    --------------
-    **data**: (List[Example]), required.
-        List of Examples
-    **use_lower**: (bool, optional), Defaults to True.
-        Use the lowercase form of the span text
+    Args:
+        data (List[Example]): List of Examples
+        use_lower (bool, optional): Use the lowercase form of the span text.
     
-    ### Returns
-    -----------
-    (DefaultDict[str, List[str]]):
-        DefaultDict mapping label to sorted list of the unique
-        spans annotated for that label.
+    Returns:
+        DefaultDict[str, List[str]]: DefaultDict mapping label to sorted list of the unique
+            spans annotated for that label.
     """
     annotations: DefaultDict[str, Set[str]] = defaultdict(set)
     sorted_annotations: DefaultDict[str, List[str]] = defaultdict(list)
@@ -58,21 +54,14 @@ def get_label_disparities(
 ) -> Set[str]:
     """Identify annotated spans that have different labels in different examples
     
-    ### Parameters
-    --------------
-    **data**: (List[Example]), required.
-        Input List of Examples
-    **label1**: (str), required.
-        First label to compare
-    **label2**: (str), required.
-        Second label to compare
-    **use_lower**: (bool, optional), Defaults to True.
-        Use the lowercase form of the span text in ents_to_label
+    Args:
+        data (List[Example]): Input List of Examples
+        label1 (str): First label to compare
+        label2 (str): Second label to compare
+        use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.
     
-    ### Returns
-    -----------
-    (Set[str]): 
-        Set of all unique text spans that overlap between label1 and label2
+    Returns:
+        Set[str]: Set of all unique text spans that overlap between label1 and label2
     """
     annotations = ents_by_label(data, use_lower=use_lower)
     return set(annotations[label1]).intersection(set(annotations[label2]))
@@ -84,21 +73,15 @@ def top_label_disparities(
     """Identify annotated spans that have different labels
     in different examples for all label pairs in data.
     
-    ### Parameters
-    --------------
-    **data**: (List[Example]), required.
-        Input List of Examples
-    **use_lower**: (bool, optional), Defaults to True.
-        Use the lowercase form of the span text in ents_to_label
-    **dedupe**: (bool, optional), Defaults to False.
-        Whether to deduplicate for table view vs confusion matrix.
-        False by default for easy confusion matrix display
+    Args:
+        data (List[Example]): Input List of Examples
+        use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.
+        dedupe (bool, optional): Whether to deduplicate for table view vs confusion matrix.
+            False by default for easy confusion matrix display.
     
-    ### Returns
-    -----------
-    (List[LabelDisparity]): 
-        List of LabelDisparity objects for each label pair combination
-        sorted by the number of disparities between them.
+    Returns:
+        List[LabelDisparity]: List of LabelDisparity objects for each label pair combination
+            sorted by the number of disparities between them.
     """
     annotations = ents_by_label(data, use_lower=use_lower)
     label_disparities = {}
@@ -122,7 +105,7 @@ def top_label_disparities(
 
 
 def top_prediction_errors(
-    ner: EntityRecognizer,
+    recognizer: EntityRecognizer,
     data: List[Example],
     labels: List[str] = None,
     n: int = None,
@@ -133,33 +116,22 @@ def top_prediction_errors(
 ) -> List[PredictionError]:
     """Get a sorted list of examples your model is worst at predicting.
     
-    ### Parameters
-    --------------
-    **ner**: (EntityRecognizer), required.
-        An instance of EntityRecognizer
-    **data**: (List[Example]), required.
-        List of annotated Examples
-    **labels**: (List[str], optional), Defaults to None.
-        List of labels to get errors for. Defaults to the labels property of `ner`.
-    **n**: (int, optional), Defaults to None.
-        If set, only use the top n examples from data
-    **k**: (int, optional), Defaults to None.
-        If set, return the top k prediction errors, otherwise the whole list.
-    **exclude_fp**: (bool, optional), Defaults to False.
-        Flag to exclude False Positive errors.
-    **exclude_fn**: (bool, optional), Defaults to False.
-        Flag to exclude False Negative errors.
-    **verbose**: (bool, optional), Defaults to False.
-        Show progress_bar or not
+    Args:
+        recognizer (EntityRecognizer): An instance of EntityRecognizer
+        data (List[Example]): List of annotated Examples
+        labels (List[str], optional): List of labels to get errors for. 
+            Defaults to the labels property of `recognizer`.
+        n (int, optional): If set, only use the top n examples from data.
+        k (int, optional): If set, return the top k prediction errors, otherwise the whole list.
+        exclude_fp (bool, optional): Flag to exclude False Positive errors.
+        exclude_fn (bool, optional): Flag to exclude False Negative errors.
+        verbose (bool, optional): Show verbose output.
     
-    ### Returns
-    -----------
-    (List[PredictionError]): 
-        List of Prediction Errors your model is making, sorted by the
-        spans your model has the most trouble with.
+    Returns:
+        List[PredictionError]: List of Prediction Errors your model is making, sorted by the
+            spans your model has the most trouble with.
     """
-
-    labels_ = labels or ner.labels
+    labels_ = labels or recognizer.labels
     if n is not None:
         data = data[:n]
 
@@ -171,11 +143,17 @@ def top_prediction_errors(
     error_examples: DefaultDict[str, List[Example]] = defaultdict(list)
     n_errors = 0
 
-    for orig_example, pred, ann in zip(data, ner.predict(texts), anns):
+    for orig_example, pred_example, ann in zip(data, recognizer.predict(texts), anns):
         if k is not None and n_errors > k:
             break
 
-        cand = set([(s.start, s.end, s.label) for s in pred.spans])
+
+        pred_error_example_pair = PredictionErrorExamplePair(
+            original=orig_example,
+            predicted=pred_example
+        )
+
+        cand = set([(s.start, s.end, s.label) for s in pred_example.spans])
         gold = set([(s.start, s.end, s.label) for s in ann])
 
         fp_diff = cand - gold
@@ -190,22 +168,22 @@ def top_prediction_errors(
                         break
                 if gold_ent:
                     start, end, label = gold_ent
-                    text = pred.text[start:end]
+                    text = pred_example.text[start:end]
                     false_label = fp[2]
                     errors[label][text][false_label] += 1
                 else:
                     start, end, false_label = fp
-                    text = pred.text[start:end]
+                    text = pred_example.text[start:end]
                     errors[NONE][text][false_label] += 1
-                error_examples[text].append(orig_example)
+                error_examples[text].append(pred_error_example_pair)
                 n_errors += 1
 
         if fn_diff and not exclude_fn:
             for fn in fn_diff:
                 start, end, label = fn
-                text = pred.text[start:end]
+                text = pred_example.text[start:end]
                 errors[label][text][NONE] += 1
-                error_examples[text].append(orig_example)
+                error_examples[text].append(pred_error_example_pair)
                 n_errors += 1
 
     ranked_errors: List[PredictionError] = []
@@ -245,99 +223,24 @@ def top_prediction_errors(
     return ranked_errors
 
 
-def entity_coverage(
-    data: List[Example],
-    sep: str = "||",
-    use_lower: bool = True,
-    return_examples: bool = False,
-) -> List[EntityCoverage]:
-    """Identify how well you dataset covers an entity type. Get insights
-    on the how many times certain text/label span combinations exist across your
-    data so that you can focus your annotation efforts better rather than
-    annotating examples your Model already understands well.
-    
-    ### Parameters
-    --------------
-    **data**: (List[Example]), required.
-        List of Examples
-    **sep**: (str, optional), Defaults to "||".
-        Separator used in coverage map, only change if || exists in your text
-        or label
-    **use_lower**: (bool, optional), Defaults to True.
-        Use the lowercase form of the span text in ents_to_label
-    **return_examples**: (bool, optional), Defaults to False.
-        If True, return Examples that contain the entity label annotation.
-    
-    ### Returns
-    -----------
-    (List[EntityCoverage]): 
-        Sorted List of EntityCoverage objects containing the text, label, count, and
-        an optional list of examples where that text/label annotation exists.
-        
-        e.g.
-        [
-            {
-                "text": "design",
-                "label": "SKILL",
-                "count": 243
-            }
-        ]
-    """
-    coverage_map: DefaultDict[str, int] = defaultdict(int)
-    examples_map: DefaultDict[str, List[Example]] = defaultdict(list)
-
-    for example in data:
-        for span in example.spans:
-            text = span.text
-            if use_lower:
-                text = text.lower()
-            key = f"{text}{sep}{span.label}"
-            coverage_map[key] += 1
-            examples_map[key].append(example)
-
-    coverage = []
-    for key, count in coverage_map.items():
-        text, label = key.split(sep)
-        record = EntityCoverage(text=text, label=label, count=count)
-        if return_examples:
-            record.examples = examples_map[key]
-        coverage.append(record)
-
-    sorted_coverage = sorted(coverage, key=lambda x: x.count, reverse=True)
-    return sorted_coverage
-
-
 def get_hardest_examples(
     pred_errors: List[PredictionError],
     return_pred_errors: bool = True,
     remove_pred_error_examples: bool = True,
 ) -> List[HardestExample]:
-    """Get the hardest Examples given a list of PredictionErrors.
-    Useful to run before streaming Examples back through Prodigy
-    to prioritize these examples and ensure they're annotated correctly.
+    """Get hardest examples from list of PredictionError types
     
-    ### Parameters
-    --------------
-    **pred_errors**: (List[PredictionError]), required.
-        List of PredictionErrors
-    **return_pred_errors**: (bool, optional), Defaults to True.
-        Whether to return the PredictionErrors associated with each Example
-    **remove_pred_error_examples**: (bool, optional), Defaults to True.
-        If return_pred_errors is True, whether to remove the List of Examples
-        for each PredictionError or not. Since you already have the Example
-        this essentially just cleans up the output.
+    Args:
+        pred_errors (List[PredictionError]): list of PredictionError
+        return_pred_errors (bool, optional): Whether to return prediction errors. Defaults to True.
+        remove_pred_error_examples (bool, optional): Whether to remove examples from returned PredictionError. Defaults to True.
     
-    ### Raises
-    -----------
-    ValueError: 
-        If there are no examples present in the pred_errors Parameter
+    Raises:
+        ValueError: Each PredictionError must have a List of Examples 
     
-    ### Returns
-    -----------
-    (List[HardestExample]): 
-        List of the HardestExample type that maps the Example to the number of 
-        PredcitionErrors it contains as well as the optional list of PredcitionErrors
-    """
+    Returns:
+        List[HardestExample]: Sorted list of the hardest examples for a model to work on.
+    """    
 
     has_examples = any([pe.examples for pe in pred_errors])
     if not has_examples:

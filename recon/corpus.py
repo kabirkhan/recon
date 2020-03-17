@@ -2,28 +2,27 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List
 
 from spacy.util import ensure_path
+import srsly
 
 from .loaders import read_json, read_jsonl
 from .types import Example
 
 
-class Dataset:
-    """Container for a full dataset with train/dev/test splits.
+class Corpus:    
+    """Container for a full Corpus with train/dev/test splits.
     Used to apply core functions to all datasets at once.
-
-    ### Parameters
-    --------------
-    **train**: (List[Example]), required.
-        List of Examples for **train** set
-    **dev**: (List[Example]), required.
-        List of Examples for **dev** set
-    **test**: (List[Example], optional), Defaults to None.
-        List of Examples for **test** set
     """
 
     def __init__(
         self, train: List[Example], dev: List[Example], test: List[Example] = None
     ):
+        """Initialize a Corpus.
+        
+        Args:
+            train (List[Example]): List of Examples for **train** set
+            dev (List[Example]): List of Examples for **dev** set
+            test (List[Example], optional): Defaults to None. List of Examples for **test** set
+        """
         self._train = train
         self._dev = dev
         self._test = test
@@ -37,23 +36,17 @@ class Dataset:
         test_file: str = "test.jsonl",
         loader_func: Callable = read_jsonl,
     ) -> "Dataset":
-        """Load Dataset from disk given a directory with files 
+        """Load Corpus from disk given a directory with files 
         named explicitly train.jsonl, dev.jsonl, and test.jsonl
         
-        ### Parameters
-        --------------
-        **data_dir**: (Path), required.
-            directory to load from
-        **train_file**: (str, optional), Defaults to train.jsonl.
-            Filename of train data under path
-        **dev_file**: (str, optional), Defaults to dev.jsonl.
-            Filename of dev data under path
-        **test_file**: (str, optional), Defaults to test.jsonl.
-            Filename of test data under path
-        **loader_func**: (Callable, optional), Defaults to read_jsonl.
-            Loader function (TODO: Make this a bit more generic)
+        Args:
+            data_dir (Path): directory to load from.
+            train_file (str, optional): Filename of train data under data_dir. Defaults to train.jsonl.
+            dev_file (str, optional): Filename of dev data under data_dir. Defaults to dev.jsonl.
+            test_file (str, optional): Filename of test data under data_dir. Defaults to test.jsonl.
+            loader_func (Callable, optional): Callable that reads a file and returns a List of Examples. 
+                Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
-
         data_dir = ensure_path(data_dir)
 
         train_data = loader_func(data_dir / train_file)
@@ -61,41 +54,72 @@ class Dataset:
 
         try:
             test_data = loader_func(data_dir / test_file)
-            ds = Dataset(train_data, dev_data, test=test_data)
+            ds = cls(train_data, dev_data, test=test_data)
         except ValueError as e:
-            ds = Dataset(train_data, dev_data)
+            ds = cls(train_data, dev_data)
         return ds
+    
+    def to_disk(self, data_dir: Path, force: bool = False):
+        """Save Corpus to Disk
+        
+        Args:
+            data_dir (Path): Directory to save data to
+            force (bool): Force save to directory. Create parent directories
+                or overwrite existing data.
+        """
+        data_dir = ensure_path(data_dir)
+
+        srsly.write_jsonl(data_dir / "train.jsonl", self.train.dict())
+        srsly.write_jsonl(data_dir / "dev.jsonl", self.dev.dict())
+        srsly.write_jsonl(data_dir / "test.jsonl", self.test.dict())
 
     @property
     def train(self) -> List[Example]:
+        """Return train dataset
+        
+        Returns:
+            List[Example]: Train Examples
+        """
         return self._train
 
     @property
     def dev(self) -> List[Example]:
+        """Return train dev
+        
+        Returns:
+            List[Example]: Train Examples
+        """
         return self._dev
 
     @property
     def test(self) -> List[Example]:
+        """Return test dataset
+        
+        Returns:
+            List[Example]: Test Examples
+        """
         return self._test or []
 
     @property
     def all(self) -> List[Example]:
+        """Return concatenation of train/dev/test datasets
+        
+        Returns:
+            List[Example]: All Examples in Corpus
+        """
         return self.train + self.dev + self.test
 
     def apply(
         self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
     ) -> Dict[str, Any]:
-        """Apply an existing function to all datasets
+        """Apply a function to all datasets
         
-        ### Parameters
-        --------------
-        **func**: (Callable[[List[Example]], Any]), required.
-            Function from an existing recon module that can operate on a List of Examples
+        Args:
+            func (Callable[[List[Example], Any, Any], Any]): 
+                Function from an existing recon module that can operate on a List of Examples
         
-        ### Returns
-        -----------
-        (Dict[str, Any): 
-            Dictionary mapping dataset names to return type of func Callable
+        Returns:
+            Dict[str, Any]: Dictionary mapping dataset names to return type of func Callable
         """
         res = {
             "train": func(self.train, *args, **kwargs),  # type: ignore
@@ -120,14 +144,12 @@ class Dataset:
         *args: Any,
         **kwargs: Any
     ) -> None:
-        """Apply an existing function to all data inplace
+        """Apply a function to all data inplace.
         
-        ### Parameters
-        --------------
-        **func**: (Callable[[List[Example]], List[Example]]), required.
-            Function from an existing recon module that can operate on a List of Examples
+        Args:
+            func (Callable[[List[Example], Any, Any], List[Example]]): Function from an existing recon module
+                that can operate on a List[Example] and return a List[Example]
         """
-
         new_train = self._validate_inplace_apply(self.train, func(self.train, *args, **kwargs))  # type: ignore
         new_dev = self._validate_inplace_apply(self.dev, func(self.dev, *args, **kwargs))  # type: ignore
         new_test = self._validate_inplace_apply(self.test, func(self.test, *args, **kwargs))  # type: ignore
