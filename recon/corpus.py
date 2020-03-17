@@ -1,14 +1,14 @@
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
-from spacy.util import ensure_path
 import srsly
+from spacy.util import ensure_path
 
 from .loaders import read_json, read_jsonl
 from .types import Example
 
 
-class Corpus:    
+class Corpus:
     """Container for a full Corpus with train/dev/test splits.
     Used to apply core functions to all datasets at once.
     """
@@ -58,7 +58,7 @@ class Corpus:
         except ValueError as e:
             ds = cls(train_data, dev_data)
         return ds
-    
+
     def to_disk(self, data_dir: Path, force: bool = False):
         """Save Corpus to Disk
         

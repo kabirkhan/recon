@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, Schema, validator
 
 class Span(BaseModel):
     """Entity Label in Example"""
+
     text: str
     """Span text"""
     start: int
@@ -23,6 +24,7 @@ class Example(BaseModel):
         spans (List[Span]): List of entity spans
         meta (Dict[str, Any], optional): Meta information about the example
     """
+
     text: str
     spans: List[Span]
     meta: Dict[str, Any] = {}
@@ -37,6 +39,7 @@ class PredictionErrorExamplePair(BaseModel):
         spans (List[Span]): List of entity spans
         meta (Dict[str, Any], optional): Meta information about the example
     """
+
     original: Example
     predicted: Example
 
@@ -52,6 +55,7 @@ class PredictionError(BaseModel):
         examples (List[PredictionErrorExamplePair], optional):
             List of PredictionErrorExamplePairs that have this PredictionError
     """
+
     text: str
     true_label: str
     pred_label: str
@@ -63,6 +67,7 @@ class HardestExample(BaseModel):
     """Container for how hard an Example is for an EntityRecognizer to predict
     all entities correctly for.
     """
+
     example: Example
     count: int
     prediction_errors: Optional[List[PredictionError]]
@@ -78,6 +83,7 @@ class LabelDisparity(BaseModel):
         count (int): Number of times this label disparity occurs
         examples (List[Example], optional): List of Examples where this disparity occurs
     """
+
     label1: str
     label2: str
     count: int
@@ -86,6 +92,7 @@ class LabelDisparity(BaseModel):
 
 class NERStats(BaseModel):
     """Container for tracking basic NER statistics"""
+
     n_examples: int
     n_examples_no_entities: int
     n_annotations: int
@@ -102,6 +109,7 @@ class EntityCoverage(BaseModel):
         count (int): Number of times this text/label combination occurs
         examples (List[Example], optional): List of Examples where this entity occurs
     """
+
     text: str
     label: str
     count: int
@@ -110,11 +118,13 @@ class EntityCoverage(BaseModel):
 
 class EntityCoverageStats(BaseModel):
     """Container for output of how similar the Entity Coverage of 2 datasets is"""
+
     entity: float
     count: float
 
 
 class Outliers(BaseModel):
     """Container for low and high indices of outlier detection"""
+
     low: List[int]
     high: List[int]

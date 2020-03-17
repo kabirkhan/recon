@@ -1,9 +1,14 @@
-from typing import Callable
 from pathlib import Path
-from wasabi import Printer
+from typing import Callable
+
 from recon.corpus import Corpus
-from recon.stats import get_ner_stats, calculate_label_balance_entropy, calculate_label_similarity
+from recon.stats import (
+    calculate_label_balance_entropy,
+    calculate_label_similarity,
+    get_ner_stats,
+)
 from recon.types import Example, NERStats
+from wasabi import Printer
 
 
 def stats(data_dir: Path):
@@ -21,11 +26,13 @@ def stats(data_dir: Path):
             sorted_labels = sorted(ner_stats.n_annotations_per_type.keys())
 
             msg.text(f"Stats for {ds.capitalize()} data")
-            msg.text('--------------------')
-            msg.table({
-                'N Examples': ner_stats.n_examples,
-                'N Annotations': ner_stats.n_annotations
-            })
+            msg.text("--------------------")
+            msg.table(
+                {
+                    "N Examples": ner_stats.n_examples,
+                    "N Annotations": ner_stats.n_annotations,
+                }
+            )
             msg.info(f"Labels in {ds}")
             msg.text(sorted_labels)
 
@@ -37,7 +44,7 @@ def stats(data_dir: Path):
         msg.good("Done")
 
     msg.divider("Calculating stats")
-    
+
     # print_stats(corpus)
     train_dev_sim = calculate_label_similarity(corpus.train, corpus.dev)
     train_test_sim = calculate_label_similarity(corpus.train, corpus.test)
@@ -45,11 +52,10 @@ def stats(data_dir: Path):
 
     msg.divider("Calculating Similarity between label distributions of Corpus")
 
-    msg.table({
-        "Train / Dev": round(train_dev_sim, 2),
-        "Train / Test": round(train_test_sim, 2),
-        "Dev / Test": round(dev_test_sim, 2)
-    })
-
-
-
+    msg.table(
+        {
+            "Train / Dev": round(train_dev_sim, 2),
+            "Train / Test": round(train_test_sim, 2),
+            "Dev / Test": round(dev_test_sim, 2),
+        }
+    )

@@ -2,8 +2,8 @@
 
 __version__ = "0.2.0"
 
-from .corrections import *
 from .corpus import Corpus
+from .corrections import *
 from .insights import *
 from .loaders import read_json, read_jsonl
 from .stats import get_ner_stats
