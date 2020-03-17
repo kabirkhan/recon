@@ -147,10 +147,8 @@ def top_prediction_errors(
         if k is not None and n_errors > k:
             break
 
-
         pred_error_example_pair = PredictionErrorExamplePair(
-            original=orig_example,
-            predicted=pred_example
+            original=orig_example, predicted=pred_example
         )
 
         cand = set([(s.start, s.end, s.label) for s in pred_example.spans])
@@ -240,7 +238,7 @@ def get_hardest_examples(
     
     Returns:
         List[HardestExample]: Sorted list of the hardest examples for a model to work on.
-    """    
+    """
 
     has_examples = any([pe.examples for pe in pred_errors])
     if not has_examples:

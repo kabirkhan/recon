@@ -34,7 +34,7 @@ class EntityRecognizer:
         
         Returns:
             Iterator[Example]: Iterator of Examples
-        """        
+        """
         raise NotImplementedError
 
 

@@ -1,20 +1,28 @@
 import copy
 from pathlib import Path
 from typing import Dict, List
-import pandas as pd
-import plotly.express as px
+
 import numpy as np
-import streamlit as st
+import pandas as pd
 import spacy
 import typer
-from wasabi import Printer
 from recon import Dataset
 from recon.constants import NONE
 from recon.corrections import rename_labels
-from recon.types import Example, PredictionError, HardestExample
-from recon.stats import get_ner_stats, get_entity_coverage
-from recon.insights import ents_by_label, get_label_disparities, top_prediction_errors, top_label_disparities, get_hardest_examples
+from recon.insights import (
+    ents_by_label,
+    get_hardest_examples,
+    get_label_disparities,
+    top_label_disparities,
+    top_prediction_errors,
+)
 from recon.recognizer import SpacyEntityRecognizer
+from recon.stats import get_entity_coverage, get_ner_stats
+from recon.types import Example, HardestExample, PredictionError
+from wasabi import Printer
+
+import plotly.express as px
+import streamlit as st
 
 
 @st.cache(allow_output_mutation=True)

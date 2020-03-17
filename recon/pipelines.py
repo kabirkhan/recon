@@ -8,5 +8,5 @@ def compose(*funcs) -> Any:
 
     Returns:
         Any: Output of final function in chain
-    """    
+    """
     return lambda x: reduce(lambda f, g: g(f), list(funcs), x)

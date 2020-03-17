@@ -3,7 +3,6 @@ from typing import Dict, List
 
 import pytest
 from recon.loaders import read_jsonl
-from recon.stats import ner_stats
 from recon.types import Example
 from spacy.lang.en import English
 

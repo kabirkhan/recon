@@ -1,15 +1,22 @@
-from collections import defaultdict
 import math
+from collections import defaultdict
 from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Union
+
 import numpy as np
+import srsly
 from scipy.spatial.distance import jaccard, jensenshannon
 from scipy.stats import entropy as scipy_entropy
 
-import srsly
-
 from .constants import NONE
 from .pipelines import compose
-from .types import EntityCoverage, EntityCoverageStats, Example, NERStats, Outliers, Span
+from .types import (
+    EntityCoverage,
+    EntityCoverageStats,
+    Example,
+    NERStats,
+    Outliers,
+    Span,
+)
 
 
 def get_ner_stats(
@@ -38,7 +45,10 @@ def get_ner_stats(
                 annotations_per_type[s.label] += 1
                 examples[s.label].append(e)
 
-    sorted_anns_by_count = {a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)}
+    sorted_anns_by_count = {
+        a[0]: a[1]
+        for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
+    }
 
     stats = NERStats(
         n_examples=len(data),
@@ -74,7 +84,7 @@ def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
 def calculate_label_similarity(x: List[Example], y: List[Example]) -> float:
     pipeline = compose(get_ner_stats, get_sorted_type_counts, counts_to_probs)
     distance = jensenshannon(pipeline(x), pipeline(y))
-    
+
     return (1 - distance) * 100
 
 
@@ -124,7 +134,9 @@ def get_entity_coverage(
     return sorted_coverage
 
 
-def calculate_entity_coverage_stats(x: List[Example], y: List[Example]) -> EntityCoverageStats:
+def calculate_entity_coverage_stats(
+    x: List[Example], y: List[Example]
+) -> EntityCoverageStats:
     """Calculate how well dataset x covers the entities in dataset y.
     This function should be used to calculate how similar your train set
     annotations cover the annotations in your dev/test set
@@ -139,12 +151,13 @@ def calculate_entity_coverage_stats(x: List[Example], y: List[Example]) -> Entit
             2. Count coverage (sum of the EntityCoverage.count property for 
             each EntityCoverage in y to get a more holisic coverage scaled by how 
             often entities occur in each dataset x and y)
-    """    
+    """
+
     def get_ec_map(ecs: List[EntityCoverage], sep: str = "|||") -> Set[str]:
         return {f"{ec.text}{sep}{ec.label}": ec.count for ec in ecs}
 
     pipeline = compose(get_entity_coverage, get_ec_map)
-    
+
     x_map = pipeline(x)
     y_map = pipeline(y)
 
@@ -152,7 +165,7 @@ def calculate_entity_coverage_stats(x: List[Example], y: List[Example]) -> Entit
     count_intersection = 0
     n_union = 0
     count_union = 0
-    
+
     for k, count in y_map.items():
         if k in x_map:
             n_intersection += 1
@@ -162,7 +175,7 @@ def calculate_entity_coverage_stats(x: List[Example], y: List[Example]) -> Entit
 
     return EntityCoverageStats(
         entity=(n_intersection / n_union) * 100,
-        count=(count_intersection / count_union) * 100
+        count=(count_intersection / count_union) * 100,
     )
 
 
@@ -175,7 +188,7 @@ def counts_to_probs(seq: Sequence[int]) -> Sequence[float]:
     
     Returns:
         Sequence[float]: Sequence of probabilities
-    """    
+    """
     return np.asarray(seq) / sum(seq)
 
 
@@ -196,13 +209,15 @@ def entropy(seq: Union[List[int], List[float]], total: int = None) -> float:
     """
     if not seq:
         raise ValueError("Pass a valid non-empty sequence")
-    
+
     if isinstance(seq[0], float):
         e = scipy_entropy(seq)
     elif isinstance(seq[0], int):
-        e = scipy_entropy(counts_to_probs(seq)) 
+        e = scipy_entropy(counts_to_probs(seq))
     else:
-        raise ValueError("Parameter seq must be a sequence of probabilites or integers.")
+        raise ValueError(
+            "Parameter seq must be a sequence of probabilites or integers."
+        )
     return e
 
 
@@ -214,7 +229,7 @@ def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
     
     Returns:
         float: Entropy for annotation counts of each label
-    """    
+    """
     total = ner_stats.n_annotations
     classes = [count for label, count in ner_stats.n_annotations_per_type.items()]
     return entropy(classes, total)
@@ -229,7 +244,7 @@ def calculate_entity_coverage_entropy(entity_coverage_stats: List[EntityCoverage
     
     Returns:
         float: Entropy for entity coverage counts
-    """    
+    """
     counts = [ecs.count for ecs in entity_coverage_stats]
     return entropy(counts, sum(counts))
 
@@ -249,8 +264,8 @@ def detect_outliers(seq: Sequence[Any], use_log: bool = False) -> Outliers:
     q1 = np.quantile(seq, 0.25)
     q3 = np.quantile(seq, 0.75)
     iqr = q3 - q1
-    fence_low  = math.floor(q1 - 1.5 * iqr)
-    fence_high  = math.floor(q3 + 1.5 * iqr)
+    fence_low = math.floor(q1 - 1.5 * iqr)
+    fence_high = math.floor(q3 + 1.5 * iqr)
     print(fence_low, q1, q3, fence_high)
     low_indices = [i for i, n in enumerate(seq) if n <= fence_low]
     high_indices = [i for i, n in enumerate(seq) if n > fence_high]
