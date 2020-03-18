@@ -1,6 +1,6 @@
 import math
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Union
+from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Set, Union
 
 import numpy as np
 import srsly
@@ -81,7 +81,26 @@ def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
     return [t[1] for t in sorted(annotations_per_type.items(), key=lambda p: p[0])]
 
 
-def calculate_label_similarity(x: List[Example], y: List[Example]) -> float:
+def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) -> float:
+    """Calculate the similarity of the label distribution for 2 datasets.
+    
+    e.g. This can help you understand how well your train set models your dev and test sets.
+    Empircally you want a similarity over **0.8** when comparing your train set to each of your
+    dev and test sets.
+
+        calculate_label_distribution_similarity(corpus.train, corpus.dev)
+        # 98.57
+
+        calculate_label_distribution_similarity(corpus.train, corpus.test)
+        # 73.29 - This is bad, let's investigate our test set more
+    
+    Args:
+        x (List[Example]): Dataset
+        y (List[Example]): Dataset to compare x to
+    
+    Returns:
+        float: Similarity of label distributions
+    """    
     pipeline = compose(get_ner_stats, get_sorted_type_counts, counts_to_probs)
     distance = jensenshannon(pipeline(x), pipeline(y))
 
@@ -235,7 +254,7 @@ def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
     return entropy(classes, total)
 
 
-def calculate_entity_coverage_entropy(entity_coverage_stats: List[EntityCoverageStats]):
+def calculate_entity_coverage_entropy(entity_coverage_stats: List[EntityCoverageStats]) -> float:
     """Use Entropy to calculate a metric for entity coverage.
     
     Args:
@@ -246,7 +265,7 @@ def calculate_entity_coverage_entropy(entity_coverage_stats: List[EntityCoverage
         float: Entropy for entity coverage counts
     """
     counts = [ecs.count for ecs in entity_coverage_stats]
-    return entropy(counts, sum(counts))
+    return entropy(counts, sum(counts))  # type: ignore
 
 
 def detect_outliers(seq: Sequence[Any], use_log: bool = False) -> Outliers:

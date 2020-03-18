@@ -35,7 +35,7 @@ class Corpus:
         dev_file: str = "dev.jsonl",
         test_file: str = "test.jsonl",
         loader_func: Callable = read_jsonl,
-    ) -> "Dataset":
+    ) -> "Corpus":
         """Load Corpus from disk given a directory with files 
         named explicitly train.jsonl, dev.jsonl, and test.jsonl
         
@@ -54,10 +54,10 @@ class Corpus:
 
         try:
             test_data = loader_func(data_dir / test_file)
-            ds = cls(train_data, dev_data, test=test_data)
+            corpus = cls(train_data, dev_data, test=test_data)
         except ValueError as e:
-            ds = cls(train_data, dev_data)
-        return ds
+            corpus = cls(train_data, dev_data)
+        return corpus
 
     def to_disk(self, data_dir: Path, force: bool = False):
         """Save Corpus to Disk
@@ -68,10 +68,15 @@ class Corpus:
                 or overwrite existing data.
         """
         data_dir = ensure_path(data_dir)
+        if force:
+            data_dir.mkdir(parents=True, exist_ok=True)
 
-        srsly.write_jsonl(data_dir / "train.jsonl", self.train.dict())
-        srsly.write_jsonl(data_dir / "dev.jsonl", self.dev.dict())
-        srsly.write_jsonl(data_dir / "test.jsonl", self.test.dict())
+        def serialize(examples: List[Example]):
+            return [e.dict() for e in examples]
+
+        srsly.write_jsonl(data_dir / "train.jsonl", serialize(self.train))
+        srsly.write_jsonl(data_dir / "dev.jsonl", serialize(self.dev))
+        srsly.write_jsonl(data_dir / "test.jsonl", serialize(self.test))
 
     @property
     def train(self) -> List[Example]:
@@ -135,7 +140,7 @@ class Corpus:
     ) -> List[Example]:
         assert isinstance(new_data, list)
         assert len(new_data) == len(old_data)
-        assert isinstance(new_data[0], Example)
+        assert new_data[0].text == old_data[0].text
         return new_data
 
     def apply_(
