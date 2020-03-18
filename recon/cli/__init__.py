@@ -11,7 +11,7 @@ for command in commands:
 
 
 @app.callback()
-def main():
+def main() -> None:
     """
     \b
      _____    ______    _____    ____    _   _ 

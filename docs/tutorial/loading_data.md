@@ -13,19 +13,19 @@ A single example in this format looks like:
 
 ReconNER expects your data to be in a collection in the `.jsonl` File Format.
 
-## Load Dataset from_disk
+## Load Corpus from_disk
 
 There are several utilities available for loading your data.
 
 
-The easiest way to load your data is to initialize a [Dataset](../api/dataset.md) from disk.
-If you have a train/dev/test split or just train/dev files in the same directory, it's as easy as calling the `from_disk` `classmethod` for the `Dataset` object.
+The easiest way to load your data is to initialize a [Corpus](../api/corpus.md) from disk.
+If you have a train/dev/test split or just train/dev files in the same directory, it's as easy as calling the `from_disk` `classmethod` for the `Corpus` object.
 
 ```Python
-ds = Dataset.from_disk('path/to/data_dir')
+corpus = Corpus.from_disk('path/to/data_dir')
 ```
 
-`Dataset.from_disk` will look in the `data_dir` you provide for a file structure that looks like:
+`Corpus.from_disk` will look in the `data_dir` you provide for a file structure that looks like:
 
 ```
 data_dir
@@ -34,14 +34,14 @@ data_dir
 │   test.jsonl
 ```
 
-!!! note
+!!! tip
     The test.jsonl file is **optional** but generally you should split your annotated data into train/dev/test files.
 
 ## The Process of Loading Data
 
-While it's recommended to load data using the `Dataset.from_disk` method, you can also load data directly from disk using the `loaders.read_jsonl` and `loaders.read_json` functions.
+While it's recommended to load data using the `Corpus.from_disk` method, you can also load data directly from disk using the `loaders.read_jsonl` and `loaders.read_json` functions.
 
-These functions expect the same example format (in fact, the `Dataset.from_disk` runs `loaders.read_jsonl` function) and run a few steps.
+These functions expect the same example format (in fact, the `Corpus.from_disk` runs `loaders.read_jsonl` function) and run a few steps.
 
 ### 1. Read data from disk
 Loads your data with <a href="https://github.com/explosion/srsly" class="external-link" target="_blank">srsly</a> using `srsly.read_jsonl` or `srsly.read_json`
