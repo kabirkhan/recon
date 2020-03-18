@@ -4,7 +4,7 @@ from typing import Callable
 from recon.corpus import Corpus
 from recon.stats import (
     calculate_label_balance_entropy,
-    calculate_label_similarity,
+    calculate_label_distribution_similarity,
     get_ner_stats,
 )
 from recon.types import Example, NERStats
@@ -46,9 +46,9 @@ def stats(data_dir: Path):
     msg.divider("Calculating stats")
 
     print_stats(corpus)
-    train_dev_sim = calculate_label_similarity(corpus.train, corpus.dev)
-    train_test_sim = calculate_label_similarity(corpus.train, corpus.test)
-    dev_test_sim = calculate_label_similarity(corpus.dev, corpus.test)
+    train_dev_sim = calculate_label_distribution_similarity(corpus.train, corpus.dev)
+    train_test_sim = calculate_label_distribution_similarity(corpus.train, corpus.test)
+    dev_test_sim = calculate_label_distribution_similarity(corpus.dev, corpus.test)
 
     msg.divider("Calculating Similarity between label distributions of Corpus")
 

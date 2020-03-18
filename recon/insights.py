@@ -140,7 +140,7 @@ def top_prediction_errors(
     anns = (e.spans for e in data)
 
     errors = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))  # type: ignore
-    error_examples: DefaultDict[str, List[Example]] = defaultdict(list)
+    error_examples: DefaultDict[str, List[PredictionErrorExamplePair]] = defaultdict(list)
     n_errors = 0
 
     for orig_example, pred_example, ann in zip(data, recognizer.predict(texts), anns):
@@ -204,7 +204,7 @@ def top_prediction_errors(
     for re in ranked_errors:
         if re.examples:
             for e in re.examples:
-                error_texts.add(e.text)
+                error_texts.add(e.original.text)
 
     error_rate = round(len(error_texts) / len(data), 2)
     if verbose:
@@ -251,8 +251,8 @@ def get_hardest_examples(
     for pe in pred_errors:
         if pe.examples:
             for example in pe.examples:
-                examples_text_map[example.text] = example
-                example_pred_errors_map[example.text].append(pe)
+                examples_text_map[example.original.text] = example.original
+                example_pred_errors_map[example.original.text].append(pe)
 
     hardest_examples = []
     for example_text, example_pred_errors in example_pred_errors_map.items():

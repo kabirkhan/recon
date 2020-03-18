@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import spacy
 import typer
-from recon import Dataset
+from recon import Corpus
 from recon.constants import NONE
 from recon.corrections import rename_labels
 from recon.insights import (
@@ -31,7 +31,7 @@ def load_model(name):
 
 @st.cache
 def load_dataset(data_dir: Path):
-    return Dataset.from_disk(data_dir)
+    return Corpus.from_disk(data_dir)
 
 
 st.sidebar.title("Interactive Recon Visualizer")

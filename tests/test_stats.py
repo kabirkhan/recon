@@ -1,8 +1,9 @@
 from recon.stats import get_ner_stats
+from recon.types import NERStats
 
 
 def test_get_ner_stats(example_data):
-    stats = get_ner_stats(example_data["train"])
+    stats: NERStats = get_ner_stats(example_data["train"])  # type: ignore
     str_stats = get_ner_stats(example_data["train"], serialize=True)
     assert isinstance(str_stats, str)
 
