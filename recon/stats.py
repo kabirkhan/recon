@@ -172,7 +172,7 @@ def calculate_entity_coverage_stats(
             often entities occur in each dataset x and y)
     """
 
-    def get_ec_map(ecs: List[EntityCoverage], sep: str = "|||") -> Set[str]:
+    def get_ec_map(ecs: List[EntityCoverage], sep: str = "|||") -> Dict[str, int]:
         return {f"{ec.text}{sep}{ec.label}": ec.count for ec in ecs}
 
     pipeline = compose(get_entity_coverage, get_ec_map)

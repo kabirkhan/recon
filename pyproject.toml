@@ -30,6 +30,7 @@ classifiers = [
 requires = [
     "pydantic == 1.4",
     "spacy >= 2.2.1, <3.0.0",
+    "scipy",
     "typer >= 0.0.8",
     "tqdm"
 ]
