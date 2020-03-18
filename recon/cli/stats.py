@@ -37,7 +37,7 @@ def stats(data_dir: Path):
             msg.text(sorted_labels)
 
             msg.info("N Annotations per Label")
-            msg.table(n_annotations_per_type)
+            msg.table(ner_stats.n_annotations_per_type)
 
     with msg.loading("Loading Corpus from Disk"):
         corpus = Corpus.from_disk(data_dir)
@@ -45,7 +45,7 @@ def stats(data_dir: Path):
 
     msg.divider("Calculating stats")
 
-    # print_stats(corpus)
+    print_stats(corpus)
     train_dev_sim = calculate_label_similarity(corpus.train, corpus.dev)
     train_test_sim = calculate_label_similarity(corpus.train, corpus.test)
     dev_test_sim = calculate_label_similarity(corpus.dev, corpus.test)
@@ -56,6 +56,6 @@ def stats(data_dir: Path):
         {
             "Train / Dev": round(train_dev_sim, 2),
             "Train / Test": round(train_test_sim, 2),
-            "Dev / Test": round(dev_test_sim, 2),
+            "Dev   / Test": round(dev_test_sim, 2),
         }
     )

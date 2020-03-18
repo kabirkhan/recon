@@ -1,8 +1,8 @@
 from functools import reduce
-from typing import Any
+from typing import Any, Callable, Sequence
 
 
-def compose(*funcs) -> Any:
+def compose(*funcs: Any) -> Any:
     """Compose a chain of functions
     TODO: mypy plugin to validate input/output types
 
