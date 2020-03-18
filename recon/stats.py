@@ -81,7 +81,9 @@ def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
     return [t[1] for t in sorted(annotations_per_type.items(), key=lambda p: p[0])]
 
 
-def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) -> float:
+def calculate_label_distribution_similarity(
+    x: List[Example], y: List[Example]
+) -> float:
     """Calculate the similarity of the label distribution for 2 datasets.
     
     e.g. This can help you understand how well your train set models your dev and test sets.
@@ -100,7 +102,7 @@ def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) 
     
     Returns:
         float: Similarity of label distributions
-    """    
+    """
     pipeline = compose(get_ner_stats, get_sorted_type_counts, counts_to_probs)
     distance = jensenshannon(pipeline(x), pipeline(y))
 
@@ -254,7 +256,9 @@ def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
     return entropy(classes, total)
 
 
-def calculate_entity_coverage_entropy(entity_coverage_stats: List[EntityCoverageStats]) -> float:
+def calculate_entity_coverage_entropy(
+    entity_coverage_stats: List[EntityCoverageStats],
+) -> float:
     """Use Entropy to calculate a metric for entity coverage.
     
     Args:

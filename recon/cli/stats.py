@@ -11,16 +11,16 @@ from recon.types import Example, NERStats
 from wasabi import Printer
 
 
-def stats(data_dir: Path):
+def stats(data_dir: Path) -> None:
     """Calculate statistics on a Corpus
 
     Args:
         data_dir (Path): Path to data folder
     """
 
-    msg = Printer()
+    msg: Printer = Printer()
 
-    def print_stats(corpus: Corpus):
+    def print_stats(corpus: Corpus) -> None:
         ner_stats: NERStats
         for ds, ner_stats in corpus.apply(get_ner_stats).items():
             sorted_labels = sorted(ner_stats.n_annotations_per_type.keys())

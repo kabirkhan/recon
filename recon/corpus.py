@@ -59,7 +59,7 @@ class Corpus:
             corpus = cls(train_data, dev_data)
         return corpus
 
-    def to_disk(self, data_dir: Path, force: bool = False):
+    def to_disk(self, data_dir: Path, force: bool = False) -> None:
         """Save Corpus to Disk
         
         Args:
@@ -71,7 +71,7 @@ class Corpus:
         if force:
             data_dir.mkdir(parents=True, exist_ok=True)
 
-        def serialize(examples: List[Example]):
+        def serialize(examples: List[Example]) -> List[Dict[str, object]]:
             return [e.dict() for e in examples]
 
         srsly.write_jsonl(data_dir / "train.jsonl", serialize(self.train))
