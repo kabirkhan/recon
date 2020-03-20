@@ -41,7 +41,7 @@ def fix_annotations(
             for matching corrections. Defaults to True.
     
     Returns:
-        List[Example]: [description]
+        List[Example]: Fixed Examples
     """
     data_copy: List[Example] = copy.deepcopy(data)
     if use_lower:

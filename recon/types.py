@@ -4,29 +4,28 @@ from pydantic import BaseModel, Field, Schema, validator
 
 
 class Span(BaseModel):
-    """Entity Label in Example"""
-
+    """Entity Span in Example"""
     text: str
-    """Span text"""
     start: int
-    """Span start character index in Example text."""
     end: int
-    """Span end character index in Example text."""
     label: str
-    """Entity label"""
+    token_start: Optional[int]
+    token_end: Optional[int]
+
+
+class Token(BaseModel):
+    """Token with offsets into Example Text"""
+    text: str
+    start: int
+    end: int
+    id: int
 
 
 class Example(BaseModel):
-    """Example with NER Label spans
-    
-    Attributes:
-        text (str): Example text
-        spans (List[Span]): List of entity spans
-        meta (Dict[str, Any], optional): Meta information about the example
-    """
-
+    """Example with NER Label spans"""
     text: str
     spans: List[Span]
+    tokens: List[Token]
     meta: Dict[str, Any] = {}
 
 

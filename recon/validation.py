@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Tuple
 
+from spacy.language import Language
+from .pipeline import Example
 from .types import Example
 
 
@@ -12,8 +14,6 @@ def json_to_examples(data: List[Dict[str, Any]]) -> List[Example]:
     Returns:
         List[Example]: List of typed Examples
     """
-    data = fix_annotations_format(data)
-    data = filter_overlaps(data)
     return [Example(**example) for example in data]
 
 
@@ -21,10 +21,10 @@ def fix_annotations_format(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Fix annotations format for a consistent dataset
     
     Args:
-        data (List[Dict[str, Any]]): List of Examples
+        data (List[Dict[str, Any]]): List of JSON Examples
     
     Returns:
-        List[Dict[str, Any]]: List of Examples with corrected formatting
+        List[Dict[str, Any]]: List of JSON Examples with corrected formatting
     """
     for e in data:
         if "meta" not in e:
@@ -36,6 +36,30 @@ def fix_annotations_format(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             if "text" not in s:
                 s["text"] = e["text"][s["start"] : s["end"]]
             s["label"] = s["label"].upper()
+    return data
+
+
+def add_tokens(nlp: Language, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Add tokens to each to JSON Example
+    
+    Args:
+        nlp (Language): spaCy Language instance for tokenization
+        data (List[Dict[str, Any]]): List of JSON Examples
+    
+    Returns:
+        List[Dict[str, Any]]: List of JSON Examples with tokens
+    """
+    texts = (e['text'] for e in data)
+
+    with nlp.disable_pipes(*nlp.pipe_names):
+        for e, doc in zip(data, nlp.pipe(texts)):
+            e["tokens"] = [{
+                "text": t.text,
+                "start": t.start,
+                "end": t.end,
+                "id": i
+            } for i, t in enumerate(doc)]
+
     return data
 
 
