@@ -11,7 +11,7 @@ def main(data_dir: Path):
     ds_stats = ds.apply(get_ner_stats, serialize=True, no_print=True)
     for name, stats in ds_stats.items():
         print(f"{name}")
-        print('=' * 50)
+        print("=" * 50)
         print(stats)
 
 
