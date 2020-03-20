@@ -67,3 +67,6 @@ all = [
 
 [tool.flit.scripts]
 recon = "recon.cli:app"
+
+[tool.flit.entrypoints."prodigy_recipes"]
+"recon.ner_correct" = "recon:prodigy_recipes.ner_correct"

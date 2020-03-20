@@ -1,1 +1,1 @@
-NONE = "__NONE__"
+NONE = "NOT_LABELED"
