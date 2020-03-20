@@ -2,7 +2,9 @@ from pathlib import Path
 from typing import Dict, List
 
 import pytest
+from recon.corpus import Corpus
 from recon.loaders import read_jsonl
+from recon.recognizer import SpacyEntityRecognizer
 from recon.types import Example
 from spacy.lang.en import English
 
@@ -24,10 +26,8 @@ def test_texts():
 def example_data() -> Dict[str, List[Example]]:
     """Fixture to load example train/dev/test data that has inconsistencies.
     
-    ### Returns
-    -----------
-    (Dict[str, List[Example]]):
-        Dataset containing the train/dev/test split
+    Returns:
+        Dict[str, List[Example]]: Dataset containing the train/dev/test split
     """
     base_path = Path(__file__).parent.parent / "examples/data/skills"
     return {
@@ -35,3 +35,28 @@ def example_data() -> Dict[str, List[Example]]:
         "dev": read_jsonl(base_path / "dev.jsonl"),
         "test": read_jsonl(base_path / "test.jsonl"),
     }
+
+
+@pytest.fixture()
+def example_corpus() -> Corpus:
+    """Fixture to load example train/dev/test data that has inconsistencies.
+    
+    Returns:
+        Corpus: Example data
+    """
+    base_path = Path(__file__).parent.parent / "examples/data/skills"
+    return Corpus.from_disk(base_path)
+
+
+@pytest.fixture()
+def recognizer(nlp, example_corpus):
+    patterns = []
+
+    for e in example_corpus.all:
+        for span in e.spans:
+            patterns.append({"label": span.label, "pattern": span.text.lower()})
+
+    nlp.add_pipe(nlp.create_pipe("entity_ruler", {"patterns": patterns}))
+
+    recognizer = SpacyEntityRecognizer(nlp)
+    return recognizer

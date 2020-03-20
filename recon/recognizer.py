@@ -2,7 +2,7 @@ from typing import Iterable, Iterator, List, Set
 
 from spacy.language import Language
 
-from .types import Example, Span
+from .types import Example, Span, Token
 
 
 class EntityRecognizer:
@@ -84,5 +84,9 @@ class SpacyEntityRecognizer(EntityRecognizer):
                         text=e.text, start=e.start_char, end=e.end_char, label=e.label_
                     )
                     for e in doc.ents
+                ],
+                tokens=[
+                    Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i)
+                    for t in doc
                 ],
             )

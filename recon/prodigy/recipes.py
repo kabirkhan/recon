@@ -36,7 +36,7 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
     for he in hardest_examples:
         task = he.example.dict()
         task = list(add_tokens(nlp, [task]))[0]
-        gold_span_hashes = {make_span_hash(span): span for span in task['spans']}
+        gold_span_hashes = {make_span_hash(span): span for span in task["spans"]}
         predicted_example = None
         assert he.prediction_errors is not None
         for pe in he.prediction_errors:
@@ -48,20 +48,24 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
             pthtml = []
             predicted_example_task = predicted_example.dict()
             predicted_example_task = list(add_tokens(nlp, [predicted_example_task]))[0]
-            
-            for token in predicted_example_task['tokens']:
+
+            for token in predicted_example_task["tokens"]:
                 pthtml.append(f'<span class="recon-token">{token["text"]} </span>')
 
-            pred_spans = predicted_example_task['spans']
-            pred_span_hashes = [make_span_hash(span) for span in predicted_example_task['spans']]
+            pred_spans = predicted_example_task["spans"]
+            pred_span_hashes = [
+                make_span_hash(span) for span in predicted_example_task["spans"]
+            ]
 
             for gold_span_hash, gold_span in gold_span_hashes.items():
                 if gold_span_hash not in pred_span_hashes:
                     gold_span_miss = copy.deepcopy(gold_span)
-                    gold_span_miss['label'] = NONE
+                    gold_span_miss["label"] = NONE
                     pred_spans.append(gold_span_miss)
 
-            pred_spans = remove_overlapping_entities(sorted(pred_spans, key=lambda s: s["start"]))
+            pred_spans = remove_overlapping_entities(
+                sorted(pred_spans, key=lambda s: s["start"])
+            )
             # pred_spans = sorted(pred_spans, key=lambda s: s["start"])
 
             i = len(pred_spans) - 1
@@ -70,15 +74,27 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
                 span_hash = make_span_hash(span)
                 if span_hash in gold_span_hashes:
                     labelColorClass = "recon-pred-success-mark"
-                elif span['label'] == NONE:
+                elif span["label"] == NONE:
                     labelColorClass = "recon-pred-missing-mark"
                 else:
                     labelColorClass = "recon-pred-error-mark"
 
-                pthtml = pthtml[:span['token_end'] + 1] + [f'<span class="recon-pred-label">{span["label"]}<span class="c0178">x</span></span></span>'] + pthtml[span['token_end'] + 1:]
-                pthtml = pthtml[:span['token_start']] + [f'<span class="recon-pred {labelColorClass}">'] + pthtml[span['token_start']:]
+                pthtml = (
+                    pthtml[: span["token_end"] + 1]
+                    + [
+                        f'<span class="recon-pred-label">{span["label"]}<span class="c0178">x</span></span></span>'
+                    ]
+                    + pthtml[span["token_end"] + 1 :]
+                )
+                pthtml = (
+                    pthtml[: span["token_start"]]
+                    + [f'<span class="recon-pred {labelColorClass}">']
+                    + pthtml[span["token_start"] :]
+                )
                 i -= 1
-            task['html'] = f"""
+            task[
+                "html"
+            ] = f"""
             <h2 class='recon-title'>Recon Prediction Errors</h2>
             <h5 class='recon-subtitle'>
                 The following text shows the errors your model made on this example inline.
@@ -89,18 +105,38 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
                 {''.join(pthtml)}
             </div>
             """
-        task['prediction_errors'] = [pe.dict() for pe in he.prediction_errors]
+        task["prediction_errors"] = [pe.dict() for pe in he.prediction_errors]
         yield task
 
 
 @prodigy.recipe(
     "recon.ner_correct",
     dataset=("Dataset to save annotations to", "positional", None, str),
-    spacy_model=("Base model or blank:lang (e.g. blank:en) for blank model", "positional", None, str),
-    hardest_examples=("Data to annotate (file path or '-' to read from standard input)", "positional", None, str),
+    spacy_model=(
+        "Base model or blank:lang (e.g. blank:en) for blank model",
+        "positional",
+        None,
+        str,
+    ),
+    hardest_examples=(
+        "Data to annotate (file path or '-' to read from standard input)",
+        "positional",
+        None,
+        str,
+    ),
     loader=("Loader (guessed from file extension if not set)", "option", "lo", str),
-    label=("Comma-separated label(s) to annotate or text file with one label per line", "option", "l", get_labels),
-    exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
+    label=(
+        "Comma-separated label(s) to annotate or text file with one label per line",
+        "option",
+        "l",
+        get_labels,
+    ),
+    exclude=(
+        "Comma-separated list of dataset IDs whose annotations to exclude",
+        "option",
+        "e",
+        split_string,
+    ),
 )
 def ner_correct(
     dataset: str,
@@ -169,7 +205,7 @@ def ner_correct(
         "exclude": exclude,
         "config": {
             "lang": nlp.lang,
-            "labels": labels.split(','),
+            "labels": labels.split(","),
             "exclude_by": "input",
             "blocks": [
                 {"view_id": "ner_manual"},
@@ -219,6 +255,6 @@ def ner_correct(
                 text-transform: uppercase;
                 vertical-align: middle;
             }
-            """
-        }
+            """,
+        },
     }
