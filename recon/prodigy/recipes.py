@@ -22,10 +22,11 @@ from prodigy.util import (
     set_hashes,
     split_string,
 )
+from wasabi import msg
+
 from recon.constants import NONE
 from recon.types import HardestExample
 from recon.validation import remove_overlapping_entities
-from wasabi import msg
 
 
 def make_span_hash(span: Dict):
