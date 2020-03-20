@@ -11,6 +11,6 @@ from .validation import *
 
 try:
     # This needs to be imported in order for the entry points to be loaded
-    from . import prodigy_recipes  # noqa: F401
+    from .prodigy import recipes as prodigy_recipes  # noqa: F401
 except ImportError:
     pass
