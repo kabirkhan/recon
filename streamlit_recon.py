@@ -10,7 +10,7 @@ from recon import Corpus
 from recon.constants import NONE
 from recon.corrections import rename_labels
 from recon.insights import (
-    ents_by_label,
+    get_ents_by_label,
     get_hardest_examples,
     get_label_disparities,
     top_label_disparities,

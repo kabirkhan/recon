@@ -22,7 +22,7 @@ from .types import (
 )
 
 
-def ents_by_label(
+def get_ents_by_label(
     data: List[Example], use_lower: bool = True
 ) -> DefaultDict[str, List[str]]:
     """Get a dictionary of unique text spans by label for your data
@@ -63,7 +63,7 @@ def get_label_disparities(
     Returns:
         Set[str]: Set of all unique text spans that overlap between label1 and label2
     """
-    annotations = ents_by_label(data, use_lower=use_lower)
+    annotations = get_ents_by_label(data, use_lower=use_lower)
     return set(annotations[label1]).intersection(set(annotations[label2]))
 
 
@@ -83,7 +83,7 @@ def top_label_disparities(
         List[LabelDisparity]: List of LabelDisparity objects for each label pair combination
             sorted by the number of disparities between them.
     """
-    annotations = ents_by_label(data, use_lower=use_lower)
+    annotations = get_ents_by_label(data, use_lower=use_lower)
     label_disparities = {}
     for label1 in annotations.keys():
         for label2 in annotations.keys():

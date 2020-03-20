@@ -144,10 +144,7 @@ class Corpus:
         return new_data
 
     def apply_(
-        self,
-        func: Callable[[List[Example], Any, Any], List[Example]],
-        *args: Any,
-        **kwargs: Any
+        self, func: Callable[[Any], List[Example]], *args: Any, **kwargs: Any
     ) -> None:
         """Apply a function to all data inplace.
         

@@ -155,7 +155,7 @@ def get_entity_coverage(
     return sorted_coverage
 
 
-def calculate_entity_coverage_stats(
+def calculate_entity_coverage_similarity(
     x: List[Example], y: List[Example]
 ) -> EntityCoverageStats:
     """Calculate how well dataset x covers the entities in dataset y.
@@ -256,19 +256,17 @@ def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
     return entropy(classes, total)
 
 
-def calculate_entity_coverage_entropy(
-    entity_coverage_stats: List[EntityCoverageStats],
-) -> float:
+def calculate_entity_coverage_entropy(entity_coverage: List[EntityCoverage],) -> float:
     """Use Entropy to calculate a metric for entity coverage.
     
     Args:
-        entity_coverage_stats (List[EntityCoverageStats]): List of EntityCoverageStats 
+        entity_coverage (List[EntityCoverage]): List of EntityCoverage 
             from get_entity_coverage
     
     Returns:
         float: Entropy for entity coverage counts
     """
-    counts = [ecs.count for ecs in entity_coverage_stats]
+    counts = [ecs.count for ecs in entity_coverage]
     return entropy(counts, sum(counts))  # type: ignore
 
 
@@ -282,14 +280,11 @@ def detect_outliers(seq: Sequence[Any], use_log: bool = False) -> Outliers:
     Returns:
         Tuple[List[int], List[int]]: Tuple of low and high indices
     """
-    if use_log:
-        seq = np.log(seq)
     q1 = np.quantile(seq, 0.25)
     q3 = np.quantile(seq, 0.75)
     iqr = q3 - q1
     fence_low = math.floor(q1 - 1.5 * iqr)
     fence_high = math.floor(q3 + 1.5 * iqr)
-    print(fence_low, q1, q3, fence_high)
     low_indices = [i for i, n in enumerate(seq) if n <= fence_low]
     high_indices = [i for i, n in enumerate(seq) if n > fence_high]
     return Outliers(low=low_indices, high=high_indices)

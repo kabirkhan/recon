@@ -1,5 +1,6 @@
 import pytest
-from recon.types import Example, Span
+from recon.types import Example, Span, Token
+from recon.util import registry
 from recon.validation import *
 
 
@@ -17,10 +18,13 @@ def messy_data():
     ]
 
 
-def test_json_to_examples(messy_data):
-    fixed_examples = json_to_examples(messy_data)
+def test_loading_pipeline(messy_data):
+    loading_pipeline = registry.loading_pipelines.get("default")
+    pipeline = loading_pipeline()
+    fixed_examples = pipeline(messy_data)
     assert isinstance(fixed_examples[0], Example)
     assert isinstance(fixed_examples[0].spans[0], Span)
+    assert isinstance(fixed_examples[0].tokens[0], Token)
 
     assert fixed_examples[0].spans[0].text == "Denver, Colorado"
     assert fixed_examples[0].spans[0].label == "LOC"

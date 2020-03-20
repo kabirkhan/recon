@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, Schema, validator
 
 class Span(BaseModel):
     """Entity Span in Example"""
+
     text: str
     start: int
     end: int
@@ -15,6 +16,7 @@ class Span(BaseModel):
 
 class Token(BaseModel):
     """Token with offsets into Example Text"""
+
     text: str
     start: int
     end: int
@@ -23,6 +25,7 @@ class Token(BaseModel):
 
 class Example(BaseModel):
     """Example with NER Label spans"""
+
     text: str
     spans: List[Span]
     tokens: List[Token]

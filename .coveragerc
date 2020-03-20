@@ -2,5 +2,10 @@
 
 source =
     recon
+
+omit =
+    recon/cli/*
+    recon/prodigy/*
+    recon/scorer.py
     
 parallel = True

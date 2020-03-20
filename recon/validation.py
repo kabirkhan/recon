@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Tuple
 
 from spacy.language import Language
-from .pipeline import Example
+
 from .types import Example
 
 
@@ -49,16 +49,14 @@ def add_tokens(nlp: Language, data: List[Dict[str, Any]]) -> List[Dict[str, Any]
     Returns:
         List[Dict[str, Any]]: List of JSON Examples with tokens
     """
-    texts = (e['text'] for e in data)
+    texts = (e["text"] for e in data)
 
     with nlp.disable_pipes(*nlp.pipe_names):
         for e, doc in zip(data, nlp.pipe(texts)):
-            e["tokens"] = [{
-                "text": t.text,
-                "start": t.start,
-                "end": t.end,
-                "id": i
-            } for i, t in enumerate(doc)]
+            e["tokens"] = [
+                {"text": t.text, "start": t.idx, "end": t.idx + len(t), "id": t.i}
+                for t in doc
+            ]
 
     return data
 
