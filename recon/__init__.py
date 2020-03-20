@@ -8,3 +8,9 @@ from .insights import *
 from .loaders import read_json, read_jsonl
 from .stats import get_ner_stats
 from .validation import *
+
+try:
+    # This needs to be imported in order for the entry points to be loaded
+    from . import prodigy_recipes  # noqa: F401
+except ImportError:
+    pass
