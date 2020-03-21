@@ -1,11 +1,16 @@
+# isort:skip_file
+
 import copy
 from pathlib import Path
 from typing import Dict, List
 
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import spacy
+import streamlit as st
 import typer
+from wasabi import Printer
 from recon import Corpus
 from recon.constants import NONE
 from recon.corrections import rename_labels
@@ -19,10 +24,6 @@ from recon.insights import (
 from recon.recognizer import SpacyEntityRecognizer
 from recon.stats import get_entity_coverage, get_ner_stats
 from recon.types import Example, HardestExample, PredictionError
-from wasabi import Printer
-
-import plotly.express as px
-import streamlit as st
 
 
 @st.cache(allow_output_mutation=True)

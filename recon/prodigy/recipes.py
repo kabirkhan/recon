@@ -1,15 +1,13 @@
+# isort:skip_file
 # type: ignore
 
-
+from collections import Counter, defaultdict
 import copy
 import random
-from collections import Counter, defaultdict
 from typing import Dict, Iterable, List, Optional, Union
 
 import catalogue
 import prodigy
-import spacy
-import srsly
 from prodigy.components.db import connect
 from prodigy.components.loaders import get_stream
 from prodigy.components.preprocess import add_tokens
@@ -22,10 +20,12 @@ from prodigy.util import (
     set_hashes,
     split_string,
 )
+import spacy
+import srsly
+from wasabi import msg
 from recon.constants import NONE
 from recon.types import HardestExample
 from recon.validation import remove_overlapping_entities
-from wasabi import msg
 
 
 def make_span_hash(span: Dict):
