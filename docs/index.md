@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://microsoft.github.io/reconner"><img src="/img/recon.svg" alt="Recon"></a>
+  <a href="https://microsoft.github.io/reconner"><img src="https://microsoft.github.io/reconner/img/recon.svg" alt="Recon"></a>
 </p>
 <p align="center">
     <em>Recon NER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>

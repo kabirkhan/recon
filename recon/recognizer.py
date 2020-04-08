@@ -1,6 +1,8 @@
-from typing import Iterable, Iterator, List, Set
+from typing import Dict, Iterable, Iterator, List, Set, Tuple
 
 from spacy.language import Language
+import srsly
+from wasabi import Printer
 
 from .types import Example, Span, Token
 
@@ -81,7 +83,8 @@ class SpacyEntityRecognizer(EntityRecognizer):
                 text=doc.text,
                 spans=[
                     Span(
-                        text=e.text, start=e.start_char, end=e.end_char, label=e.label_
+                        text=e.text, start=e.start_char, end=e.end_char,
+                        label=e.label_, token_start=e.start, token_end=e.end
                     )
                     for e in doc.ents
                 ],
@@ -90,3 +93,33 @@ class SpacyEntityRecognizer(EntityRecognizer):
                     for t in doc
                 ],
             )
+    
+    def evaluate(self, data: List[Example]) -> None:
+        msg = Printer()
+        formatted_data, _ = self._format_data(data)
+        sc = self.nlp.evaluate(formatted_data, batch_size=64)
+        msg.divider("Recognizer Results")
+        result = [
+            ("Precision", f"{sc.ents_p:.3f}"),
+            ("Recall", f"{sc.ents_r:.3f}"),
+            ("F-Score", f"{sc.ents_f:.3f}"),
+        ]
+        msg.table(result)
+        
+        table_data = []
+        for label, scores in sorted(sc.ents_per_type.items(), key=lambda tup: tup[0]):
+            table_data.append((
+                label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}"
+            ))
+        header = ("Label", "Precision", "Recall", "F-Score")
+        formatted = msg.table(table_data, header=header, divider=True)
+        return sc
+            
+    def _format_data(self, data: List[Example]) -> Tuple[List[Tuple[str, Dict[str, List[Tuple[int, int, str]]]]], Set[str]]:
+        result = []
+        labels = set()
+        for example in data:
+            ents = [(s.start, s.end, s.label) for s in example.spans]
+            labels.update([ent[2] for ent in ents])
+            result.append((example.text, {"entities": ents}))
+        return result, labels

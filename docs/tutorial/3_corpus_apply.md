@@ -14,7 +14,7 @@ and run that `Callable` over all the datasets as well as a concatenation of all 
 Let's edit that `main.py` file you created in the previous step to utilize the `Dataset.apply` method.
 
 ```Python hl_lines="10"
-{!./src/tutorial/2_ds_apply.py!}
+{!./src/tutorial/2_corpus_apply.py!}
 ```
 
 ## Run the application

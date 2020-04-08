@@ -4,8 +4,10 @@ from typing import Any, Callable, Dict, List
 import srsly
 from spacy.util import ensure_path
 
+from .dataset import Dataset
 from .loaders import read_json, read_jsonl
-from .types import Example
+from .store import ExampleStore
+from .types import Example, OperationResult
 
 
 class Corpus:
@@ -13,19 +15,28 @@ class Corpus:
     Used to apply core functions to all datasets at once.
     """
 
-    def __init__(
-        self, train: List[Example], dev: List[Example], test: List[Example] = None
-    ):
+    def __init__(self, train: Dataset, dev: Dataset, test: Dataset = None, example_store: ExampleStore = None):
         """Initialize a Corpus.
         
         Args:
-            train (List[Example]): List of Examples for **train** set
-            dev (List[Example]): List of Examples for **dev** set
-            test (List[Example], optional): Defaults to None. List of Examples for **test** set
+            train (Dataset): List of Examples for **train** set
+            dev (Dataset): List of Examples for **dev** set
+            test (Dataset, optional): Defaults to None. List of Examples for **test** set
         """
+        if example_store is None:
+            examples = train.data + dev.data
+            if test:
+                examples += test.data
+            example_store = ExampleStore(examples)
+        self.example_store = example_store
+
+        for ds in (train, dev, test):
+            ds.example_store = example_store
+
         self._train = train
         self._dev = dev
         self._test = test
+
 
     @classmethod
     def from_disk(
@@ -49,14 +60,14 @@ class Corpus:
         """
         data_dir = ensure_path(data_dir)
 
-        train_data = loader_func(data_dir / train_file)
-        dev_data = loader_func(data_dir / dev_file)
-
+        train = Dataset("train").from_disk(data_dir / train_file)
+        dev = Dataset("dev").from_disk(data_dir / dev_file)
+        
         try:
-            test_data = loader_func(data_dir / test_file)
-            corpus = cls(train_data, dev_data, test=test_data)
+            test = Dataset("test").from_disk(data_dir / test_file)
+            corpus = cls(train, dev, test=test)
         except ValueError as e:
-            corpus = cls(train_data, dev_data)
+            corpus = cls(train, dev)
         return corpus
 
     def to_disk(self, data_dir: Path, force: bool = False) -> None:
@@ -71,12 +82,10 @@ class Corpus:
         if force:
             data_dir.mkdir(parents=True, exist_ok=True)
 
-        def serialize(examples: List[Example]) -> List[Dict[str, object]]:
-            return [e.dict() for e in examples]
-
-        srsly.write_jsonl(data_dir / "train.jsonl", serialize(self.train))
-        srsly.write_jsonl(data_dir / "dev.jsonl", serialize(self.dev))
-        srsly.write_jsonl(data_dir / "test.jsonl", serialize(self.test))
+        self._train.to_disk(data_dir / "train.jsonl", force=force)
+        self._dev.to_disk(data_dir / "dev.jsonl", force=force)
+        if self._test:
+            self._test.to_disk(data_dir / "test.jsonl", force=force)
 
     @property
     def train(self) -> List[Example]:
@@ -85,7 +94,7 @@ class Corpus:
         Returns:
             List[Example]: Train Examples
         """
-        return self._train
+        return self._train.data
 
     @property
     def dev(self) -> List[Example]:
@@ -94,7 +103,7 @@ class Corpus:
         Returns:
             List[Example]: Train Examples
         """
-        return self._dev
+        return self._dev.data
 
     @property
     def test(self) -> List[Example]:
@@ -103,7 +112,7 @@ class Corpus:
         Returns:
             List[Example]: Test Examples
         """
-        return self._test or []
+        return self._test.data or []
 
     @property
     def all(self) -> List[Example]:
@@ -135,27 +144,23 @@ class Corpus:
 
         return res
 
-    def _validate_inplace_apply(
-        self, old_data: List[Example], new_data: List[Example]
-    ) -> List[Example]:
-        assert isinstance(new_data, list)
-        assert len(new_data) == len(old_data)
-        assert new_data[0].text == old_data[0].text
-        return new_data
-
     def apply_(
-        self, func: Callable[[Any], List[Example]], *args: Any, **kwargs: Any
+        self, operation: Callable[[Any], OperationResult], *args: Any, **kwargs: Any
     ) -> None:
         """Apply a function to all data inplace.
         
         Args:
-            func (Callable[[List[Example], Any, Any], List[Example]]): Function from an existing recon module
+            func (Callable[[Any], OperationResult]): Function from an existing recon module
                 that can operate on a List[Example] and return a List[Example]
         """
-        new_train = self._validate_inplace_apply(self.train, func(self.train, *args, **kwargs))  # type: ignore
-        new_dev = self._validate_inplace_apply(self.dev, func(self.dev, *args, **kwargs))  # type: ignore
-        new_test = self._validate_inplace_apply(self.test, func(self.test, *args, **kwargs))  # type: ignore
+        self._train.apply_(operation, *args, **kwargs)
+        self._dev.apply_(operation, *args, **kwargs)
+        self._test.apply_(operation, *args, **kwargs)
 
-        self._train = new_train
-        self._dev = new_dev
-        self._test = new_test
+        # new_train = self._validate_inplace_apply(self.train, func(self.train, *args, **kwargs))  # type: ignore
+        # new_dev = self._validate_inplace_apply(self.dev, func(self.dev, *args, **kwargs))  # type: ignore
+        # new_test = self._validate_inplace_apply(self.test, func(self.test, *args, **kwargs))  # type: ignore
+
+        # self._train = new_train
+        # self._dev = new_dev
+        # self._test = new_test
