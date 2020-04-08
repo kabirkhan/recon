@@ -88,9 +88,8 @@ def top_label_disparities(
     for label1 in annotations.keys():
         for label2 in annotations.keys():
             if label1 != label2:
-                n_disparities = len(
-                    set(annotations[label1]).intersection(set(annotations[label2]))
-                )
+                intersection = set(annotations[label1]).intersection(set(annotations[label2]))
+                n_disparities = len(intersection)
                 if n_disparities > 0:
                     if dedupe:
                         input_hash = "||".join(sorted([label1, label2]))
@@ -159,6 +158,8 @@ def top_prediction_errors(
         fp_diff = cand - gold
         fn_diff = gold - cand
 
+        seen = set()
+
         if fp_diff and not exclude_fp:
             for fp in fp_diff:
                 gold_ent = None
@@ -171,37 +172,41 @@ def top_prediction_errors(
                     text = pred_example.text[start:end]
                     false_label = fp[2]
                     errors[label][text][false_label] += 1
+                    error_examples[f"{text}||{label}||{false_label}"].append(pred_error_example_pair)
                 else:
                     start, end, false_label = fp
                     text = pred_example.text[start:end]
                     errors[NONE][text][false_label] += 1
-                error_examples[text].append(pred_error_example_pair)
+                    error_examples[f"{text}||{NONE}||{false_label}"].append(pred_error_example_pair)
                 n_errors += 1
+                seen.add((start, end))
 
         if fn_diff and not exclude_fn:
             for fn in fn_diff:
                 start, end, label = fn
-                text = pred_example.text[start:end]
-                errors[label][text][NONE] += 1
-                error_examples[text].append(pred_error_example_pair)
-                n_errors += 1
+                if (start, end) not in seen:
+                    text = pred_example.text[start:end]
+                    errors[label][text][NONE] += 1
+                    error_examples[f"{text}||{label}||{NONE}"].append(pred_error_example_pair)
+                    n_errors += 1
 
-    ranked_errors: List[PredictionError] = []
+    ranked_errors_map: Dict[str, List[PredictionError]] = defaultdict(list)
 
     for label, errors_per_label in errors.items():
         for error_text, error_labels in errors_per_label.items():
             for error_label, count in error_labels.items():
-                ranked_errors.append(
-                    PredictionError(
-                        text=error_text,
-                        true_label=label,
-                        pred_label=error_label,
-                        count=count,
-                        examples=error_examples[error_text],
-                    )
+                pe_hash = f"{error_text}||{label}||{error_label}"
+                ranked_errors_map[pe_hash] = PredictionError(
+                    text=error_text,
+                    true_label=label,
+                    pred_label=error_label,
+                    count=count,
+                    examples=error_examples[f"{error_text}||{label}||{error_label}"],
                 )
 
-    ranked_errors = sorted(ranked_errors, key=lambda error: error.count, reverse=True)
+    ranked_errors: List[PredictionError] = sorted(
+        list(ranked_errors_map.values()), key=lambda error: error.count, reverse=True # type: ignore
+    )
     error_texts = set()
     for re in ranked_errors:
         if re.examples:
@@ -254,22 +259,45 @@ def get_hardest_examples(
         if pe.examples:
             for example in pe.examples:
                 examples_text_map[example.original.text] = example.original
-                example_pred_errors_map[example.original.text].append(pe)
+                example_pred_errors_map[example.original.text].append(
+                    PredictionError(
+                        text=pe.text,
+                        true_label=pe.true_label,
+                        pred_label=pe.pred_label,
+                        count=pe.count,
+                        examples=[example]
+                    )
+                )
 
     hardest_examples = []
     for example_text, example_pred_errors in example_pred_errors_map.items():
         example = examples_text_map[example_text]  # type: ignore
 
-        record = HardestExample(example=example, count=len(example_pred_errors))
-        if return_pred_errors:
-            if remove_pred_error_examples:
-                _example_pred_errors = copy.deepcopy(example_pred_errors)
-                for _pe in _example_pred_errors:
-                    _pe.examples = []
+        prediction_errors: List[PredictionError] = []
+        if remove_pred_error_examples and example_pred_errors:
+            prediction_errors = [
+                PredictionError(
+                    text=pe.text,
+                    true_label=pe.true_label,
+                    pred_label=pe.pred_label,
+                    count=pe.count,
+                    examples=[]
+                ) for pe in example_pred_errors
+            ]
+        else:
+            prediction_errors = example_pred_errors
 
-                record.prediction_errors = _example_pred_errors
-            else:
-                record.prediction_errors = example_pred_errors
+        prediction_error_hashes: Set[str] = set()
+        deduped_prediction_errors: List[PredictionError] = []
+            
+        for pe in prediction_errors:
+            pe_hash = f"{pe.text}||{pe.true_label}||{pe.pred_label}"
+            if pe_hash not in prediction_error_hashes:
+                deduped_prediction_errors.append(pe)
+
+        record = HardestExample(example=example, count=len(deduped_prediction_errors))
+        if return_pred_errors:
+            record.prediction_errors = deduped_prediction_errors
         hardest_examples.append(record)
 
     sorted_hardest_examples = sorted(

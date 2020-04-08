@@ -24,19 +24,23 @@ import spacy
 import srsly
 from wasabi import msg
 from recon.constants import NONE
-from recon.types import HardestExample
+from recon.loaders import read_jsonl
+from recon.types import HardestExample, Example, Span
 from recon.validation import remove_overlapping_entities
 
 
-def make_span_hash(span: Dict):
-    return f"{span['text']}|||{span['start']}|||{span['end']}|||{span['label']}"
+def make_span_hash(span: Union[Span, Dict[str, object]]) -> str:
+    if isinstance(span, Span):
+        h = f"{span.text}|||{span.start}|||{span.end}|||{span.label}"
+    else:
+        h = f'{span["text"]}|||{span["start"]}|||{span["end"]}|||{span["label"]}'
+    return h
 
 
 def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]):
     for he in hardest_examples:
         task = he.example.dict()
-        task = list(add_tokens(nlp, [task]))[0]
-        gold_span_hashes = {make_span_hash(span): span for span in task["spans"]}
+        gold_span_hashes = {make_span_hash(span): span for span in he.example.spans}
         predicted_example = None
         assert he.prediction_errors is not None
         for pe in he.prediction_errors:
@@ -47,26 +51,24 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
         if predicted_example:
             pthtml = []
             predicted_example_task = predicted_example.dict()
-            predicted_example_task = list(add_tokens(nlp, [predicted_example_task]))[0]
 
-            for token in predicted_example_task["tokens"]:
-                pthtml.append(f'<span class="recon-token">{token["text"]} </span>')
+            for token in predicted_example.tokens:
+                pthtml.append(f'<span class="recon-token">{token.text} </span>')
 
-            pred_spans = predicted_example_task["spans"]
+            pred_spans = predicted_example.spans
             pred_span_hashes = [
-                make_span_hash(span) for span in predicted_example_task["spans"]
+                make_span_hash(span) for span in predicted_example.spans
             ]
 
             for gold_span_hash, gold_span in gold_span_hashes.items():
                 if gold_span_hash not in pred_span_hashes:
                     gold_span_miss = copy.deepcopy(gold_span)
-                    gold_span_miss["label"] = NONE
+                    gold_span_miss.label = NONE
                     pred_spans.append(gold_span_miss)
 
             pred_spans = remove_overlapping_entities(
-                sorted(pred_spans, key=lambda s: s["start"])
+                sorted([span.dict() for span in pred_spans], key=lambda s: s["start"])
             )
-            # pred_spans = sorted(pred_spans, key=lambda s: s["start"])
 
             i = len(pred_spans) - 1
             while i >= 0:
@@ -79,12 +81,15 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
                 else:
                     labelColorClass = "recon-pred-error-mark"
 
+                if not span["token_end"]:
+                    print(span)
+
                 pthtml = (
-                    pthtml[: span["token_end"] + 1]
+                    pthtml[: span["token_end"]]
                     + [
                         f'<span class="recon-pred-label">{span["label"]}<span class="c0178">x</span></span></span>'
                     ]
-                    + pthtml[span["token_end"] + 1 :]
+                    + pthtml[span["token_end"]:]
                 )
                 pthtml = (
                     pthtml[: span["token_start"]]
@@ -92,9 +97,8 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
                     + pthtml[span["token_start"] :]
                 )
                 i -= 1
-            task[
-                "html"
-            ] = f"""
+
+            task["html"] = f"""
             <h2 class='recon-title'>Recon Prediction Errors</h2>
             <h5 class='recon-subtitle'>
                 The following text shows the errors your model made on this example inline.
@@ -124,7 +128,6 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
         None,
         str,
     ),
-    loader=("Loader (guessed from file extension if not set)", "option", "lo", str),
     label=(
         "Comma-separated label(s) to annotate or text file with one label per line",
         "option",
@@ -142,7 +145,6 @@ def ner_correct(
     dataset: str,
     spacy_model: str,
     hardest_examples: List[HardestExample],
-    loader: Optional[str] = None,
     label: Optional[List[str]] = None,
     exclude: Optional[List[str]] = None,
 ):
@@ -162,10 +164,13 @@ def ner_correct(
         if not labels:
             msg.fail("No --label argument set and no labels found in model", exits=1)
         msg.text(f"Using {len(labels)} labels from model: {', '.join(labels)}")
+
     log(f"RECIPE: Annotating with {len(labels)} labels", labels)
+    labels = labels.split(",")
 
     stream = get_stream_from_hardest_examples(nlp, hardest_examples)
-    stream = add_tokens(nlp, stream)  # add "tokens" key to the tasks
+    # stream = add_tokens(nlp, stream)  # add "tokens" key to the tasks
+    # stream = set_hashes(stream)
 
     table_template = """
     <style>
@@ -205,30 +210,33 @@ def ner_correct(
         "exclude": exclude,
         "config": {
             "lang": nlp.lang,
-            "labels": labels.split(","),
+            "labels": labels,
             "exclude_by": "input",
             "blocks": [
                 {"view_id": "ner_manual"},
                 {"view_id": "html"},
                 {"view_id": "html", "field_rows": 3, "html_template": table_template},
             ],
-            "global_css": """
-            .recon-title {
+            "global_css": f"""
+            .prodigy-container {{
+                max-width: {'900px' if len(labels) > 8 else '600px'}
+            }}
+            .recon-title {{
                 text-align: left;
                 margin-top: -80px;
-            }
-            .recon-subtitle {
+            }}
+            .recon-subtitle {{
                 text-align: left;
                 margin-top: -80px;
                 white-space: normal;
-            }
-            .recon-container {
+            }}
+            .recon-container {{
                 text-align: left;
                 line-height: 2;
                 margin-top: -80px;
                 white-space: pre-line;
-            }
-            .recon-pred {
+            }}
+            .recon-pred {{
                 color: inherit;
                 margin: 0 0.15em;
                 display: inline;
@@ -236,17 +244,17 @@ def ner_correct(
                 font-weight: bold;
                 line-height: 1;
                 -webkit-box-decoration-break: clone;
-            }
-            .recon-pred-success-mark {
+            }}
+            .recon-pred-success-mark {{
                 background: #00cc66;
-            }
-            .recon-pred-error-mark {
+            }}
+            .recon-pred-error-mark {{
                 background: #fc7683;
-            }
-            .recon-pred-missing-mark {
+            }}
+            .recon-pred-missing-mark {{
                 background: #84b4c4;
-            }
-            .recon-pred-label { 
+            }}
+            .recon-pred-label {{
                 color: #583fcf;
                 font-size: 0.675em;
                 font-weight: bold;
@@ -254,7 +262,59 @@ def ner_correct(
                 margin-left: 8px;
                 text-transform: uppercase;
                 vertical-align: middle;
-            }
+            }}
             """,
         },
     }
+
+
+@prodigy.recipe(
+    "recon.ner_merge",
+    # fmt: off
+    dataset=("Dataset with saved annotations to from recon.ner_correct", "positional", None, str),
+    source=("Source data to merge examples with (file path or List of Examples)", "positional", None, str),
+    output_file=("Optional output file", "positional", None, str),
+    exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
+    # fmt: on
+)
+def ner_merge(
+    dataset: str,
+    source: Union[str, Iterable[Example]],
+    output_file: Optional[str] = None,
+    exclude: Optional[List[str]] = None,
+):
+    """
+    Stream a List of `recon.types.HardestExample` instances to prodigy
+    for review/correction. Uses the Prodigy blocks interface to display
+    prediction error information along with ner view
+    """
+    log("RECIPE: Starting recipe recon.ner_merge", locals())
+    if isinstance(source, str):
+        data = read_jsonl(source)
+    else:
+        data = source
+
+    DB = connect()
+    if dataset not in DB:
+        msg.fail(f"Can't find dataset '{dataset}'", exits=1)
+    
+    prodigy_raw_examples = DB.get_dataset(dataset)
+    for eg in prodigy_raw_examples:
+        for span in eg["spans"]:
+            span["text"] = eg["text"][span["start"]:span["end"]]
+    prodigy_examples = [Example(**eg) for eg in prodigy_raw_examples if eg["answer"] == "accept"]
+    prodigy_example_texts = {e.text for e in prodigy_examples}
+
+    merged_examples = prodigy_examples
+
+    for example in data:
+        if example.text not in prodigy_example_texts:
+            merged_examples.append(example)
+
+    assert len(merged_examples) == len(prodigy_examples)
+
+    if output_file:
+        log(f"RECIPE: Fixing {len(prodigy_examples)} examples in data")
+        srsly.write_jsonl(output_file, [e.dict() for e in merged_examples])
+        msg.good(f"Exported {len(merged_examples)} examples to file", output_file)
+ 

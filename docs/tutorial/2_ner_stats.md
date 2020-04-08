@@ -6,10 +6,12 @@ Once you have your data loaded either by itself as a list of `Example`s or as a 
 
 The `stats.get_ner_stats` function expects a `List[Example]` as it's input parameter and will return a serializable response with info about your data. Let's see how this works on the provided example data.
 
-If you don't already have the example data, download it now:
-f
-!!! error
-    Fix this, add CLI for example data download
+!!! tip
+    If you don't already have the example data or a dataset of your own, you can download it now. Open a terminal and run the `download` command.
+    ```console
+    $ recon download examples ./data
+    ```
+
 
 ## Example
 

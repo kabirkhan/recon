@@ -8,7 +8,6 @@ from scipy.spatial.distance import jaccard, jensenshannon
 from scipy.stats import entropy as scipy_entropy
 
 from .constants import NONE
-from .pipelines import compose
 from .types import (
     EntityCoverage,
     EntityCoverageStats,
@@ -103,7 +102,12 @@ def calculate_label_distribution_similarity(
     Returns:
         float: Similarity of label distributions
     """
-    pipeline = compose(get_ner_stats, get_sorted_type_counts, counts_to_probs)
+    def pipeline(data):
+        stats = get_ner_stats(data)
+        assert isinstance(stats, NERStats)
+        sorted_type_counts = get_sorted_type_counts(stats)
+        counts_to_probs = counts_to_probs(sorted_type_counts)
+
     distance = jensenshannon(pipeline(x), pipeline(y))
 
     return (1 - distance) * 100
@@ -174,10 +178,9 @@ def calculate_entity_coverage_similarity(
             often entities occur in each dataset x and y)
     """
 
-    def get_ec_map(ecs: List[EntityCoverage], sep: str = "|||") -> Dict[str, int]:
-        return {f"{ec.text}{sep}{ec.label}": ec.count for ec in ecs}
-
-    pipeline = compose(get_entity_coverage, get_ec_map)
+    def pipeline(data):
+        ecs = get_entity_coverage(data)
+        return {hash(ec): ec.count for ec in ecs}
 
     x_map = pipeline(x)
     y_map = pipeline(y)

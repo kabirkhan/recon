@@ -1,6 +1,9 @@
+from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, Schema, validator
+from .hashing import example_hash, span_hash, token_hash, tokenized_example_hash
 
 
 class Span(BaseModel):
@@ -13,6 +16,9 @@ class Span(BaseModel):
     token_start: Optional[int]
     token_end: Optional[int]
 
+    def __hash__(self):
+        return span_hash(self)
+
 
 class Token(BaseModel):
     """Token with offsets into Example Text"""
@@ -22,14 +28,69 @@ class Token(BaseModel):
     end: int
     id: int
 
+    def __hash__(self):
+        return token_hash(self)
+
 
 class Example(BaseModel):
     """Example with NER Label spans"""
 
     text: str
     spans: List[Span]
-    tokens: List[Token]
+    tokens: Optional[List[Token]]
     meta: Dict[str, Any] = {}
+
+    def __hash__(self):
+        return example_hash(self)
+
+
+class TokenizedExample(Example):
+    """Example with NER Label spans and tokens"""
+    tokens: List[Token]
+
+    def __hash__(self):
+        return tokenized_example_hash(self)
+
+
+class TransformationType(Enum):
+    EXAMPLE_ADDED = "EXAMPLE_ADDED"
+    EXAMPLE_REMOVED = "EXAMPLE_REMOVED"
+    EXAMPLE_CHANGED = "EXAMPLE_CHANGED"
+
+
+class Transformation(BaseModel):
+    prev_example: int
+    example: int
+    type: TransformationType
+
+
+class OperationStatus(Enum):
+    NOT_STARTED = "NOT_STARTED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+
+
+class OperationState(BaseModel):
+    name: str
+    status: OperationStatus = OperationStatus.NOT_STARTED
+    ts: datetime = datetime.now()
+    examples_added: int = 0
+    examples_removed: int = 0
+    examples_changed: int = 0
+    annotations_added: int = 0
+    annotations_removed: int = 0
+    annotations_changed: int = 0
+    transformations: List[Transformation] = []
+
+
+class DatasetOperationsState(BaseModel):
+    name: str
+    operations: List[OperationState]
+
+
+class OperationResult(BaseModel):
+    data: Any
+    state: OperationState
 
 
 class PredictionErrorExamplePair(BaseModel):
@@ -116,6 +177,9 @@ class EntityCoverage(BaseModel):
     label: str
     count: int
     examples: Optional[List[Example]] = []
+
+    def __hash__(self):
+        return (self.text, self.label)
 
 
 class EntityCoverageStats(BaseModel):
