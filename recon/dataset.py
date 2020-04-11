@@ -1,11 +1,12 @@
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Set
-
+from typing import Any, Callable, Dict, List, Set, Tuple
 import srsly
 from spacy.util import ensure_path
 
 from .hashing import dataset_hash
 from .loaders import read_json, read_jsonl
+from .operations import registry
 from .registry import loading_pipelines
 from .store import ExampleStore
 from .types import DatasetOperationsState, Example, OperationResult, OperationState, OperationStatus
@@ -94,7 +95,7 @@ class Dataset:
         return func(self.data, *args, **kwargs) # type: ignore
         
     def apply_(
-        self, operation: Callable[[Any], OperationResult], *args: Any, **kwargs: Any
+        self, operation: Callable[[Any], OperationResult], *args: Any, initial_state: OperationState = None, **kwargs: Any
     ) -> None:
         """Apply a function to all data inplace.
         
@@ -102,11 +103,9 @@ class Dataset:
             func (Callable[[List[Example], Any, Any], List[Example]]): Function from an existing recon module
                 that can operate on a List[Example] and return a List[Example]
         """
-        result: OperationResult = next(operation(self, *args, **kwargs))  # type: ignore
+        result: OperationResult = operation(self, *args, initial_state=initial_state, **kwargs)  # type: ignore
         dataset_changed = any((result.state.examples_added, result.state.examples_removed, result.state.examples_changed))
         if dataset_changed:
-            self.iteration += 1
-
             self.global_state[result.state.name] = result.state
             self.operations.append(result.state)
             self.data = result.data
@@ -126,42 +125,73 @@ class Dataset:
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         path = ensure_path(path)
-        if (path / ".recon" / self.name).exists():
-            cfg = srsly.read_json(path / ".recon" / self.name)
-            print(cfg)
-            self.operations = [OperationState(**op) for op in cfg["operations"]]
+        disabled_operations: Set[str] = set()
+        ds_op_state = None
+        if (path.parent / ".recon" / self.name).exists():
+            state = srsly.read_json(path.parent / ".recon" / self.name / "state.json")
+            ds_op_state = DatasetOperationsState(**state)
 
-        idx_to_remove: Set[int] = set()
-        for idx, op in enumerate(self.operations):
-            if op.name in loading_pipeline and op.status == OperationStatus.COMPLETED:
-                idx_to_remove.add(idx)
+            for op in ds_op_state.operations:
+                if op.name in loading_pipeline and op.status == OperationStatus.COMPLETED:
+                    disabled_operations.add(op.name)
 
-        loading_pipeline = [op for i, op in enumerate(loading_pipeline) if i not in idx_to_remove]
-
+        # loading_pipeline = [op for i, op in enumerate(loading_pipeline) if op not in idx_to_remove]
+        print("Disabled operations: ", disabled_operations)
         data = loader_func(path, loading_pipeline=loading_pipeline)
         self.data = data
 
+        if ds_op_state and self.commit_hash != ds_op_state.commit:
+            print("Dataset hash is different, rerun operations")
+            # Dataset changed, examples added
+            self.operations.append(
+                OperationState(
+                    name="examples_added_external",
+                    status=OperationStatus.COMPLETED,
+                    ts=datetime.now(),
+                    examples_added=max(len(self) - ds_op_state.size, 0),
+                    examples_removed=max(ds_op_state.size - len(self), 0),
+                    examples_changed=0,
+                    transformations=[]
+                )
+            )
+
+            seen: Set[str] = set()
+            operations_to_run: Dict[str, Tuple[OperationState, List[Any], Dict[str, Any]]] = {}
+            for op in self.operations:
+                if op.name not in seen and op.name in registry.operations:
+                    operations_to_run[op.name] = (op, op.args, op.kwargs)
+                    seen.add(op.name)
+
+            for op_name, (state, args, kwargs) in operations_to_run:
+                op = registry.operations.get(op_name)
+                self.apply_(op, *args, initial_state=state, **kwargs)
+                
+
         return self
 
-    def to_disk(self, output_path: Path, force: bool = False) -> None:
+    def to_disk(self, output_path: Path, force: bool = False, save_examples: bool = True) -> None:
         """Save Corpus to Disk
         
         Args:
             output_path (Path): Output file path to save data to
             force (bool): Force save to directory. Create parent directories
                 or overwrite existing data.
+            save_examples (bool): Save the example store along with the state.
         """
         output_path = ensure_path(output_path)
         output_dir = output_path.parent
-        cfg_dir = output_dir / ".recon" / self.name
+        state_dir = output_dir / ".recon" / self.name
         if force:
             output_dir.mkdir(parents=True, exist_ok=True)
         
-            if not cfg_dir.exists():
-                cfg_dir.mkdir(parents=True, exist_ok=True)
+            if not state_dir.exists():
+                state_dir.mkdir(parents=True, exist_ok=True)
 
-        cfg = DatasetOperationsState(name=self.name, operations=self.operations)
-        with (cfg_dir / "state.json").open("w+") as cfg_f:
-            cfg_f.write(cfg.json())
+        ds_op_state = DatasetOperationsState(name=self.name, commit=self.commit_hash, size=len(self), operations=self.operations)
+        with (state_dir / "state.json").open("w+") as state_f:
+            state_f.write(ds_op_state.json(indent=4))
+
+        if save_examples:
+            self.example_store.to_disk(state_dir / "example_store.jsonl")
 
         srsly.write_jsonl(output_path, [e.dict() for e in self.data])

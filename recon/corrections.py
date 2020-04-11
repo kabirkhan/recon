@@ -4,10 +4,17 @@ import copy
 from collections import defaultdict
 from typing import DefaultDict, Dict, List
 
-from .types import Example
+from .operations import operation
+from .types import Example, TransformationCallbacks
 
 
-def rename_labels(data: List[Example], label_map: Dict[str, str]) -> List[Example]:
+@operation("rename_labels")
+def rename_labels(
+    data: List[Example],
+    label_map: Dict[str, str],
+    *,
+    callbacks: TransformationCallbacks
+) -> List[Example]:
     """Rename labels in a copy of List[Example] data
     
     Args:
@@ -17,15 +24,23 @@ def rename_labels(data: List[Example], label_map: Dict[str, str]) -> List[Exampl
     Returns:
         List[Example]: Copy List of Examples with renamed labels
     """
-    data_copy = copy.deepcopy(data)
-    for example in data_copy:
+    examples = copy.deepcopy(data)
+    for example in examples:
+        orig_example = hash(example)
         for span in example.spans:
             span.label = label_map.get(span.label, span.label)
-    return data_copy
+        if hash(example) != orig_example:
+            callbacks.change_example(orig_example, example)
+    return examples
 
 
+@operation(name="fix_annotations")
 def fix_annotations(
-    data: List[Example], corrections: Dict[str, str], use_lower: bool = True
+    data: List[Example],
+    corrections: Dict[str, str],
+    *,
+    case_sensitive: bool = False,
+    callbacks: TransformationCallbacks
 ) -> List[Example]:
     """Fix annotations in a copy of List[Example] data.
     
@@ -37,36 +52,44 @@ def fix_annotations(
         data (List[Example]): List of Examples
         corrections (Dict[str, str]): Dictionary of corrections mapping entity text to a new label.
         If the value is set to None, the annotation will be removed
-        use_lower (bool, optional): Use the lowercase form of the span text 
-            for matching corrections. Defaults to True.
+        case_sensitive (bool, optional): Consider case of text for each correction
     
     Returns:
         List[Example]: Fixed Examples
     """
-    data_copy: List[Example] = copy.deepcopy(data)
-    if use_lower:
+    examples: List[Example] = copy.deepcopy(data)
+    if case_sensitive:
+        corrections = {t: l for t, l in corrections.items()}
+    else:
         corrections = {t.lower(): l for t, l in corrections.items()}
 
     prints: DefaultDict[str, List[str]] = defaultdict(list)
 
     for example in data:
+        orig_example = hash(example)
         ents_to_remove = []
         for i, s in enumerate(example.spans):
-            t = s.text.lower()
+            t = s.text if case_sensitive else s.text.lower()
 
             if t in corrections:
+                print(t, "in corrections")
                 if corrections[t] is print:
                     prints[t] += [("=" * 100), example.text, s.label]
                 elif corrections[t] is None:
                     ents_to_remove.append(i)
                 else:
+                    print("before", s.label)
                     s.label = corrections[t]
+                    print("after", s.label)
 
         i = len(ents_to_remove) - 1
         while i >= 0:
             idx = ents_to_remove[i]
             del example.spans[idx]
             i -= 1
+
+        if hash(example) != orig_example:
+            callbacks.change_example(orig_example, example)
 
     for k in sorted(prints):
         print(f"**{k}**")

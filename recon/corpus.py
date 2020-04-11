@@ -79,13 +79,19 @@ class Corpus:
                 or overwrite existing data.
         """
         data_dir = ensure_path(data_dir)
+        state_dir = data_dir / ".recon"
         if force:
             data_dir.mkdir(parents=True, exist_ok=True)
 
-        self._train.to_disk(data_dir / "train.jsonl", force=force)
-        self._dev.to_disk(data_dir / "dev.jsonl", force=force)
+            if not state_dir.exists():
+                state_dir.mkdir(parents=True, exist_ok=True)
+
+        self._train.to_disk(data_dir / "train.jsonl", force=force, save_examples=False)
+        self._dev.to_disk(data_dir / "dev.jsonl", force=force, save_examples=False)
         if self._test:
-            self._test.to_disk(data_dir / "test.jsonl", force=force)
+            self._test.to_disk(data_dir / "test.jsonl", force=force, save_examples=False)
+
+        self.example_store.to_disk(state_dir / "example_store.jsonl")
 
     @property
     def train(self) -> List[Example]:

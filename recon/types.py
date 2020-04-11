@@ -55,15 +55,15 @@ class TokenizedExample(Example):
         return tokenized_example_hash(self)
 
 
-class TransformationType(Enum):
+class TransformationType(str, Enum):
     EXAMPLE_ADDED = "EXAMPLE_ADDED"
     EXAMPLE_REMOVED = "EXAMPLE_REMOVED"
     EXAMPLE_CHANGED = "EXAMPLE_CHANGED"
 
 
 class Transformation(BaseModel):
-    prev_example: int = None
-    example: int = None
+    prev_example: Optional[int] = None
+    example: Optional[int] = None
     type: TransformationType
 
     def __hash__(self):
@@ -76,7 +76,7 @@ class TransformationCallbacks(BaseModel):
     change_example: Callable[[int, Example], Transformation]
 
 
-class OperationStatus(Enum):
+class OperationStatus(str, Enum):
     NOT_STARTED = "NOT_STARTED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
@@ -84,19 +84,20 @@ class OperationStatus(Enum):
 
 class OperationState(BaseModel):
     name: str
+    args: List[Any] = []
+    kwargs: Dict[str, Any] = {}
     status: OperationStatus = OperationStatus.NOT_STARTED
     ts: datetime = datetime.now()
     examples_added: int = 0
     examples_removed: int = 0
     examples_changed: int = 0
-    annotations_added: int = 0
-    annotations_removed: int = 0
-    annotations_changed: int = 0
     transformations: List[Transformation] = []
 
 
 class DatasetOperationsState(BaseModel):
     name: str
+    commit: str
+    size: int
     operations: List[OperationState]
 
 
