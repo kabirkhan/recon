@@ -1,8 +1,10 @@
+from collections import Counter
 from copy import deepcopy
 from inspect import isclass
 from typing import Any, Callable, Dict, List, Set, Tuple
 
 import catalogue
+import srsly
 
 from .types import Example, OperationResult, OperationState, OperationStatus, Transformation, TransformationCallbacks, TransformationType
 
@@ -92,13 +94,18 @@ class operation:
             initial_len = len(prev_data)
             new_data_len = len(new_data)
 
+            
+            transformation_counts = Counter([t.type for t in state.transformations])
             print("TRANSFORMATIONS CALCULATED")
+            print(srsly.json_dumps(transformation_counts, indent=4))
             print("Transformations (ADDED): ", len([t for t in state.transformations if t.type == TransformationType.EXAMPLE_ADDED]))
             print("Transformations (REMOVED): ", len([t for t in state.transformations if t.type == TransformationType.EXAMPLE_REMOVED]))
             print("Transformations (CHANGED): ", len([t for t in state.transformations if t.type == TransformationType.EXAMPLE_CHANGED]))
 
-            state.examples_added = max(new_data_len - initial_len, 0)
-            state.examples_removed = max(initial_len - new_data_len, 0)
+
+            state.examples_added = transformation_counts[TransformationType.EXAMPLE_ADDED]# len([t for t in state.transformations if t.type == TransformationType.EXAMPLE_ADDED])
+            state.examples_removed = transformation_counts[TransformationType.EXAMPLE_REMOVED]
+            state.examples_changed = transformation_counts[TransformationType.EXAMPLE_CHANGED]
             
             state.status = OperationStatus.COMPLETED
 
