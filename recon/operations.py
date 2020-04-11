@@ -76,9 +76,6 @@ class operation:
                 change_example=change_example
             )
 
-            # if isclass(obj):
-            #     new_data = obj()(dataset.data, callbacks=callbacks)
-            # else:
             new_data = obj(dataset.data, *args, **kwargs, callbacks=callbacks)
             transformation_counts = Counter([t.type for t in state.transformations])
 
