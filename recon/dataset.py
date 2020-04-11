@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Set, Tuple
@@ -55,16 +56,14 @@ class Dataset:
         self,
         name: str,
         data: List[Example] = [],
-        global_state: Dict[str, List[OperationState]] = {},
-        operations: List[OperationState] = [],
-        iteration: int = 0,
+        operations: List[OperationState] = None,
         example_store: ExampleStore = None
     ):
         self.name = name
         self.data = data
-        self.global_state = global_state
+        if not operations:
+            operations = []
         self.operations = operations
-        self.iteration = iteration
 
         if example_store is None:
             example_store = ExampleStore(data)
@@ -104,10 +103,9 @@ class Dataset:
                 that can operate on a List[Example] and return a List[Example]
         """
         result: OperationResult = operation(self, *args, initial_state=initial_state, **kwargs)  # type: ignore
+        self.operations.append(result.state)
         dataset_changed = any((result.state.examples_added, result.state.examples_removed, result.state.examples_changed))
         if dataset_changed:
-            self.global_state[result.state.name] = result.state
-            self.operations.append(result.state)
             self.data = result.data
 
     def from_disk(
@@ -125,23 +123,16 @@ class Dataset:
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         path = ensure_path(path)
-        disabled_operations: Set[str] = set()
         ds_op_state = None
         if (path.parent / ".recon" / self.name).exists():
             state = srsly.read_json(path.parent / ".recon" / self.name / "state.json")
             ds_op_state = DatasetOperationsState(**state)
+            self.operations = ds_op_state.operations
 
-            for op in ds_op_state.operations:
-                if op.name in loading_pipeline and op.status == OperationStatus.COMPLETED:
-                    disabled_operations.add(op.name)
-
-        # loading_pipeline = [op for i, op in enumerate(loading_pipeline) if op not in idx_to_remove]
-        print("Disabled operations: ", disabled_operations)
         data = loader_func(path, loading_pipeline=loading_pipeline)
         self.data = data
 
         if ds_op_state and self.commit_hash != ds_op_state.commit:
-            print("Dataset hash is different, rerun operations")
             # Dataset changed, examples added
             self.operations.append(
                 OperationState(
@@ -155,19 +146,24 @@ class Dataset:
                 )
             )
 
-            seen: Set[str] = set()
-            operations_to_run: Dict[str, Tuple[OperationState, List[Any], Dict[str, Any]]] = {}
             for op in self.operations:
-                if op.name not in seen and op.name in registry.operations:
-                    operations_to_run[op.name] = (op, op.args, op.kwargs)
-                    seen.add(op.name)
+                op.status = OperationStatus.NOT_STARTED
 
-            for op_name, (state, args, kwargs) in operations_to_run:
-                op = registry.operations.get(op_name)
-                self.apply_(op, *args, initial_state=state, **kwargs)
-                
+        seen: Set[str] = set()
+        operations_to_run: Dict[str, OperationState] = {}
+
+        for op in self.operations:
+            if op.name not in operations_to_run and op.name in registry.operations:
+                operations_to_run[op.name] = op
+
+        print(operations_to_run.keys())
+
+        for op_name, state in operations_to_run.items():
+            op = registry.operations.get(op_name)
+            self.apply_(op, *state.args, initial_state=state, **state.kwargs)
 
         return self
+
 
     def to_disk(self, output_path: Path, force: bool = False, save_examples: bool = True) -> None:
         """Save Corpus to Disk
@@ -188,8 +184,9 @@ class Dataset:
                 state_dir.mkdir(parents=True, exist_ok=True)
 
         ds_op_state = DatasetOperationsState(name=self.name, commit=self.commit_hash, size=len(self), operations=self.operations)
-        with (state_dir / "state.json").open("w+") as state_f:
-            state_f.write(ds_op_state.json(indent=4))
+        srsly.write_json(state_dir / "state.json", ds_op_state.dict())
+        # with (state_dir / "state.json").open("w+") as state_f:
+        #     state_f.write(ds_op_state.json(indent=4))
 
         if save_examples:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
