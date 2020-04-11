@@ -4,16 +4,17 @@ from typing import Any, Dict, List, Set, Tuple
 
 from spacy.language import Language
 
+from .dataset import Dataset
 from .operations import operation
 from .registry import tokenizers
-from .types import Example, OperationState, Span, Token
+from .types import Example, OperationState, Span, Token, TokenizedExample, Transformation, TransformationType, TransformationCallbacks
 
 
-@operation("fix_tokenization_and_spacing")
+@operation("fix_tokenization_and_spacing", inject_state=True)
 def fix_tokenization_and_spacing(
     examples: List[Example],
     *,
-    state: Dict[str, OperationState],
+    callbacks: TransformationCallbacks,
     tokenizer: str = "default",
     verbose: bool = True
 ) -> List[Example]:
@@ -23,12 +24,12 @@ def fix_tokenization_and_spacing(
     get two words pushed together where one is an entity so this can fix a lot of issues.
     
     Args:
-        examples (List[Example]): List of Examples
+        dataset (Dataset): Input Dataset
         tokenizer (str, optional): Name of tokenizer in tokenizers registry to use
         verbose (bool, optional): Print status
     
     Returns:
-        List[Example]: List of fixed Examples
+        Dataset: Dataset with fixed Examples
     """
     fixed_examples = []
     tokenization_errors: List[Tuple[Dict[str, Any], str]] = []
@@ -39,6 +40,7 @@ def fix_tokenization_and_spacing(
     
     with nlp.disable_pipes(*nlp.pipe_names):
         for example, doc in zip(examples, nlp.pipe(texts)):
+            orig_example = hash(example)
             fixed_example = example.copy()
             doc = nlp.make_doc(fixed_example.text)
 
@@ -91,6 +93,7 @@ def fix_tokenization_and_spacing(
                         new_text = f"{fe_text[:split_start]}{span.text} {fe_text[split_end:]}"
 
                         fixed_example.text = new_text
+
                 elif span.start not in token_starts and span.end in token_ends:
                     # Bad tokenization
                     # e.g. with[Raymond][PERSON] but text should be split to with [Raymond][PERSON]
@@ -133,52 +136,59 @@ def fix_tokenization_and_spacing(
                     unfixable_tokenization_errors.add(fixed_example.text)
                     break
 
+
                 # Increment the start and end characters for each span
             for span_i, count in spans_to_increment.items():
                 fixed_example.spans[span_i].start += count
                 fixed_example.spans[span_i].end += count
                 
             if fixed_example.text not in unfixable_tokenization_errors:
+                if hash(fixed_example) != orig_example:
+                    callbacks.change_example(orig_example, fixed_example)
                 fixed_examples.append(fixed_example)
+            else:
+                callbacks.remove_example(orig_example)
     
     if tokenization_errors and verbose:
         print(f"Found {len(tokenization_errors)} tokenization errors.")
         print(f"Found {len(unfixable_tokenization_errors)} unfixable tokenization errors.")
-        print([(e[0].text, e[1]) for e in tokenization_errors])
 
     return fixed_examples
 
 
 
-@operation("add_tokens")
+@operation("add_tokens", inject_state=True)
 def add_tokens(
-    data: List[Example],
+    examples: List[Example],
     *,
-    state: Dict[str, OperationState],
+    callbacks: TransformationCallbacks,
     verbose: bool = True,
     tokenizer: str = "default"
 ) -> List[Example]:
-    """Add tokens to each JSON Example
+    """Add tokens to each Example
     
     Args:
-        data (List[Example]): List of JSON Examples
+        dataset (Dataset): Dataset to tokenize
         force (boo, optional): Force add tokens
         tokenizer (str, optional): Name of tokenizer in tokenizers registry to use
     
     Returns:
-        List[Example]: List of Examples with tokens
+        Dataset: Dataset of Examples with tokens
     """
     # has_tokens = all(["tokens" in e for e in data])
     # if has_tokens and not force:
     #     return data
-    
-    output_examples: List[Example] = []
+
+    output_examples: List[TokenizedExample] = []
     tokenization_errors: List[Tuple[Dict[str, Any], str]] = []
+    unfixable_examples: Set[str] = set()
     nlp = tokenizers.get(tokenizer)()
-    texts = (e.text for e in data)
+    texts = (e.text for e in examples)
 
     with nlp.disable_pipes(*nlp.pipe_names):
-        for example, doc in zip(data, nlp.pipe(texts)):
+        for example, doc in zip(examples, nlp.pipe(texts)):
+            orig_example = hash(example)
+            fixed_example = example.copy() #TokenizedExample(text=example.text, spans=example.spans, meta=example.meta, tokens=example.tokens)
             tokens = []
             token_starts = {}
             token_ends = {}
@@ -193,23 +203,28 @@ def add_tokens(
                 token_ends[end] = t
 
             
-            example.tokens = tokens
+            fixed_example.tokens = tokens
 
-            for span in example.spans:
+            for span in fixed_example.spans:
                 if span.start in token_starts and span.end in token_ends:
                     span.token_start = token_starts[span.start].i
                     span.token_end = token_ends[span.end].i
 
                 if span.token_start is None or span.token_end is None:
                     print(span)
-                    tokenization_errors.append((example, span.text))
-    
-    if tokenization_errors and verbose:
-        print(f"Found {len(tokenization_errors)} tokenization errors.")
+                    tokenization_errors.append((fixed_example, span.text))
+                    unfixable_examples.add(fixed_example.text)
 
-    error_texts = {e[0].text for e in tokenization_errors}
-    for example in data:
-        if example.text not in error_texts:
-            output_examples.append(example)
+            if fixed_example.text not in unfixable_examples:
+                if hash(fixed_example) != orig_example:
+                    callbacks.change_example(orig_example, fixed_example)
+                output_examples.append(fixed_example)
+            else:
+                callbacks.remove_example(orig_example)
+    
+    if verbose:
+        print(f"Found {len(tokenization_errors)} tokenization errors.")
+        print(f"Found {len(unfixable_examples)} unfixable examples.")
+
         
     return output_examples

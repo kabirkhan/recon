@@ -1,9 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from pydantic import BaseModel, Field, Schema, validator
-from .hashing import example_hash, span_hash, token_hash, tokenized_example_hash
+from .hashing import example_hash, span_hash, text_hash, token_hash, tokenized_example_hash, transformation_hash
 
 
 class Span(BaseModel):
@@ -41,7 +41,10 @@ class Example(BaseModel):
     meta: Dict[str, Any] = {}
 
     def __hash__(self):
-        return example_hash(self)
+        return tokenized_example_hash(self)
+    
+    def text_hash(self):
+        return text_hash(self.text)
 
 
 class TokenizedExample(Example):
@@ -59,9 +62,18 @@ class TransformationType(Enum):
 
 
 class Transformation(BaseModel):
-    prev_example: int
-    example: int
+    prev_example: int = None
+    example: int = None
     type: TransformationType
+
+    def __hash__(self):
+        return transformation_hash(self)
+
+
+class TransformationCallbacks(BaseModel):
+    add_example: Callable[[Example], Transformation]
+    remove_example: Callable[[int], Transformation]
+    change_example: Callable[[int, Example], Transformation]
 
 
 class OperationStatus(Enum):
