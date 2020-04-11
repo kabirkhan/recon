@@ -1,4 +1,9 @@
+from pathlib import Path
 from typing import Any, Dict, List, Set
+
+from spacy.util import ensure_path
+import srsly
+
 from .hashing import text_hash
 from .types import Example
 
@@ -37,3 +42,24 @@ class ExampleStore:
     
     def contains_text(self, example):
         return example.text in self._texts
+
+    def from_disk(self, path: Path) -> "ExampleStore":
+        path = ensure_path(path)
+        examples = srsly.read_jsonl(path)
+        for e in examples:
+            example_hash = e["example_hash"]
+            raw_example = e["example"]
+            example = Example(**raw_example)
+            assert hash(example) == example_hash
+            self.add(example)
+
+        return self
+    
+    def to_disk(self, path: Path) -> None:
+
+        path = ensure_path(path)
+        examples = []
+        for example_hash, example in self._map.items():
+            examples.append({"example_hash": example_hash, "example": example.dict()})
+            
+        srsly.write_jsonl(path, examples)

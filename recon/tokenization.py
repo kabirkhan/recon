@@ -10,7 +10,7 @@ from .registry import tokenizers
 from .types import Example, OperationState, Span, Token, TokenizedExample, Transformation, TransformationType, TransformationCallbacks
 
 
-@operation("fix_tokenization_and_spacing", inject_state=True)
+@operation("fix_tokenization_and_spacing")
 def fix_tokenization_and_spacing(
     examples: List[Example],
     *,
@@ -157,7 +157,7 @@ def fix_tokenization_and_spacing(
 
 
 
-@operation("add_tokens", inject_state=True)
+@operation("add_tokens")
 def add_tokens(
     examples: List[Example],
     *,
@@ -175,10 +175,6 @@ def add_tokens(
     Returns:
         Dataset: Dataset of Examples with tokens
     """
-    # has_tokens = all(["tokens" in e for e in data])
-    # if has_tokens and not force:
-    #     return data
-
     output_examples: List[TokenizedExample] = []
     tokenization_errors: List[Tuple[Dict[str, Any], str]] = []
     unfixable_examples: Set[str] = set()
@@ -188,7 +184,7 @@ def add_tokens(
     with nlp.disable_pipes(*nlp.pipe_names):
         for example, doc in zip(examples, nlp.pipe(texts)):
             orig_example = hash(example)
-            fixed_example = example.copy() #TokenizedExample(text=example.text, spans=example.spans, meta=example.meta, tokens=example.tokens)
+            fixed_example = example.copy()
             tokens = []
             token_starts = {}
             token_ends = {}
