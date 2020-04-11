@@ -76,6 +76,9 @@ class Dataset:
     def __hash__(self):
         return dataset_hash(self)
     
+    def __len__(self):
+        return len(self.data)
+    
     def apply(
         self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
     ) -> Any:
@@ -99,7 +102,7 @@ class Dataset:
             func (Callable[[List[Example], Any, Any], List[Example]]): Function from an existing recon module
                 that can operate on a List[Example] and return a List[Example]
         """
-        result: OperationResult = operation(self.data, *args, **kwargs)  # type: ignore
+        result: OperationResult = next(operation(self, *args, **kwargs))  # type: ignore
         dataset_changed = any((result.state.examples_added, result.state.examples_removed, result.state.examples_changed))
         if dataset_changed:
             self.iteration += 1
