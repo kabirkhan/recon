@@ -15,28 +15,22 @@ class registry:
 
 class operation:
     def __init__(self, name: str):
-        """Decorate a pipeline component.
-        name (str): Default component and factory name.
+        """Decorate an operation that makes some changes to a dataset.
+
+        Args:
+            name (str): Operation name.
         """
         self.name = name
 
-    def __call__(self, *args, **kwargs):
-        obj = args[0]
-        args = args[1:]
-
+    def __call__(self, *args, **kwargs) -> Callable:
+        obj: Callable = args[0]
 
         def factory(dataset, *args, **kwargs) -> OperationResult:
-            # print(self.initial_state)
-            # if self.initial_state.status == OperationStatus.COMPLETED:
-            #     return OperationResult(data=dataset.data, state=self.initial_state)
-            # TODO: run this step above inside Dataset.apply_
+
             initial_state = kwargs.pop("initial_state")
             if not initial_state:
                 initial_state = OperationState(name=self.name)
             state = initial_state.copy(deep=True)
-
-            print(f"Running operation on {dataset.name}")
-            print("=" * 100)
 
             if state.status == OperationStatus.NOT_STARTED:
                 state.status = OperationStatus.IN_PROGRESS
@@ -82,12 +76,6 @@ class operation:
             state.examples_added = transformation_counts[TransformationType.EXAMPLE_ADDED]
             state.examples_removed = transformation_counts[TransformationType.EXAMPLE_REMOVED]
             state.examples_changed = transformation_counts[TransformationType.EXAMPLE_CHANGED]
-
-            print("TRANSFORMATIONS CALCULATED")
-            print("Transformations (ADDED): ", state.examples_added)
-            print("Transformations (REMOVED): ", state.examples_removed)
-            print("Transformations (CHANGED): ", state.examples_changed)
-            
             state.status = OperationStatus.COMPLETED
 
             state_copy = state.copy(deep=True)

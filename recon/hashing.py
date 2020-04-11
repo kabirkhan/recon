@@ -1,21 +1,17 @@
 import hashlib
-from typing import Callable, Union
+from typing import Any, Callable, Tuple, Union
 
 
-def text_hash(text: str, as_int: bool = True):
-    return _hash((text), as_int=as_int)
-
-
-def token_hash(token, as_int: bool = True):
+def token_hash(token: Any, as_int: bool = True) -> Union[str, int]:
     return _hash((token.text, token.start, token.end, token.id), as_int=as_int)
 
 
-def span_hash(span, as_int: bool = True):
+def span_hash(span: Any, as_int: bool = True) -> Union[str, int]:
     hash_data = (span.start, span.end, span.label, span.text, span.token_start if span.token_start else 0, span.token_end if span.token_end else 0)
     return _hash(hash_data, as_int=as_int)
 
 
-def example_hash(example, as_int: bool = True):
+def example_hash(example: Any, as_int: bool = True) -> Union[str, int]:
     hash_data = (
         (example.text,)
         + tuple((span_hash(span, as_int=False) for span in example.spans))
@@ -23,7 +19,7 @@ def example_hash(example, as_int: bool = True):
     return _hash(hash_data, as_int=as_int)
 
 
-def tokenized_example_hash(example, as_int: bool = True):
+def tokenized_example_hash(example: Any, as_int: bool = True) -> Union[str, int]:
     tokens = example.tokens or []
     hash_data = (
         (example.text,)
@@ -33,7 +29,7 @@ def tokenized_example_hash(example, as_int: bool = True):
     return _hash(hash_data, as_int=as_int)
 
 
-def dataset_hash(dataset, as_int: bool = True):
+def dataset_hash(dataset: Any, as_int: bool = True) -> Union[str, int]:
     hash_data = (
         (dataset.name,) + 
         tuple((example_hash(example, as_int=False) for example in dataset.data))
@@ -41,13 +37,13 @@ def dataset_hash(dataset, as_int: bool = True):
     return _hash(hash_data, as_int=as_int)
 
 
-def transformation_hash(transformation, as_int: bool = True):
+def transformation_hash(transformation: Any, as_int: bool = True) -> Union[str, int]:
     hash_data = (transformation.type.value,)
     return _hash(hash_data, as_int=as_int) + transformation.prev_example + transformation.example
 
 
 def _hash(
-    tpl, hash_function: Callable = hashlib.sha1, as_int: bool = True
+    tpl: Tuple, hash_function: Callable = hashlib.sha1, as_int: bool = True
 ) -> Union[str, int]:
     m = hash_function()
     for e in tpl:

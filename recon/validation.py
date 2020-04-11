@@ -4,10 +4,12 @@ from typing import Any, Dict, List, Set, Tuple
 
 from spacy.language import Language
 
-from .types import Example, Span
+from .operations import operation
+from .types import Example, Span, TransformationCallbacks
 
 
-def filter_overlaps(data: List[Example]) -> List[Example]:
+@operation("filter_overlaps")
+def filter_overlaps(data: List[Example], *, callbacks: TransformationCallbacks) -> List[Example]:
     """Filter overlapping entity spans by picking the longest one.
     
     Args:
@@ -17,13 +19,18 @@ def filter_overlaps(data: List[Example]) -> List[Example]:
         List[Example]: List of Examples with fixed overlaps
     """
     out_data = []
-    for e in data:
-        annotations: List[Span] = sorted(e.spans, key=lambda s: s.start)
+    for example in data:
+        orig_example = hash(example)
+        annotations: List[Span] = sorted(example.spans, key=lambda s: s.start)
         filtered_annotations = remove_overlapping_entities(annotations)
 
-        new_e = e.copy()
-        new_e.spans = filtered_annotations
-        out_data.append(new_e)
+        fixed_example = example.copy()
+        fixed_example.spans = filtered_annotations
+
+        if hash(fixed_example) != orig_example:
+            callbacks.change_example(orig_example, fixed_example)
+
+        out_data.append(fixed_example)
 
     return out_data
 

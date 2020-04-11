@@ -1,9 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple, cast
 
 from pydantic import BaseModel, Field, Schema, validator
-from .hashing import example_hash, span_hash, text_hash, token_hash, tokenized_example_hash, transformation_hash
+from .hashing import example_hash, span_hash, token_hash, tokenized_example_hash, transformation_hash
 
 
 class Span(BaseModel):
@@ -16,8 +16,8 @@ class Span(BaseModel):
     token_start: Optional[int]
     token_end: Optional[int]
 
-    def __hash__(self):
-        return span_hash(self)
+    def __hash__(self) -> int:
+        return cast(int, span_hash(self))
 
 
 class Token(BaseModel):
@@ -28,8 +28,8 @@ class Token(BaseModel):
     end: int
     id: int
 
-    def __hash__(self):
-        return token_hash(self)
+    def __hash__(self) -> int:
+        return cast(int, token_hash(self))
 
 
 class Example(BaseModel):
@@ -40,19 +40,8 @@ class Example(BaseModel):
     tokens: Optional[List[Token]]
     meta: Dict[str, Any] = {}
 
-    def __hash__(self):
-        return tokenized_example_hash(self)
-    
-    def text_hash(self):
-        return text_hash(self.text)
-
-
-class TokenizedExample(Example):
-    """Example with NER Label spans and tokens"""
-    tokens: List[Token]
-
-    def __hash__(self):
-        return tokenized_example_hash(self)
+    def __hash__(self) -> int:
+        return cast(int, tokenized_example_hash(self))
 
 
 class TransformationType(str, Enum):
@@ -66,8 +55,8 @@ class Transformation(BaseModel):
     example: Optional[int] = None
     type: TransformationType
 
-    def __hash__(self):
-        return transformation_hash(self)
+    def __hash__(self) -> int:
+        return cast(int, transformation_hash(self))
 
 
 class TransformationCallbacks(BaseModel):
@@ -191,8 +180,8 @@ class EntityCoverage(BaseModel):
     count: int
     examples: Optional[List[Example]] = []
 
-    def __hash__(self):
-        return (self.text, self.label)
+    def __hash__(self) -> int:
+        return hash((self.text, self.label))
 
 
 class EntityCoverageStats(BaseModel):
