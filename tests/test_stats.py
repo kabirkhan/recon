@@ -10,44 +10,40 @@ from recon.stats import (
 from recon.types import NERStats
 
 
-def test_get_ner_stats(example_data):
-    stats: NERStats = get_ner_stats(example_data["train"])  # type: ignore
-    str_stats = get_ner_stats(example_data["train"], serialize=True)
+def test_get_ner_stats(example_corpus_processed):
+    stats: NERStats = get_ner_stats(example_corpus_processed.train)  # type: ignore
+    str_stats = get_ner_stats(example_corpus_processed.train, serialize=True)
     assert isinstance(str_stats, str)
 
-    assert stats.n_examples == 106
+    assert stats.n_examples == 105
     assert stats.n_examples_no_entities == 29
-    assert stats.n_annotations_per_type == {"SKILL": 199, "PRODUCT": 34, "JOB_ROLE": 10}
+    assert stats.n_annotations_per_type == {"SKILL": 194, "PRODUCT": 34, "JOB_ROLE": 10}
 
 
-def test_calculate_label_distribution_similarity(example_data):
-    similarity = calculate_label_distribution_similarity(
-        example_data["train"], example_data["dev"]
-    )
+def test_calculate_label_distribution_similarity(example_corpus_processed):
+    similarity = calculate_label_distribution_similarity(example_corpus_processed.train, example_corpus_processed.dev)
 
-    assert round(similarity, 2) == 86.44
+    assert round(similarity, 2) == 86.47
 
 
-def test_calculate_entity_coverage_similarity(example_data):
-    ec_stats = calculate_entity_coverage_similarity(
-        example_data["train"], example_data["dev"]
-    )
+def test_calculate_entity_coverage_similarity(example_corpus_processed):
+    ec_stats = calculate_entity_coverage_similarity(example_corpus_processed.train, example_corpus_processed.dev)
 
     assert round(ec_stats.entity, 2) == 30.57
     assert round(ec_stats.count, 2) == 36.11
 
 
-def test_calculate_entity_coverage_entropy(example_data):
-    entity_coverage = get_entity_coverage(example_data["train"])
+def test_calculate_entity_coverage_entropy(example_corpus_processed):
+    entity_coverage = get_entity_coverage(example_corpus_processed.train)
     entropy = calculate_entity_coverage_entropy(entity_coverage)
 
-    assert round(entropy, 2) == 5.24
+    assert round(entropy, 2) == 5.23
 
 
-def test_calculate_label_balance_entropy(example_data):
-    ner_stats = get_ner_stats(example_data["train"])
+def test_calculate_label_balance_entropy(example_corpus_processed):
+    ner_stats = get_ner_stats(example_corpus_processed.train)
     entropy = calculate_label_balance_entropy(ner_stats)  # type: ignore
-    assert round(entropy, 2) == 0.57
+    assert round(entropy, 2) == 0.58
 
 
 def test_detect_outliers():

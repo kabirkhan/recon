@@ -2,8 +2,14 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple, cast
 
-from pydantic import BaseModel, Field, Schema, validator
-from .hashing import example_hash, span_hash, token_hash, tokenized_example_hash, transformation_hash
+from pydantic import BaseModel, Field, Schema, root_validator
+from .hashing import (
+    example_hash,
+    span_hash,
+    token_hash,
+    tokenized_example_hash,
+    transformation_hash,
+)
 
 
 class Span(BaseModel):
@@ -39,6 +45,28 @@ class Example(BaseModel):
     spans: List[Span]
     tokens: Optional[List[Token]]
     meta: Dict[str, Any] = {}
+    formatted: bool = False
+
+    @root_validator(pre=True)
+    def span_text_must_exist(cls, values):
+        if not values.get("formatted", False):
+            # Ensure each span has a text property
+            spans = values["spans"]
+            for span in spans:
+                if "text" not in span:
+                    span["text"] = values["text"][span["start"] : span["end"]]
+
+            # Ensure the meta has a source property
+            # if something that's not a dict is passed in
+            meta = values.get("meta", {})
+            if isinstance(meta, list) or isinstance(meta, str):
+                meta = {"source": meta}
+
+            values["spans"] = spans
+            values["meta"] = meta
+            values["formatted"] = True
+
+        return values
 
     def __hash__(self) -> int:
         return cast(int, tokenized_example_hash(self))
@@ -63,6 +91,7 @@ class TransformationCallbacks(BaseModel):
     add_example: Callable[[Example], Transformation]
     remove_example: Callable[[int], Transformation]
     change_example: Callable[[int, Example], Transformation]
+    track_example: Callable[[Optional[int], Optional[Example]], Transformation]
 
 
 class OperationStatus(str, Enum):
@@ -73,6 +102,7 @@ class OperationStatus(str, Enum):
 
 class OperationState(BaseModel):
     name: str
+    batch: bool = False
     args: List[Any] = []
     kwargs: Dict[str, Any] = {}
     status: OperationStatus = OperationStatus.NOT_STARTED
@@ -93,6 +123,13 @@ class DatasetOperationsState(BaseModel):
 class OperationResult(BaseModel):
     data: Any
     state: OperationState
+
+
+class CorpusApplyResult(BaseModel):
+    train: Any
+    dev: Any
+    test: Any
+    all: Any
 
 
 class PredictionErrorExamplePair(BaseModel):

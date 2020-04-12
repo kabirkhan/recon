@@ -7,15 +7,19 @@ def token_hash(token: Any, as_int: bool = True) -> Union[str, int]:
 
 
 def span_hash(span: Any, as_int: bool = True) -> Union[str, int]:
-    hash_data = (span.start, span.end, span.label, span.text, span.token_start if span.token_start else 0, span.token_end if span.token_end else 0)
+    hash_data = (
+        span.start,
+        span.end,
+        span.label,
+        span.text,
+        span.token_start if span.token_start else 0,
+        span.token_end if span.token_end else 0,
+    )
     return _hash(hash_data, as_int=as_int)
 
 
 def example_hash(example: Any, as_int: bool = True) -> Union[str, int]:
-    hash_data = (
-        (example.text,)
-        + tuple((span_hash(span, as_int=False) for span in example.spans))
-    )
+    hash_data = (example.text,) + tuple((span_hash(span, as_int=False) for span in example.spans))
     return _hash(hash_data, as_int=as_int)
 
 
@@ -30,9 +34,8 @@ def tokenized_example_hash(example: Any, as_int: bool = True) -> Union[str, int]
 
 
 def dataset_hash(dataset: Any, as_int: bool = True) -> Union[str, int]:
-    hash_data = (
-        (dataset.name,) + 
-        tuple((example_hash(example, as_int=False) for example in dataset.data))
+    hash_data = (dataset.name,) + tuple(
+        (example_hash(example, as_int=False) for example in dataset.data)
     )
     return _hash(hash_data, as_int=as_int)
 

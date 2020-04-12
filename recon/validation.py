@@ -8,8 +8,15 @@ from .operations import operation
 from .types import Example, Span, TransformationCallbacks
 
 
+@operation("upcase_labels")
+def upcase_labels(example: Example) -> Example:
+    for s in example.spans:
+        s.label = s.label.upper()
+    return example
+
+
 @operation("filter_overlaps")
-def filter_overlaps(data: List[Example], *, callbacks: TransformationCallbacks) -> List[Example]:
+def filter_overlaps(example: Example) -> Example:
     """Filter overlapping entity spans by picking the longest one.
     
     Args:
@@ -18,21 +25,12 @@ def filter_overlaps(data: List[Example], *, callbacks: TransformationCallbacks) 
     Returns:
         List[Example]: List of Examples with fixed overlaps
     """
-    out_data = []
-    for example in data:
-        orig_example = hash(example)
-        annotations: List[Span] = sorted(example.spans, key=lambda s: s.start)
-        filtered_annotations = remove_overlapping_entities(annotations)
+    
+    annotations: List[Span] = sorted(example.spans, key=lambda s: s.start)
+    filtered_annotations = remove_overlapping_entities(annotations)
+    example.spans = filtered_annotations
 
-        fixed_example = example.copy()
-        fixed_example.spans = filtered_annotations
-
-        if hash(fixed_example) != orig_example:
-            callbacks.change_example(orig_example, fixed_example)
-
-        out_data.append(fixed_example)
-
-    return out_data
+    return example
 
 
 def select_subset_of_overlapping_chain(

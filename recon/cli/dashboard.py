@@ -42,10 +42,9 @@ def dashboard(data_dir: Path) -> None:
 
     # with msg.loading("Loading Corpus from Disk"):
     corpus = Corpus.from_disk(data_dir)
-        # msg.good("Done")
+    # msg.good("Done")
 
     ner_stats = corpus.apply(get_ner_stats)
-
 
     # external_stylesheets = [
     #     "https://codepen.io/chriddyp/pen/bWLwgP.css",
@@ -58,7 +57,6 @@ def dashboard(data_dir: Path) -> None:
     # ]
 
     # app = dash.Dash(__name__, external_stylesheets=external_stylesheets, external_scripts=external_scripts)
-
 
     # def generate_bar_chart_stats(id: str, ner_stats: NERStats, name: str = None):
     #     return dcc.Graph(
@@ -81,8 +79,6 @@ def dashboard(data_dir: Path) -> None:
     #     html.Div(className="uk-child-width-1-2@s uk-grid-match")
     #     html.H1(className="" children='Recon NER Dashboard'),
 
-
-
     #     html.Div(children='''
     #         This dashboard shows statistics for all your data.
     #     '''),
@@ -95,8 +91,6 @@ def dashboard(data_dir: Path) -> None:
     #     ], style={'columnCount': 4})
     # ])
 
-
-    
     uvicorn.run(app, port=9090)
 
     # app.run_server(debug=True)

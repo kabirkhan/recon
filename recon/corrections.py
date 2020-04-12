@@ -10,10 +10,7 @@ from .types import Example, TransformationCallbacks
 
 @operation("rename_labels")
 def rename_labels(
-    data: List[Example],
-    label_map: Dict[str, str],
-    *,
-    callbacks: TransformationCallbacks
+    example: Example, label_map: Dict[str, str]
 ) -> List[Example]:
     """Rename labels in a copy of List[Example] data
     
@@ -24,23 +21,18 @@ def rename_labels(
     Returns:
         List[Example]: Copy List of Examples with renamed labels
     """
-    examples = copy.deepcopy(data)
-    for example in examples:
-        orig_example = hash(example)
-        for span in example.spans:
-            span.label = label_map.get(span.label, span.label)
-        if hash(example) != orig_example:
-            callbacks.change_example(orig_example, example)
-    return examples
+    for span in example.spans:
+        span.label = label_map.get(span.label, span.label)
+    return example
 
 
-@operation(name="fix_annotations")
+@operation("fix_annotations")
 def fix_annotations(
     data: List[Example],
     corrections: Dict[str, str],
     *,
     case_sensitive: bool = False,
-    callbacks: TransformationCallbacks
+    callbacks: TransformationCallbacks = None,
 ) -> List[Example]:
     """Fix annotations in a copy of List[Example] data.
     

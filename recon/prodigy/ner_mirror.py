@@ -33,31 +33,30 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-app.layout = html.Div(children=[
-    html.H1(children='Hello Dash'),
-
-    html.Div(children='''
+app.layout = html.Div(
+    children=[
+        html.H1(children="Hello Dash"),
+        html.Div(
+            children="""
         Dash: A web application framework for Python.
-    '''),
-
-    dcc.Graph(
-        id='example-graph',
-        figure={
-            'data': [
-                {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
-                {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'},
-            ],
-            'layout': {
-                'title': 'Dash Data Visualization'
-            }
-        }
-    )
-])
-
+    """
+        ),
+        dcc.Graph(
+            id="example-graph",
+            figure={
+                "data": [
+                    {"x": [1, 2, 3], "y": [4, 1, 2], "type": "bar", "name": "SF"},
+                    {"x": [1, 2, 3], "y": [2, 4, 5], "type": "bar", "name": "Montréal"},
+                ],
+                "layout": {"title": "Dash Data Visualization"},
+            },
+        ),
+    ]
+)
 
 
 @prodigy.recipe(
@@ -106,7 +105,6 @@ def manual(
         stream = (eg for _, eg in pattern_matcher(stream))
     stream = add_tokens(nlp, stream)  # add "tokens" key to the tasks
 
-
     print(app.index())
 
     print(app.server.url_map)
@@ -116,7 +114,6 @@ def manual(
     print(app.serve_layout())
     # app.run_server()
     # html = requests.get('127.0.0.1:8050/').text()
-
 
     # with open('./recon/prodigy/templates/graph.html') as f:
     #     html = f.read()
@@ -131,9 +128,6 @@ def manual(
             "lang": nlp.lang,
             "labels": labels,
             "exclude_by": "input",
-            "blocks": [
-                {"view_id": "html", "html_template": html},
-                {"view_id": "ner_manual"}
-            ]
+            "blocks": [{"view_id": "html", "html_template": html}, {"view_id": "ner_manual"}],
         },
     }

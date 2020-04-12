@@ -1,10 +1,11 @@
 {
   "name":"dev",
-  "commit":"2c670e027d91caa3c5c803cb44e4571e8cc546f6",
+  "commit":"83dc8cc9fa1a02d282d1df3267eb3c4c0cc38ba0",
   "size":110,
   "operations":[
     {
       "name":"fix_tokenization_and_spacing",
+      "batch":false,
       "args":[
 
       ],
@@ -12,7 +13,7 @@
 
       },
       "status":"COMPLETED",
-      "ts":1586614096,
+      "ts":1586687281,
       "examples_added":0,
       "examples_removed":0,
       "examples_changed":0,
@@ -22,6 +23,7 @@
     },
     {
       "name":"add_tokens",
+      "batch":false,
       "args":[
 
       ],
@@ -29,7 +31,7 @@
 
       },
       "status":"COMPLETED",
-      "ts":1586614096,
+      "ts":1586687281,
       "examples_added":0,
       "examples_removed":0,
       "examples_changed":61,
@@ -337,6 +339,346 @@
         {
           "prev_example":1241234826570026284,
           "example":1833181202442600516,
+          "type":"EXAMPLE_CHANGED"
+        }
+      ]
+    },
+    {
+      "name":"upcase_labels",
+      "batch":false,
+      "args":[
+
+      ],
+      "kwargs":{
+
+      },
+      "status":"COMPLETED",
+      "ts":1586687281,
+      "examples_added":0,
+      "examples_removed":0,
+      "examples_changed":0,
+      "transformations":[
+
+      ]
+    },
+    {
+      "name":"filter_overlaps",
+      "batch":false,
+      "args":[
+
+      ],
+      "kwargs":{
+
+      },
+      "status":"COMPLETED",
+      "ts":1586687281,
+      "examples_added":0,
+      "examples_removed":0,
+      "examples_changed":0,
+      "transformations":[
+
+      ]
+    },
+    {
+      "name":"rename_labels",
+      "batch":false,
+      "args":[
+        {
+          "SKILL":"SKILL2"
+        }
+      ],
+      "kwargs":{
+
+      },
+      "status":"COMPLETED",
+      "ts":1586687281,
+      "examples_added":0,
+      "examples_removed":0,
+      "examples_changed":57,
+      "transformations":[
+        {
+          "prev_example":1440163042794325281,
+          "example":439114004258632928,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":835817907353458012,
+          "example":1348557594963277345,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1401544305210362028,
+          "example":1789787541977449277,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":332836289686742008,
+          "example":665614085125026663,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1985041809858521669,
+          "example":979189682009808479,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":363126924732114070,
+          "example":1855805349044350607,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":2062494350645492838,
+          "example":1677634238381760567,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":125226676741797670,
+          "example":805483414575082246,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":900690815503486694,
+          "example":1457825296941528002,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":636278463496769178,
+          "example":372976826559039751,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1348692299055623649,
+          "example":42184721497520724,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":912320589480914103,
+          "example":203575631393737521,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":505688486216668913,
+          "example":172572774650532907,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":940049509288004316,
+          "example":2037289937953196571,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1254795659103647011,
+          "example":703817445269182468,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1842678957685877656,
+          "example":1314456687821463701,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1753513273684108539,
+          "example":2071983830550331321,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1334752675665439360,
+          "example":895385627805881163,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":304552633087526026,
+          "example":914518865286120591,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":2090025049069879692,
+          "example":913881798141422883,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1998121117612668136,
+          "example":792716947158774814,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":138940353415693895,
+          "example":237717315459628361,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":807789874943666786,
+          "example":2196811528779819455,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":693624185771132858,
+          "example":1168933750017128105,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":215044788993671706,
+          "example":238839299402285989,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1243642870221238577,
+          "example":1811211840187605042,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":976335651493318978,
+          "example":2105909703507025384,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1260399736843119145,
+          "example":964446975896002999,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1120870192443779736,
+          "example":1604003265251948571,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":794884332250398680,
+          "example":205967803595768193,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":87626146976593938,
+          "example":1345058767106378765,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1705459858278701252,
+          "example":200815600430851386,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1567681933491385351,
+          "example":2289491968211135469,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1187139263955360799,
+          "example":1591173550921986416,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":364879109950222698,
+          "example":756914343636721487,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":299955032411688720,
+          "example":326606684474500750,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":2093986262202459949,
+          "example":197811335854322891,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":389791035289573273,
+          "example":707597741785805894,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":710368738635460045,
+          "example":1252101725425666597,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":965158159646087830,
+          "example":424546755573994778,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1178601262641361769,
+          "example":917770887351247364,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":696565478402206348,
+          "example":2095206829720434750,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":125049327325098525,
+          "example":2283785746555573592,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1536531611695849117,
+          "example":90087543734709913,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1363696056778861329,
+          "example":1606422505241704167,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1852484009322308679,
+          "example":849095314236811850,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":316564513223618496,
+          "example":297039850229612190,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1858510174776353448,
+          "example":843911122402327964,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":618979523221451294,
+          "example":1323697904186059619,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1161497324480003982,
+          "example":1441927985017848927,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1512691624363968979,
+          "example":1710067432392522609,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1634895015591119744,
+          "example":1908422997461276332,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1281916855679910499,
+          "example":108837444668228418,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1687966585026244669,
+          "example":2167650892957273444,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":31033368191502405,
+          "example":535391147005578551,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":791268765332423786,
+          "example":432787694279002078,
+          "type":"EXAMPLE_CHANGED"
+        },
+        {
+          "prev_example":1833181202442600516,
+          "example":579454314969434504,
           "type":"EXAMPLE_CHANGED"
         }
       ]
