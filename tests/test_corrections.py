@@ -17,16 +17,10 @@ def test_rename_labels(example_corpus):
 
 
 def test_fix_annotations(example_corpus):
-    disparities = get_label_disparities(
-        example_corpus.all, label1="SKILL", label2="JOB_ROLE"
-    )
+    disparities = get_label_disparities(example_corpus.all, label1="SKILL", label2="JOB_ROLE")
     assert disparities == {"model", "software development engineer"}
 
-    example_corpus.apply_(
-        fix_annotations, {"software development engineer": "JOB_ROLE"}
-    )
+    example_corpus.apply_(fix_annotations, {"software development engineer": "JOB_ROLE"})
 
-    disparities_fixed = get_label_disparities(
-        example_corpus.all, label1="SKILL", label2="JOB_ROLE"
-    )
+    disparities_fixed = get_label_disparities(example_corpus.all, label1="SKILL", label2="JOB_ROLE")
     assert disparities_fixed == {"model"}

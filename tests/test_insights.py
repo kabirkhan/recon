@@ -5,11 +5,18 @@ from recon.insights import (
 )
 
 
-def test_top_label_disparities(example_corpus):
+def test_top_label_disparities(example_corpus, example_corpus_processed):
     top_disparities = top_label_disparities(example_corpus.all)
-    assert len(top_disparities) == 2
+    assert len(top_disparities) == 6
 
     top_disparities = top_label_disparities(example_corpus.all, dedupe=True)
+    assert len(top_disparities) == 3
+    assert top_disparities[0].count == 2
+
+    top_disparities_processed = top_label_disparities(example_corpus_processed.all)
+    assert len(top_disparities_processed) == 2
+
+    top_disparities_processed = top_label_disparities(example_corpus_processed.all, dedupe=True)
     assert len(top_disparities) == 1
     assert top_disparities[0].count == 2
 
@@ -24,6 +31,4 @@ def test_get_hardest_examples(recognizer, example_corpus):
     hardest_examples = get_hardest_examples(pred_errors)
 
     assert len(hardest_examples) == 42
-    assert hardest_examples[0].example.text.startswith(
-        "Some of the free Apache Tomcat resources"
-    )
+    assert hardest_examples[0].example.text.startswith("Some of the free Apache Tomcat resources")

@@ -12,9 +12,7 @@ def test_corpus_initialize(example_data):
     assert len(corpus1.dev) == 110
     assert len(corpus1.all) == 216
 
-    corpus2 = Corpus(
-        example_data["train"], example_data["dev"], test=example_data["test"]
-    )
+    corpus2 = Corpus(example_data["train"], example_data["dev"], test=example_data["test"])
     assert len(corpus2.train) == 106
     assert len(corpus2.dev) == 110
     assert len(corpus2.test) == 96
@@ -22,9 +20,7 @@ def test_corpus_initialize(example_data):
 
 
 def test_corpus_disk(example_data):
-    corpus = Corpus(
-        example_data["train"], example_data["dev"], test=example_data["test"]
-    )
+    corpus = Corpus(example_data["train"], example_data["dev"], test=example_data["test"])
     save_dir = Path(__file__).parent.parent / "examples/data/skills/to_disk_test"
 
     corpus.to_disk(save_dir, force=True)
@@ -42,9 +38,7 @@ def test_corpus_disk(example_data):
 
 
 def test_corpus_apply(example_data):
-    corpus = Corpus(
-        example_data["train"], example_data["dev"], test=example_data["test"]
-    )
+    corpus = Corpus(example_data["train"], example_data["dev"], test=example_data["test"])
     stats = corpus.apply(get_ner_stats)
     assert sorted(list(stats.keys())) == ["all", "dev", "test", "train"]
 
@@ -52,9 +46,7 @@ def test_corpus_apply(example_data):
 
 
 def test_corpus_apply_inplace(example_data):
-    corpus = Corpus(
-        example_data["train"], example_data["dev"], test=example_data["test"]
-    )
+    corpus = Corpus(example_data["train"], example_data["dev"], test=example_data["test"])
     stats = corpus.apply(get_ner_stats)
     assert sorted(list(stats.keys())) == ["all", "dev", "test", "train"]
 

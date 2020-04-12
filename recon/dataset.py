@@ -1,7 +1,7 @@
 import copy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Set, Tuple
+from typing import Any, Callable, Dict, List, Set, Tuple, Union
 import srsly
 from spacy.util import ensure_path
 
@@ -57,7 +57,7 @@ class Dataset:
         name: str,
         data: List[Example] = [],
         operations: List[OperationState] = None,
-        example_store: ExampleStore = None
+        example_store: ExampleStore = None,
     ):
         self.name = name
         self.data = data
@@ -68,17 +68,17 @@ class Dataset:
         if example_store is None:
             example_store = ExampleStore(data)
         self.example_store = example_store
-    
+
     @property
     def commit_hash(self):
         return dataset_hash(self, as_int=False)
 
     def __hash__(self):
         return dataset_hash(self)
-    
+
     def __len__(self):
         return len(self.data)
-    
+
     def apply(
         self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
     ) -> Any:
@@ -91,10 +91,14 @@ class Dataset:
         Returns:
             Result of running func on List of Examples
         """
-        return func(self.data, *args, **kwargs) # type: ignore
-        
+        return func(self.data, *args, **kwargs)  # type: ignore
+
     def apply_(
-        self, operation: Callable[[Any], OperationResult], *args: Any, initial_state: OperationState = None, **kwargs: Any
+        self,
+        operation: Callable[[Any], OperationResult],
+        *args: Any,
+        initial_state: OperationState = None,
+        **kwargs: Any,
     ) -> None:
         """Apply a function to all data inplace.
         
@@ -104,15 +108,44 @@ class Dataset:
         """
         result: OperationResult = operation(self, *args, initial_state=initial_state, **kwargs)  # type: ignore
         self.operations.append(result.state)
-        dataset_changed = any((result.state.examples_added, result.state.examples_removed, result.state.examples_changed))
+        dataset_changed = any(
+            (
+                result.state.examples_added,
+                result.state.examples_removed,
+                result.state.examples_changed,
+            )
+        )
         if dataset_changed:
             self.data = result.data
+    
+    def pipe_(self, operations: List[Union[str, OperationState]]) -> None:
+        """Run a sequence of operations on dataset data.
+        Internally calls Dataset.apply_ and will resolve named
+        operations in registry.operations
+        
+        Args:
+            operations (List[Union[str, OperationState]]): List of operations
+        """        
+        for op in operations:
+            if isinstance(op, str):
+                op_name = op
+                args = []
+                kwargs = {}
+                initial_state = None
+            elif isinstance(op, OperationState):
+                op_name = op.name
+                args = op.args
+                kwargs = op.kwargs
+                initial_state = op
+
+            operation = registry.operations.get(op_name)
+
+            self.apply_(operation, *args, initial_state=initial_state, **kwargs)
 
     def from_disk(
         self,
         path: Path,
-        loader_func: Callable = read_jsonl,
-        loading_pipeline: List[str] = loading_pipelines.get("default")()
+        loader_func: Callable = read_jsonl
     ) -> "Dataset":
         """Load Dataset from disk given a path and a loader function that reads the data
         and returns an iterator of Examples
@@ -129,7 +162,7 @@ class Dataset:
             ds_op_state = DatasetOperationsState(**state)
             self.operations = ds_op_state.operations
 
-        data = loader_func(path, loading_pipeline=loading_pipeline)
+        data = loader_func(path)
         self.data = data
 
         if ds_op_state and self.commit_hash != ds_op_state.commit:
@@ -142,7 +175,7 @@ class Dataset:
                     examples_added=max(len(self) - ds_op_state.size, 0),
                     examples_removed=max(ds_op_state.size - len(self), 0),
                     examples_changed=0,
-                    transformations=[]
+                    transformations=[],
                 )
             )
 
@@ -156,14 +189,11 @@ class Dataset:
             if op.name not in operations_to_run and op.name in registry.operations:
                 operations_to_run[op.name] = op
 
-        print(operations_to_run.keys())
-
         for op_name, state in operations_to_run.items():
             op = registry.operations.get(op_name)
             self.apply_(op, *state.args, initial_state=state, **state.kwargs)
 
         return self
-
 
     def to_disk(self, output_path: Path, force: bool = False, save_examples: bool = True) -> None:
         """Save Corpus to Disk
@@ -179,11 +209,13 @@ class Dataset:
         state_dir = output_dir / ".recon" / self.name
         if force:
             output_dir.mkdir(parents=True, exist_ok=True)
-        
+
             if not state_dir.exists():
                 state_dir.mkdir(parents=True, exist_ok=True)
 
-        ds_op_state = DatasetOperationsState(name=self.name, commit=self.commit_hash, size=len(self), operations=self.operations)
+        ds_op_state = DatasetOperationsState(
+            name=self.name, commit=self.commit_hash, size=len(self), operations=self.operations
+        )
         srsly.write_json(state_dir / "state.json", ds_op_state.dict())
         # with (state_dir / "state.json").open("w+") as state_f:
         #     state_f.write(ds_op_state.json(indent=4))

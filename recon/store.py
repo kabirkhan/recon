@@ -16,7 +16,7 @@ class ExampleStore:
 
     def __getitem__(self, example_hash: int) -> Example:
         return self._map[example_hash]
-    
+
     def __len__(self) -> int:
         """The number of strings in the store.
 
@@ -36,7 +36,7 @@ class ExampleStore:
         """
         example_hash = hash(example) if isinstance(example, Example) else example
         return example_hash in self._map
-    
+
     def add(self, example: Example) -> None:
         """Add an Example to the store
         
@@ -54,7 +54,7 @@ class ExampleStore:
         
         Returns:
             ExampleStore: Initialized ExampleStore
-        """        
+        """
         path = ensure_path(path)
         examples = srsly.read_jsonl(path)
         for e in examples:
@@ -65,7 +65,7 @@ class ExampleStore:
             self.add(example)
 
         return self
-    
+
     def to_disk(self, path: Path) -> None:
         """Save store to disk
         
@@ -76,5 +76,5 @@ class ExampleStore:
         examples = []
         for example_hash, example in self._map.items():
             examples.append({"example_hash": example_hash, "example": example.dict()})
-            
+
         srsly.write_jsonl(path, examples)

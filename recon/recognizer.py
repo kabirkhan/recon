@@ -83,17 +83,18 @@ class SpacyEntityRecognizer(EntityRecognizer):
                 text=doc.text,
                 spans=[
                     Span(
-                        text=e.text, start=e.start_char, end=e.end_char,
-                        label=e.label_, token_start=e.start, token_end=e.end
+                        text=e.text,
+                        start=e.start_char,
+                        end=e.end_char,
+                        label=e.label_,
+                        token_start=e.start,
+                        token_end=e.end,
                     )
                     for e in doc.ents
                 ],
-                tokens=[
-                    Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i)
-                    for t in doc
-                ],
+                tokens=[Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc],
             )
-    
+
     def evaluate(self, data: List[Example]) -> None:
         msg = Printer()
         formatted_data, _ = self._format_data(data)
@@ -105,17 +106,19 @@ class SpacyEntityRecognizer(EntityRecognizer):
             ("F-Score", f"{sc.ents_f:.3f}"),
         ]
         msg.table(result)
-        
+
         table_data = []
         for label, scores in sorted(sc.ents_per_type.items(), key=lambda tup: tup[0]):
-            table_data.append((
-                label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}"
-            ))
+            table_data.append(
+                (label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}")
+            )
         header = ("Label", "Precision", "Recall", "F-Score")
         formatted = msg.table(table_data, header=header, divider=True)
         return sc
-            
-    def _format_data(self, data: List[Example]) -> Tuple[List[Tuple[str, Dict[str, List[Tuple[int, int, str]]]]], Set[str]]:
+
+    def _format_data(
+        self, data: List[Example]
+    ) -> Tuple[List[Tuple[str, Dict[str, List[Tuple[int, int, str]]]]], Set[str]]:
         result = []
         labels = set()
         for example in data:

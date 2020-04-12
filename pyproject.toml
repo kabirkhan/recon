@@ -72,3 +72,15 @@ recon = "recon.cli:app"
 "recon.ner_manual" = "recon:prodigy_ner_sidecar.manual"
 "recon.ner_correct" = "recon:prodigy_recipes.ner_correct"
 "recon.ner_merge" = "recon:prodigy_recipes.ner_merge"
+
+[tool.black]
+line-length = 100
+target-version = ['py36']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | docker
+)/
+'''

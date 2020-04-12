@@ -56,9 +56,7 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
                 pthtml.append(f'<span class="recon-token">{token.text} </span>')
 
             pred_spans = predicted_example.spans
-            pred_span_hashes = [
-                make_span_hash(span) for span in predicted_example.spans
-            ]
+            pred_span_hashes = [make_span_hash(span) for span in predicted_example.spans]
 
             for gold_span_hash, gold_span in gold_span_hashes.items():
                 if gold_span_hash not in pred_span_hashes:
@@ -89,7 +87,7 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
                     + [
                         f'<span class="recon-pred-label">{span["label"]}<span class="c0178">x</span></span></span>'
                     ]
-                    + pthtml[span["token_end"]:]
+                    + pthtml[span["token_end"] :]
                 )
                 pthtml = (
                     pthtml[: span["token_start"]]
@@ -98,7 +96,9 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
                 )
                 i -= 1
 
-            task["html"] = f"""
+            task[
+                "html"
+            ] = f"""
             <h2 class='recon-title'>Recon Prediction Errors</h2>
             <h5 class='recon-subtitle'>
                 The following text shows the errors your model made on this example inline.
@@ -297,11 +297,11 @@ def ner_merge(
     DB = connect()
     if dataset not in DB:
         msg.fail(f"Can't find dataset '{dataset}'", exits=1)
-    
+
     prodigy_raw_examples = DB.get_dataset(dataset)
     for eg in prodigy_raw_examples:
         for span in eg["spans"]:
-            span["text"] = eg["text"][span["start"]:span["end"]]
+            span["text"] = eg["text"][span["start"] : span["end"]]
     prodigy_examples = [Example(**eg) for eg in prodigy_raw_examples if eg["answer"] == "accept"]
     prodigy_example_texts = {e.text for e in prodigy_examples}
 
@@ -317,4 +317,3 @@ def ner_merge(
         log(f"RECIPE: Fixing {len(prodigy_examples)} examples in data")
         srsly.write_jsonl(output_file, [e.dict() for e in merged_examples])
         msg.good(f"Exported {len(merged_examples)} examples to file", output_file)
- 

@@ -22,9 +22,7 @@ from .types import (
 )
 
 
-def get_ents_by_label(
-    data: List[Example], use_lower: bool = True
-) -> DefaultDict[str, List[str]]:
+def get_ents_by_label(data: List[Example], use_lower: bool = True) -> DefaultDict[str, List[str]]:
     """Get a dictionary of unique text spans by label for your data
     
     Args:
@@ -139,9 +137,7 @@ def top_prediction_errors(
     anns = (e.spans for e in data)
 
     errors = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))  # type: ignore
-    error_examples: DefaultDict[str, List[PredictionErrorExamplePair]] = defaultdict(
-        list
-    )
+    error_examples: DefaultDict[str, List[PredictionErrorExamplePair]] = defaultdict(list)
     n_errors = 0
 
     for orig_example, pred_example, ann in zip(data, recognizer.predict(texts), anns):
@@ -172,7 +168,9 @@ def top_prediction_errors(
                     text = pred_example.text[start:end]
                     false_label = fp[2]
                     errors[label][text][false_label] += 1
-                    error_examples[f"{text}||{label}||{false_label}"].append(pred_error_example_pair)
+                    error_examples[f"{text}||{label}||{false_label}"].append(
+                        pred_error_example_pair
+                    )
                 else:
                     start, end, false_label = fp
                     text = pred_example.text[start:end]
@@ -205,7 +203,7 @@ def top_prediction_errors(
                 )
 
     ranked_errors: List[PredictionError] = sorted(
-        list(ranked_errors_map.values()), key=lambda error: error.count, reverse=True # type: ignore
+        list(ranked_errors_map.values()), key=lambda error: error.count, reverse=True  # type: ignore
     )
     error_texts = set()
     for re in ranked_errors:
@@ -265,7 +263,7 @@ def get_hardest_examples(
                         true_label=pe.true_label,
                         pred_label=pe.pred_label,
                         count=pe.count,
-                        examples=[example]
+                        examples=[example],
                     )
                 )
 
@@ -281,15 +279,16 @@ def get_hardest_examples(
                     true_label=pe.true_label,
                     pred_label=pe.pred_label,
                     count=pe.count,
-                    examples=[]
-                ) for pe in example_pred_errors
+                    examples=[],
+                )
+                for pe in example_pred_errors
             ]
         else:
             prediction_errors = example_pred_errors
 
         prediction_error_hashes: Set[str] = set()
         deduped_prediction_errors: List[PredictionError] = []
-            
+
         for pe in prediction_errors:
             pe_hash = f"{pe.text}||{pe.true_label}||{pe.pred_label}"
             if pe_hash not in prediction_error_hashes:
@@ -300,7 +299,5 @@ def get_hardest_examples(
             record.prediction_errors = deduped_prediction_errors
         hardest_examples.append(record)
 
-    sorted_hardest_examples = sorted(
-        hardest_examples, key=lambda he: he.count, reverse=True
-    )
+    sorted_hardest_examples = sorted(hardest_examples, key=lambda he: he.count, reverse=True)
     return sorted_hardest_examples

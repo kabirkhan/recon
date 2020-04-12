@@ -28,10 +28,7 @@ def stats(data_dir: Path) -> None:
             msg.text(f"Stats for {ds.capitalize()} data")
             msg.text("--------------------")
             msg.table(
-                {
-                    "N Examples": ner_stats.n_examples,
-                    "N Annotations": ner_stats.n_annotations,
-                }
+                {"N Examples": ner_stats.n_examples, "N Annotations": ner_stats.n_annotations,}
             )
             msg.info(f"Labels in {ds}")
             msg.text(sorted_labels)

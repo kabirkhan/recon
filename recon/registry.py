@@ -7,9 +7,7 @@ from spacy.language import Language
 from .types import Example
 
 
-loading_pipelines = catalogue.create(
-    "recon", "loading_pipelines", entry_points=True
-)
+loading_pipelines = catalogue.create("recon", "loading_pipelines", entry_points=True)
 tokenizers = catalogue.create("recon", "tokenizers", entry_points=True)
 
 
@@ -20,7 +18,7 @@ def default_loading_pipeline() -> List[str]:
         "add_tokens",
         "fix_annotations_format",
         "filter_overlaps",
-        "json_to_examples"
+        "json_to_examples",
     ]
 
 
