@@ -5,7 +5,7 @@ import pytest
 from recon.corpus import Corpus
 from recon.loaders import read_jsonl
 from recon.recognizer import SpacyEntityRecognizer
-from recon.types import Example
+from recon.types import Example, TransformationCallbacks
 from spacy.lang.en import English
 
 
@@ -73,3 +73,15 @@ def recognizer(nlp, example_corpus):
 
     recognizer = SpacyEntityRecognizer(nlp)
     return recognizer
+
+
+@pytest.fixture()
+def transformation_callbacks():
+    def shim(*args):
+        return None
+    return TransformationCallbacks(
+        add_example=shim,
+        remove_example=shim,
+        change_example=shim,
+        track_example=shim
+    )

@@ -28,11 +28,9 @@ def rename_labels(
 
 @operation("fix_annotations")
 def fix_annotations(
-    data: List[Example],
+    example: Example,
     corrections: Dict[str, str],
-    *,
-    case_sensitive: bool = False,
-    callbacks: TransformationCallbacks = None,
+    case_sensitive: bool = False
 ) -> List[Example]:
     """Fix annotations in a copy of List[Example] data.
     
@@ -41,15 +39,14 @@ def fix_annotations(
     labels for specific spans.
     
     Args:
-        data (List[Example]): List of Examples
+        example (Example): Input Example
         corrections (Dict[str, str]): Dictionary of corrections mapping entity text to a new label.
-        If the value is set to None, the annotation will be removed
+            If the value is set to None, the annotation will be removed
         case_sensitive (bool, optional): Consider case of text for each correction
     
     Returns:
-        List[Example]: Fixed Examples
+        Example: Example with fixed annotations
     """
-    examples: List[Example] = copy.deepcopy(data)
     if case_sensitive:
         corrections = {t: l for t, l in corrections.items()}
     else:
@@ -57,35 +54,27 @@ def fix_annotations(
 
     prints: DefaultDict[str, List[str]] = defaultdict(list)
 
-    for example in data:
-        orig_example = hash(example)
-        ents_to_remove = []
-        for i, s in enumerate(example.spans):
-            t = s.text if case_sensitive else s.text.lower()
+    ents_to_remove = []
+    for i, s in enumerate(example.spans):
+        t = s.text if case_sensitive else s.text.lower()
 
-            if t in corrections:
-                print(t, "in corrections")
-                if corrections[t] is print:
-                    prints[t] += [("=" * 100), example.text, s.label]
-                elif corrections[t] is None:
-                    ents_to_remove.append(i)
-                else:
-                    print("before", s.label)
-                    s.label = corrections[t]
-                    print("after", s.label)
+        if t in corrections:
+            if corrections[t] is print:
+                prints[t] += [("=" * 100), example.text, s.label]
+            elif corrections[t] is None:
+                ents_to_remove.append(i)
+            else:
+                s.label = corrections[t]
 
-        i = len(ents_to_remove) - 1
-        while i >= 0:
-            idx = ents_to_remove[i]
-            del example.spans[idx]
-            i -= 1
-
-        if hash(example) != orig_example:
-            callbacks.change_example(orig_example, example)
+    i = len(ents_to_remove) - 1
+    while i >= 0:
+        idx = ents_to_remove[i]
+        del example.spans[idx]
+        i -= 1
 
     for k in sorted(prints):
         print(f"**{k}**")
         for line in prints[k]:
             print(line)
 
-    return data
+    return example

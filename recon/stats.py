@@ -100,7 +100,7 @@ def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) 
         float: Similarity of label distributions
     """
 
-    def pipeline(data):
+    def pipeline(data: List[Example]) -> Sequence[float]:
         stats = cast(NERStats, get_ner_stats(data))
         sorted_type_counts = get_sorted_type_counts(stats)
         counts_to_probs = get_probs_from_counts(sorted_type_counts)
@@ -171,7 +171,7 @@ def calculate_entity_coverage_similarity(x: List[Example], y: List[Example]) -> 
             often entities occur in each dataset x and y)
     """
 
-    def pipeline(data):
+    def pipeline(data: List[Example]) -> Dict[int, int]:
         ecs = get_entity_coverage(data)
         return {hash(ec): ec.count for ec in ecs}
 

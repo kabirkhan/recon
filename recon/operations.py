@@ -2,7 +2,7 @@ from collections import Counter
 from copy import deepcopy
 import functools
 from inspect import isclass
-from typing import Any, Callable, Dict, List, Set, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Set, Tuple, Union
 
 import catalogue
 import srsly
@@ -23,7 +23,7 @@ class registry:
     batch_operations = catalogue.create("recon", "batch_operations", entry_points=True)
 
 
-def op_iter(data: List[Example], batch: bool = True):
+def op_iter(data: List[Example], batch: bool = True) -> Iterator[Tuple[int, Example]]:
     for example in data:
         yield hash(example), example.copy(deep=True)
 
@@ -39,15 +39,15 @@ class operation:
         self.name = name
         self.batch = batch
 
-    def __call__(self, *args, **kwargs) -> Callable:
+    def __call__(self, *args: Any, **kwargs: Any) -> Callable:
         op: Callable = args[0]
 
         class Operation:
-            def __init__(_self):
+            def __init__(_self: "Operation"):
                 _self.name = self.name
                 _self.batch = self.batch
 
-            def __call__(_self, dataset, *args, **kwargs) -> OperationResult:
+            def __call__(_self, dataset: Any, *args: Any, **kwargs: Any) -> OperationResult:
                 initial_state = kwargs.pop("initial_state")
                 if not initial_state:
                     initial_state = OperationState(name=self.name)
