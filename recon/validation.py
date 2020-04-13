@@ -10,6 +10,14 @@ from .types import Example, Span, TransformationCallbacks
 
 @operation("upcase_labels")
 def upcase_labels(example: Example) -> Example:
+    """Convert all span labels to uppercase to normalize
+    
+    Args:
+        example (Example): Input Example
+    
+    Returns:
+        Example: Example with fixed labels
+    """
     for s in example.spans:
         s.label = s.label.upper()
     return example
@@ -20,12 +28,11 @@ def filter_overlaps(example: Example) -> Example:
     """Filter overlapping entity spans by picking the longest one.
     
     Args:
-        data (List[Example]): List of Examples
+        example (Example): Input Example
     
     Returns:
-        List[Example]: List of Examples with fixed overlaps
+        List[Example]: Example with fixed overlaps
     """
-    
     annotations: List[Span] = sorted(example.spans, key=lambda s: s.start)
     filtered_annotations = remove_overlapping_entities(annotations)
     example.spans = filtered_annotations
@@ -33,9 +40,7 @@ def filter_overlaps(example: Example) -> Example:
     return example
 
 
-def select_subset_of_overlapping_chain(
-    chain: List[Span]
-) -> List[Span]:
+def select_subset_of_overlapping_chain(chain: List[Span]) -> List[Span]:
     """
     Select the subset of entities in an overlapping chain to return by greedily choosing the
     longest entity in the chain until there are no entities remaining
@@ -62,9 +67,7 @@ def select_subset_of_overlapping_chain(
     return selections_from_chain
 
 
-def remove_overlapping_entities(
-    sorted_spans: List[Span]
-) -> List[Span]:
+def remove_overlapping_entities(sorted_spans: List[Span]) -> List[Span]:
     """
     Removes overlapping entities from the entity set, by greedilytaking the longest
     entity from each overlapping chain. The input list of entities should be sorted
@@ -95,7 +98,9 @@ def remove_overlapping_entities(
                     current_entity_end, current_overlapping_chain_end
                 )
             else:
-                selections_from_chain: List[Span] = select_subset_of_overlapping_chain(current_overlapping_chain)
+                selections_from_chain: List[Span] = select_subset_of_overlapping_chain(
+                    current_overlapping_chain
+                )
 
                 current_overlapping_chain = []
                 spans_without_overlap.extend(selections_from_chain)
@@ -103,8 +108,6 @@ def remove_overlapping_entities(
                 current_overlapping_chain_start = current_entity_start
                 current_overlapping_chain_end = current_entity_end
 
-    spans_without_overlap.extend(
-        select_subset_of_overlapping_chain(current_overlapping_chain)
-    )
+    spans_without_overlap.extend(select_subset_of_overlapping_chain(current_overlapping_chain))
 
     return sorted(spans_without_overlap, key=lambda x: x.start)

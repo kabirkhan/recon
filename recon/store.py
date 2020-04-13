@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Any, Dict, List, Set, Union
 
-from spacy.util import ensure_path
 import srsly
+from spacy.util import ensure_path
 
 from .types import Example
 

@@ -1,5 +1,6 @@
-import pytest
 from typing import cast
+
+import pytest
 from recon.stats import get_ner_stats
 from recon.types import Example, NERStats, Span, Token
 from recon.validation import filter_overlaps, upcase_labels
@@ -24,7 +25,7 @@ def test_upcase_labels(example_corpus):
     assert "skill" in stats.n_annotations_per_type
     assert "product" in stats.n_annotations_per_type
     assert "SKILL" in stats.n_annotations_per_type
-    
+
     example_corpus._train.pipe_(["upcase_labels"])
     fixed_stats = cast(NERStats, get_ner_stats(example_corpus.train))
     assert "skill" not in fixed_stats.n_annotations_per_type
@@ -35,14 +36,11 @@ def test_filter_overlaps():
     def get_test_example(span_offsets):
         spans = []
         for so in span_offsets:
-            spans.append(Span(
-                text="x" * (so[1] - so[0]), start=so[0], end=so[1], label=so[2]
-            ))
+            spans.append(Span(text="x" * (so[1] - so[0]), start=so[0], end=so[1], label=so[2]))
         return Example(text="x" * 1500, spans=spans)
 
     def spans_to_offsets(spans):
         return [(span.start, span.end, span.label) for span in spans]
-
 
     test_entities = [(0, 5, "ENTITY"), (6, 10, "ENTITY")]
     result = filter_overlaps(get_test_example(test_entities))
@@ -79,7 +77,11 @@ def test_filter_overlaps():
         (806, 811, "ENTITY"),
     ]
     result = filter_overlaps(get_test_example(test_entities))
-    assert spans_to_offsets(result.spans) == [(12, 33, "ENTITY"), (769, 787, "ENTITY"), (806, 811, "ENTITY")]
+    assert spans_to_offsets(result.spans) == [
+        (12, 33, "ENTITY"),
+        (769, 787, "ENTITY"),
+        (806, 811, "ENTITY"),
+    ]
 
     test_entities = [
         (189, 209, "ENTITY"),
@@ -88,7 +90,11 @@ def test_filter_overlaps():
         (364, 368, "ENTITY"),
     ]
     result = filter_overlaps(get_test_example(test_entities))
-    assert spans_to_offsets(result.spans) == [(189, 209, "ENTITY"), (317, 362, "ENTITY"), (364, 368, "ENTITY")]
+    assert spans_to_offsets(result.spans) == [
+        (189, 209, "ENTITY"),
+        (317, 362, "ENTITY"),
+        (364, 368, "ENTITY"),
+    ]
 
     test_entities = [(445, 502, "ENTITY"), (461, 473, "ENTITY"), (474, 489, "ENTITY")]
     result = filter_overlaps(get_test_example(test_entities))

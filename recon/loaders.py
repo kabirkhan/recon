@@ -8,9 +8,9 @@ from typing import Any, Dict, List, Union
 
 import srsly
 
-from .types import Example, OperationState, OperationStatus, Transformation
 from .operations import registry
 from .registry import loading_pipelines
+from .types import Example, OperationState, OperationStatus, Transformation
 
 
 def read_jsonl(path: Path) -> List[Example]:
@@ -20,7 +20,7 @@ def read_jsonl(path: Path) -> List[Example]:
         path (Path): Path to data
     
     Returns:
-        List[Example]: List of Examples
+        List[Example]: List of examples
     """
     data = srsly.read_jsonl(path)
     examples = json_to_examples(data)
@@ -34,7 +34,7 @@ def read_json(path: Path) -> List[Example]:
         path (Path): Path to data
     
     Returns:
-        List[Example]: List of Examples
+        List[Example]: List of examples
     """
     data = srsly.read_jsonl(path)
     examples = json_to_examples(data)

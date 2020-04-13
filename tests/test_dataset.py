@@ -8,7 +8,7 @@ from recon.dataset import Dataset
 from recon.operations import registry
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
-from recon.types import OperationStatus, NERStats, TransformationType
+from recon.types import NERStats, OperationStatus, TransformationType
 
 
 def test_dataset_initialize(example_data):
@@ -66,7 +66,7 @@ def test_apply_(example_data):
     assert len(train_dataset.operations) == 0
 
     train_dataset.apply_(registry.operations.get("upcase_labels"))
-    
+
     ner_stats_post: NERStats = cast(NERStats, train_dataset.apply(get_ner_stats))
 
     pre_keys = sorted(ner_stats_pre.n_annotations_per_type.keys())
@@ -119,5 +119,4 @@ def test_dataset_to_from_disk(example_data, tmp_path):
     assert len(op.transformations) == 3
 
     for t in op.transformations:
-        assert t.type == TransformationType.EXAMPLE_CHANGED     
-    
+        assert t.type == TransformationType.EXAMPLE_CHANGED

@@ -26,9 +26,14 @@ nav:
     - API Reference:
         - Corpus: 'api/corpus.md'
         - Corrections: 'api/corrections.md'
+        - Dataset: 'api/dataset.md'
+        - Hashing: 'api/hashing.md'
         - Insights: 'api/insights.md'
         - Loaders: 'api/loaders.md'
+        - Operations: 'api/operations.md'
         - Stats: 'api/stats.md'
+        - Store: 'api/store.md'
+        - Tokenization: 'api/tokenization.md'
         - Validation: 'api/validation.md'
         - Recognizers:
             - EntityRecognizer: 'api/recognizers/base.md'

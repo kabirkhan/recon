@@ -5,7 +5,6 @@ import pytest
 from recon.corpus import Corpus
 from recon.stats import get_ner_stats
 
-
 # def test_corpus_initialize(example_data):
 #     corpus1 = Corpus(example_data["train"], example_data["dev"])
 #     assert len(corpus1.train) == 106

@@ -1,14 +1,14 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
 from pydantic import BaseModel, Field, Schema, root_validator
+
 from .hashing import (
     example_hash,
     span_hash,
     token_hash,
     tokenized_example_hash,
-    transformation_hash,
 )
 
 
@@ -84,15 +84,27 @@ class Transformation(BaseModel):
     example: Optional[int] = None
     type: TransformationType
 
-    def __hash__(self) -> int:
-        return cast(int, transformation_hash(self))
+
+# fmt: off
+def add_shim(example: Example) -> None:
+    return None
+
+def remove_shim(example_hash: int) -> None:
+    return None
+
+def change_shim(example_hash: int, new_example: Example) -> None:
+    return None
+
+def track_shim(example_hash: Optional[int] = None, new_example: Optional[Example] = None) -> None:
+    return None
+# fmt: on
 
 
-class TransformationCallbacks(BaseModel):
-    add_example: Callable[[Example], Transformation]
-    remove_example: Callable[[int], Transformation]
-    change_example: Callable[[int, Example], Transformation]
-    track_example: Callable[[Optional[int], Optional[Example]], Transformation]
+class TransformationCallbacks(NamedTuple):
+    add_example: Callable[[Example], None] = add_shim
+    remove_example: Callable[[int], None] = remove_shim
+    change_example: Callable[[int, Example], None] = change_shim
+    track_example: Callable[[Optional[int], Optional[Example]], None] = track_shim
 
 
 class OperationStatus(str, Enum):
@@ -131,6 +143,9 @@ class CorpusApplyResult(BaseModel):
     dev: Any
     test: Any
     all: Any
+
+    def items(self) -> List[Tuple[str, Any]]:
+        return [("train", self.train), ("dev", self.dev), ("test", self.test), ("all", self.all)]
 
 
 class PredictionErrorExamplePair(BaseModel):
@@ -184,7 +199,7 @@ class LabelDisparity(BaseModel):
         label1 (str): Label1
         label2 (str): Label2
         count (int): Number of times this label disparity occurs
-        examples (List[Example], optional): List of Examples where this disparity occurs
+        examples (List[Example], optional): List of examples where this disparity occurs
     """
 
     label1: str
@@ -210,7 +225,7 @@ class EntityCoverage(BaseModel):
         text (str): The entity text
         label (str): The entity label
         count (int): Number of times this text/label combination occurs
-        examples (List[Example], optional): List of Examples where this entity occurs
+        examples (List[Example], optional): List of examples where this entity occurs
     """
 
     text: str

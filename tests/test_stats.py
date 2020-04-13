@@ -21,13 +21,17 @@ def test_get_ner_stats(example_corpus_processed):
 
 
 def test_calculate_label_distribution_similarity(example_corpus_processed):
-    similarity = calculate_label_distribution_similarity(example_corpus_processed.train, example_corpus_processed.dev)
+    similarity = calculate_label_distribution_similarity(
+        example_corpus_processed.train, example_corpus_processed.dev
+    )
 
     assert round(similarity, 2) == 86.44
 
 
 def test_calculate_entity_coverage_similarity(example_corpus_processed):
-    ec_stats = calculate_entity_coverage_similarity(example_corpus_processed.train, example_corpus_processed.dev)
+    ec_stats = calculate_entity_coverage_similarity(
+        example_corpus_processed.train, example_corpus_processed.dev
+    )
 
     assert round(ec_stats.entity, 2) == 31.21
     assert round(ec_stats.count, 2) == 36.67

@@ -77,11 +77,4 @@ def recognizer(nlp, example_corpus):
 
 @pytest.fixture()
 def transformation_callbacks():
-    def shim(*args):
-        return None
-    return TransformationCallbacks(
-        add_example=shim,
-        remove_example=shim,
-        change_example=shim,
-        track_example=shim
-    )
+    return TransformationCallbacks()

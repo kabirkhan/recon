@@ -272,7 +272,7 @@ def ner_correct(
     "recon.ner_merge",
     # fmt: off
     dataset=("Dataset with saved annotations to from recon.ner_correct", "positional", None, str),
-    source=("Source data to merge examples with (file path or List of Examples)", "positional", None, str),
+    source=("Source data to merge examples with (file path or List of examples)", "positional", None, str),
     output_file=("Optional output file", "positional", None, str),
     exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
     # fmt: on

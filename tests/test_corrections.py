@@ -17,6 +17,7 @@ def test_examples():
 
     return [Example(**example) for example in raw_examples]
 
+
 def test_rename_labels(test_examples):
 
     fixed_examples = []
@@ -32,11 +33,11 @@ def test_rename_labels(test_examples):
 def test_fix_annotations(test_examples):
     disparities = get_label_disparities(test_examples, label1="SKILL", label2="JOB_ROLE")
     assert disparities == {"model", "software development engineer"}
-    
+
     fixed_examples = []
     for e in test_examples:
         example = fix_annotations(e.copy(deep=True), {"software development engineer": "JOB_ROLE"})
         fixed_examples.append(example)
-    
+
     disparities_fixed = get_label_disparities(fixed_examples, label1="SKILL", label2="JOB_ROLE")
     assert disparities_fixed == {"model"}
