@@ -103,3 +103,17 @@ function loadVisibleTermynals() {
 window.addEventListener("scroll", loadVisibleTermynals);
 createTermynals();
 loadVisibleTermynals();
+
+
+// mermaid.sequenceConfig = {
+//     diagramMarginX:500,
+//     diagramMarginY:10,
+//     boxTextMargin:5,
+//     noteMargin:10,
+//     messageMargin:35,
+//     mirrorActors:false
+// };
+
+mermaid.flowchartConfig = {
+    width: '100%'
+};

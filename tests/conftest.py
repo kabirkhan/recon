@@ -5,7 +5,7 @@ import pytest
 from recon.corpus import Corpus
 from recon.loaders import read_jsonl
 from recon.recognizer import SpacyEntityRecognizer
-from recon.types import Example
+from recon.types import Example, TransformationCallbacks
 from spacy.lang.en import English
 
 
@@ -49,6 +49,19 @@ def example_corpus() -> Corpus:
 
 
 @pytest.fixture()
+def example_corpus_processed() -> Corpus:
+    """Fixture to load example train/dev/test data that has inconsistencies.
+    
+    Returns:
+        Corpus: Example data
+    """
+    base_path = Path(__file__).parent.parent / "examples/data/skills"
+    corpus = Corpus.from_disk(base_path)
+    corpus.pipe_(["fix_tokenization_and_spacing", "add_tokens", "upcase_labels", "filter_overlaps"])
+    return corpus
+
+
+@pytest.fixture()
 def recognizer(nlp, example_corpus):
     patterns = []
 
@@ -60,3 +73,8 @@ def recognizer(nlp, example_corpus):
 
     recognizer = SpacyEntityRecognizer(nlp)
     return recognizer
+
+
+@pytest.fixture()
+def transformation_callbacks():
+    return TransformationCallbacks()

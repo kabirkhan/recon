@@ -1,7 +1,9 @@
+from typing import cast
+
 import pytest
-from recon.types import Example, Span, Token
-from recon.util import registry
-from recon.validation import *
+from recon.stats import get_ner_stats
+from recon.types import Example, NERStats, Span, Token
+from recon.validation import filter_overlaps, upcase_labels
 
 
 @pytest.fixture()
@@ -18,72 +20,82 @@ def messy_data():
     ]
 
 
-def test_loading_pipeline(messy_data):
-    loading_pipeline = registry.loading_pipelines.get("default")
-    pipeline = loading_pipeline()
-    fixed_examples = pipeline(messy_data)
-    assert isinstance(fixed_examples[0], Example)
-    assert isinstance(fixed_examples[0].spans[0], Span)
-    assert isinstance(fixed_examples[0].tokens[0], Token)
+def test_upcase_labels(example_corpus):
+    stats = cast(NERStats, get_ner_stats(example_corpus.train))
+    assert "skill" in stats.n_annotations_per_type
+    assert "product" in stats.n_annotations_per_type
+    assert "SKILL" in stats.n_annotations_per_type
 
-    assert fixed_examples[0].spans[0].text == "Denver, Colorado"
-    assert fixed_examples[0].spans[0].label == "LOC"
-
-
-def test_fix_annotations_format(messy_data):
-    fixed_data = fix_annotations_format(messy_data)
-
-    assert fixed_data[0]["spans"][0]["text"] == "Denver"
-    assert fixed_data[0]["meta"] == {"source": "Cities Data"}
+    example_corpus._train.pipe_(["upcase_labels"])
+    fixed_stats = cast(NERStats, get_ner_stats(example_corpus.train))
+    assert "skill" not in fixed_stats.n_annotations_per_type
+    assert "product" not in fixed_stats.n_annotations_per_type
 
 
-# def test_remove_overlaps():
-#     test_entities = [(0, 5, "ENTITY"), (6, 10, "ENTITY")]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(0, 5, "ENTITY"), (6, 10, "ENTITY")]
+def test_filter_overlaps():
+    def get_test_example(span_offsets):
+        spans = []
+        for so in span_offsets:
+            spans.append(Span(text="x" * (so[1] - so[0]), start=so[0], end=so[1], label=so[2]))
+        return Example(text="x" * 1500, spans=spans)
 
-#     test_entities = [(0, 5, "ENTITY"), (5, 10, "ENTITY")]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(0, 5, "ENTITY"), (5, 10, "ENTITY")]
+    def spans_to_offsets(spans):
+        return [(span.start, span.end, span.label) for span in spans]
 
-#     test_entities = [(0, 5, "ENTITY"), (4, 10, "ENTITY")]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(4, 10, "ENTITY")]
+    test_entities = [(0, 5, "ENTITY"), (6, 10, "ENTITY")]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [(0, 5, "ENTITY"), (6, 10, "ENTITY")]
 
-#     test_entities = [(0, 5, "ENTITY"), (0, 5, "ENTITY")]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(0, 5, "ENTITY")]
+    test_entities = [(0, 5, "ENTITY"), (5, 10, "ENTITY")]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [(0, 5, "ENTITY"), (5, 10, "ENTITY")]
 
-#     test_entities = [(0, 5, "ENTITY"), (4, 11, "ENTITY"), (6, 20, "ENTITY")]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(0, 5, "ENTITY"), (6, 20, "ENTITY")]
+    test_entities = [(0, 5, "ENTITY"), (4, 10, "ENTITY")]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [(4, 10, "ENTITY")]
 
-#     test_entities = [(0, 5, "ENTITY"), (4, 7, "ENTITY"), (10, 20, "ENTITY")]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(0, 5, "ENTITY"), (10, 20, "ENTITY")]
+    test_entities = [(0, 5, "ENTITY"), (0, 5, "ENTITY")]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [(0, 5, "ENTITY")]
 
-#     test_entities = [(1368, 1374, "ENTITY"), (1368, 1376, "ENTITY")]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(1368, 1376, "ENTITY")]
+    test_entities = [(0, 5, "ENTITY"), (4, 11, "ENTITY"), (6, 20, "ENTITY")]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [(0, 5, "ENTITY"), (6, 20, "ENTITY")]
 
-#     test_entities = [
-#         (12, 33, "ENTITY"),
-#         (769, 779, "ENTITY"),
-#         (769, 787, "ENTITY"),
-#         (806, 811, "ENTITY"),
-#     ]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(12, 33, "ENTITY"), (769, 787, "ENTITY"), (806, 811, "ENTITY")]
+    test_entities = [(0, 5, "ENTITY"), (4, 7, "ENTITY"), (10, 20, "ENTITY")]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [(0, 5, "ENTITY"), (10, 20, "ENTITY")]
 
-#     test_entities = [
-#         (189, 209, "ENTITY"),
-#         (317, 362, "ENTITY"),
-#         (345, 354, "ENTITY"),
-#         (364, 368, "ENTITY"),
-#     ]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(189, 209, "ENTITY"), (317, 362, "ENTITY"), (364, 368, "ENTITY")]
+    test_entities = [(1368, 1374, "ENTITY"), (1368, 1376, "ENTITY")]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [(1368, 1376, "ENTITY")]
 
-#     test_entities = [(445, 502, "ENTITY"), (461, 473, "ENTITY"), (474, 489, "ENTITY")]
-#     result = remove_overlapping_entities(test_entities)
-#     assert result == [(445, 502, "ENTITY")]
+    test_entities = [
+        (12, 33, "ENTITY"),
+        (769, 779, "ENTITY"),
+        (769, 787, "ENTITY"),
+        (806, 811, "ENTITY"),
+    ]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [
+        (12, 33, "ENTITY"),
+        (769, 787, "ENTITY"),
+        (806, 811, "ENTITY"),
+    ]
+
+    test_entities = [
+        (189, 209, "ENTITY"),
+        (317, 362, "ENTITY"),
+        (345, 354, "ENTITY"),
+        (364, 368, "ENTITY"),
+    ]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [
+        (189, 209, "ENTITY"),
+        (317, 362, "ENTITY"),
+        (364, 368, "ENTITY"),
+    ]
+
+    test_entities = [(445, 502, "ENTITY"), (461, 473, "ENTITY"), (474, 489, "ENTITY")]
+    result = filter_overlaps(get_test_example(test_entities))
+    assert spans_to_offsets(result.spans) == [(445, 502, "ENTITY")]

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable
+from typing import Callable, cast
 
 from recon.corpus import Corpus
 from recon.stats import (
@@ -21,17 +21,14 @@ def stats(data_dir: Path) -> None:
     msg: Printer = Printer()
 
     def print_stats(corpus: Corpus) -> None:
-        ner_stats: NERStats
         for ds, ner_stats in corpus.apply(get_ner_stats).items():
+            ner_stats = cast(NERStats, ner_stats)
             sorted_labels = sorted(ner_stats.n_annotations_per_type.keys())
 
             msg.text(f"Stats for {ds.capitalize()} data")
             msg.text("--------------------")
             msg.table(
-                {
-                    "N Examples": ner_stats.n_examples,
-                    "N Annotations": ner_stats.n_annotations,
-                }
+                {"N Examples": ner_stats.n_examples, "N Annotations": ner_stats.n_annotations,}
             )
             msg.info(f"Labels in {ds}")
             msg.text(sorted_labels)

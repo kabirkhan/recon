@@ -17,17 +17,23 @@ edit_uri: 'https://github.com/microsoft/reconner/tree/master/docs'
 nav:
     - Recon: 'index.md'
     - Tutorial:
-        - Loading your data: 'tutorial/loading_data.md'
-        - NER Stats: 'tutorial/ner_stats.md'
-        - Using a Corpus: 'tutorial/corpus_apply.md'
-        - Getting Insights: 'tutorial/getting_insights.md'
+        - Loading your data: 'tutorial/1_loading_data.md'
+        - NER Stats: 'tutorial/2_ner_stats.md'
+        - Using a Corpus: 'tutorial/3_corpus_apply.md'
+        - More NER Stats: 'tutorial/4_more_stats.md'
+        - Getting Insights: 'tutorial/5_getting_insights.md'
         - Custom EntityRecognizer: 'tutorial/custom_entity_recognizer.md'
     - API Reference:
         - Corpus: 'api/corpus.md'
         - Corrections: 'api/corrections.md'
+        - Dataset: 'api/dataset.md'
+        - Hashing: 'api/hashing.md'
         - Insights: 'api/insights.md'
         - Loaders: 'api/loaders.md'
+        - Operations: 'api/operations.md'
         - Stats: 'api/stats.md'
+        - Store: 'api/store.md'
+        - Tokenization: 'api/tokenization.md'
         - Validation: 'api/validation.md'
         - Recognizers:
             - EntityRecognizer: 'api/recognizers/base.md'
@@ -46,6 +52,11 @@ markdown_extensions:
     - admonition
     - codehilite
     - extra
+    - pymdownx.superfences:
+        custom_fences:
+            - name: mermaid
+              class: mermaid
+              format: !!python/name:pymdownx.superfences.fence_div_format
 
 plugins:
   - mkdocstrings
@@ -63,4 +74,6 @@ extra_css:
 
 extra_javascript:
     - 'js/termynal.js'
+    - 'https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js'
     - 'js/custom.js'
+

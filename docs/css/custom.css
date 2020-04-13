@@ -35,3 +35,7 @@ div.autodoc {
     padding-left: 25px;
     border-left: 4px solid rgba(230, 230, 230);
 }
+
+div.mermaid {
+    width: 100%
+}

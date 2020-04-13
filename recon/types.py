@@ -1,6 +1,10 @@
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
-from pydantic import BaseModel, Field, Schema, validator
+from pydantic import BaseModel, Field, Schema, root_validator
+
+from .hashing import example_hash, span_hash, token_hash, tokenized_example_hash
 
 
 class Span(BaseModel):
@@ -13,6 +17,9 @@ class Span(BaseModel):
     token_start: Optional[int]
     token_end: Optional[int]
 
+    def __hash__(self) -> int:
+        return cast(int, span_hash(self))
+
 
 class Token(BaseModel):
     """Token with offsets into Example Text"""
@@ -22,14 +29,118 @@ class Token(BaseModel):
     end: int
     id: int
 
+    def __hash__(self) -> int:
+        return cast(int, token_hash(self))
+
 
 class Example(BaseModel):
     """Example with NER Label spans"""
 
     text: str
     spans: List[Span]
-    tokens: List[Token]
+    tokens: Optional[List[Token]]
     meta: Dict[str, Any] = {}
+    formatted: bool = False
+
+    @root_validator(pre=True)
+    def span_text_must_exist(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        if not values.get("formatted", False):
+            # Ensure each span has a text property
+            spans = values["spans"]
+            for span in spans:
+                if not isinstance(span, Span):
+                    if "text" not in span:
+                        span["text"] = values["text"][span["start"] : span["end"]]
+
+            # Ensure the meta has a source property
+            # if something that's not a dict is passed in
+            meta = values.get("meta", {})
+            if isinstance(meta, list) or isinstance(meta, str):
+                meta = {"source": meta}
+
+            values["spans"] = spans
+            values["meta"] = meta
+            values["formatted"] = True
+
+        return values
+
+    def __hash__(self) -> int:
+        return cast(int, tokenized_example_hash(self))
+
+
+class TransformationType(str, Enum):
+    EXAMPLE_ADDED = "EXAMPLE_ADDED"
+    EXAMPLE_REMOVED = "EXAMPLE_REMOVED"
+    EXAMPLE_CHANGED = "EXAMPLE_CHANGED"
+
+
+class Transformation(BaseModel):
+    prev_example: Optional[int] = None
+    example: Optional[int] = None
+    type: TransformationType
+
+
+# fmt: off
+def add_shim(example: Example) -> None:
+    return None
+
+def remove_shim(example_hash: int) -> None:
+    return None
+
+def change_shim(example_hash: int, new_example: Example) -> None:
+    return None
+
+def track_shim(example_hash: Optional[int] = None, new_example: Optional[Example] = None) -> None:
+    return None
+# fmt: on
+
+
+class TransformationCallbacks(NamedTuple):
+    add_example: Callable[[Example], None] = add_shim
+    remove_example: Callable[[int], None] = remove_shim
+    change_example: Callable[[int, Example], None] = change_shim
+    track_example: Callable[[Optional[int], Optional[Example]], None] = track_shim
+
+
+class OperationStatus(str, Enum):
+    NOT_STARTED = "NOT_STARTED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+
+
+class OperationState(BaseModel):
+    name: str
+    batch: bool = False
+    args: List[Any] = []
+    kwargs: Dict[str, Any] = {}
+    status: OperationStatus = OperationStatus.NOT_STARTED
+    ts: datetime = datetime.now()
+    examples_added: int = 0
+    examples_removed: int = 0
+    examples_changed: int = 0
+    transformations: List[Transformation] = []
+
+
+class DatasetOperationsState(BaseModel):
+    name: str
+    commit: str
+    size: int
+    operations: List[OperationState]
+
+
+class OperationResult(BaseModel):
+    data: Any
+    state: OperationState
+
+
+class CorpusApplyResult(BaseModel):
+    train: Any
+    dev: Any
+    test: Any
+    all: Any
+
+    def items(self) -> List[Tuple[str, Any]]:
+        return [("train", self.train), ("dev", self.dev), ("test", self.test), ("all", self.all)]
 
 
 class PredictionErrorExamplePair(BaseModel):
@@ -83,7 +194,7 @@ class LabelDisparity(BaseModel):
         label1 (str): Label1
         label2 (str): Label2
         count (int): Number of times this label disparity occurs
-        examples (List[Example], optional): List of Examples where this disparity occurs
+        examples (List[Example], optional): List of examples where this disparity occurs
     """
 
     label1: str
@@ -109,13 +220,16 @@ class EntityCoverage(BaseModel):
         text (str): The entity text
         label (str): The entity label
         count (int): Number of times this text/label combination occurs
-        examples (List[Example], optional): List of Examples where this entity occurs
+        examples (List[Example], optional): List of examples where this entity occurs
     """
 
     text: str
     label: str
     count: int
     examples: Optional[List[Example]] = []
+
+    def __hash__(self) -> int:
+        return hash((self.text, self.label))
 
 
 class EntityCoverageStats(BaseModel):

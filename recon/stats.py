@@ -1,6 +1,6 @@
 import math
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Set, Union
+from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Set, Union, cast
 
 import numpy as np
 import srsly
@@ -8,7 +8,6 @@ from scipy.spatial.distance import jaccard, jensenshannon
 from scipy.stats import entropy as scipy_entropy
 
 from .constants import NONE
-from .pipelines import compose
 from .types import (
     EntityCoverage,
     EntityCoverageStats,
@@ -25,7 +24,7 @@ def get_ner_stats(
     """Compute statistics for NER data
     
     Args:
-        data (List[Example]): Data as a List of Examples
+        data (List[Example]): Data as a List of examples
         serialize (bool, optional): Serialize to a JSON string for printing.
         return_examples (bool, optional): Whether to return examples per type
     
@@ -46,8 +45,7 @@ def get_ner_stats(
                 examples[s.label].append(e)
 
     sorted_anns_by_count = {
-        a[0]: a[1]
-        for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
+        a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
     }
 
     stats = NERStats(
@@ -81,9 +79,7 @@ def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
     return [t[1] for t in sorted(annotations_per_type.items(), key=lambda p: p[0])]
 
 
-def calculate_label_distribution_similarity(
-    x: List[Example], y: List[Example]
-) -> float:
+def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) -> float:
     """Calculate the similarity of the label distribution for 2 datasets.
     
     e.g. This can help you understand how well your train set models your dev and test sets.
@@ -103,17 +99,20 @@ def calculate_label_distribution_similarity(
     Returns:
         float: Similarity of label distributions
     """
-    pipeline = compose(get_ner_stats, get_sorted_type_counts, counts_to_probs)
+
+    def pipeline(data: List[Example]) -> Sequence[float]:
+        stats = cast(NERStats, get_ner_stats(data))
+        sorted_type_counts = get_sorted_type_counts(stats)
+        counts_to_probs = get_probs_from_counts(sorted_type_counts)
+        return counts_to_probs
+
     distance = jensenshannon(pipeline(x), pipeline(y))
 
     return (1 - distance) * 100
 
 
 def get_entity_coverage(
-    data: List[Example],
-    sep: str = "||",
-    use_lower: bool = True,
-    return_examples: bool = False,
+    data: List[Example], sep: str = "||", use_lower: bool = True, return_examples: bool = False,
 ) -> List[EntityCoverage]:
     """Identify how well you dataset covers an entity type. Get insights
     on the how many times certain text/label span combinations exist across your
@@ -121,7 +120,7 @@ def get_entity_coverage(
     annotating examples your Model already understands well.
     
     Args:
-        data (List[Example]): List of Examples
+        data (List[Example]): List of examples
         sep (str, optional): Separator used in coverage map, only change if || exists in your text
             or label.
         use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.
@@ -155,9 +154,7 @@ def get_entity_coverage(
     return sorted_coverage
 
 
-def calculate_entity_coverage_similarity(
-    x: List[Example], y: List[Example]
-) -> EntityCoverageStats:
+def calculate_entity_coverage_similarity(x: List[Example], y: List[Example]) -> EntityCoverageStats:
     """Calculate how well dataset x covers the entities in dataset y.
     This function should be used to calculate how similar your train set
     annotations cover the annotations in your dev/test set
@@ -174,10 +171,9 @@ def calculate_entity_coverage_similarity(
             often entities occur in each dataset x and y)
     """
 
-    def get_ec_map(ecs: List[EntityCoverage], sep: str = "|||") -> Dict[str, int]:
-        return {f"{ec.text}{sep}{ec.label}": ec.count for ec in ecs}
-
-    pipeline = compose(get_entity_coverage, get_ec_map)
+    def pipeline(data: List[Example]) -> Dict[int, int]:
+        ecs = get_entity_coverage(data)
+        return {hash(ec): ec.count for ec in ecs}
 
     x_map = pipeline(x)
     y_map = pipeline(y)
@@ -195,12 +191,11 @@ def calculate_entity_coverage_similarity(
         count_union += count
 
     return EntityCoverageStats(
-        entity=(n_intersection / n_union) * 100,
-        count=(count_intersection / count_union) * 100,
+        entity=(n_intersection / n_union) * 100, count=(count_intersection / count_union) * 100,
     )
 
 
-def counts_to_probs(seq: Sequence[int]) -> Sequence[float]:
+def get_probs_from_counts(seq: Sequence[int]) -> Sequence[float]:
     """Convert a sequence of counts to a sequence of probabilties
     by dividing each n by the sum of all n in seq
     
@@ -234,11 +229,9 @@ def entropy(seq: Union[List[int], List[float]], total: int = None) -> float:
     if isinstance(seq[0], float):
         e = scipy_entropy(seq)
     elif isinstance(seq[0], int):
-        e = scipy_entropy(counts_to_probs(seq))
+        e = scipy_entropy(get_probs_from_counts(seq))
     else:
-        raise ValueError(
-            "Parameter seq must be a sequence of probabilites or integers."
-        )
+        raise ValueError("Parameter seq must be a sequence of probabilites or integers.")
     return e
 
 

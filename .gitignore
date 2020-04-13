@@ -11,5 +11,7 @@ site
 .coverage
 htmlcov
 examples/cs_data_test.ipynb
-examples/skills_data.ipynb
+examples/skills_data*.ipynb
 **/.ipynb_checkpoints
+**/.pytest_cache
+.pytest_cache
