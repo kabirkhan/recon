@@ -48,13 +48,14 @@ class Example(BaseModel):
     formatted: bool = False
 
     @root_validator(pre=True)
-    def span_text_must_exist(cls, values):
+    def span_text_must_exist(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         if not values.get("formatted", False):
             # Ensure each span has a text property
             spans = values["spans"]
             for span in spans:
-                if "text" not in span:
-                    span["text"] = values["text"][span["start"] : span["end"]]
+                if not isinstance(span, Span):
+                    if "text" not in span:
+                        span["text"] = values["text"][span["start"] : span["end"]]
 
             # Ensure the meta has a source property
             # if something that's not a dict is passed in

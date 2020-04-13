@@ -38,7 +38,7 @@ def test_filter_overlaps():
             spans.append(Span(
                 text="x" * (so[1] - so[0]), start=so[0], end=so[1], label=so[2]
             ))
-        test_example = Example(text="x" * 1500, spans=spans)
+        return Example(text="x" * 1500, spans=spans)
 
     def spans_to_offsets(spans):
         return [(span.start, span.end, span.label) for span in spans]

@@ -186,7 +186,7 @@ class Dataset:
         operations_to_run: Dict[str, OperationState] = {}
 
         for op in self.operations:
-            if op.name not in operations_to_run and op.name in registry.operations:
+            if op.name not in operations_to_run and op.name in registry.operations and op.status != OperationStatus.COMPLETED:
                 operations_to_run[op.name] = op
 
         for op_name, state in operations_to_run.items():
@@ -217,8 +217,6 @@ class Dataset:
             name=self.name, commit=self.commit_hash, size=len(self), operations=self.operations
         )
         srsly.write_json(state_dir / "state.json", ds_op_state.dict())
-        # with (state_dir / "state.json").open("w+") as state_f:
-        #     state_f.write(ds_op_state.json(indent=4))
 
         if save_examples:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
