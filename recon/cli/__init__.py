@@ -1,12 +1,11 @@
 import typer
 
-from .dashboard import dashboard
 from .stats import stats
 
 app = typer.Typer(no_args_is_help=True)
 
 
-commands = [dashboard, stats]
+commands = [stats]
 for command in commands:
     app.command(no_args_is_help=True)(command)
 

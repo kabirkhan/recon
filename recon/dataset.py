@@ -1,7 +1,8 @@
 import copy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Set, Tuple, Union, cast
+
 import srsly
 from spacy.util import ensure_path
 
@@ -10,11 +11,17 @@ from .loaders import read_json, read_jsonl
 from .operations import registry
 from .registry import loading_pipelines
 from .store import ExampleStore
-from .types import DatasetOperationsState, Example, OperationResult, OperationState, OperationStatus
+from .types import (
+    DatasetOperationsState,
+    Example,
+    OperationResult,
+    OperationState,
+    OperationStatus,
+)
 
 
 class Dataset:
-    """A Dataset is a around a List of Examples.
+    """A Dataset is a around a List of examples.
     Datasets are responsible for tracking all Operations done on them.
     This ensures data lineage and easy reporting of how changes in the 
     data based on various Operations effects overall quality.
@@ -70,13 +77,13 @@ class Dataset:
         self.example_store = example_store
 
     @property
-    def commit_hash(self):
-        return dataset_hash(self, as_int=False)
+    def commit_hash(self) -> str:
+        return cast(str, dataset_hash(self, as_int=False))
 
-    def __hash__(self):
-        return dataset_hash(self)
+    def __hash__(self) -> int:
+        return cast(int, dataset_hash(self))
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
     def apply(
@@ -86,10 +93,10 @@ class Dataset:
         
         Args:
             func (Callable[[List[Example], Any, Any], Any]): 
-                Function from an existing recon module that can operate on a List of Examples
+                Function from an existing recon module that can operate on a List of examples
         
         Returns:
-            Result of running func on List of Examples
+            Result of running func on List of examples
         """
         return func(self.data, *args, **kwargs)  # type: ignore
 
@@ -100,11 +107,11 @@ class Dataset:
         initial_state: OperationState = None,
         **kwargs: Any,
     ) -> None:
-        """Apply a function to all data inplace.
+        """Apply an operation to all data inplace.
         
         Args:
-            func (Callable[[List[Example], Any, Any], List[Example]]): Function from an existing recon module
-                that can operate on a List[Example] and return a List[Example]
+            operation (Callable[[Any], OperationResult]): Any operation that
+                changes data in place. See recon.operations.registry.operations
         """
         result: OperationResult = operation(self, *args, initial_state=initial_state, **kwargs)  # type: ignore
         self.operations.append(result.state)
@@ -117,7 +124,7 @@ class Dataset:
         )
         if dataset_changed:
             self.data = result.data
-    
+
     def pipe_(self, operations: List[Union[str, OperationState]]) -> None:
         """Run a sequence of operations on dataset data.
         Internally calls Dataset.apply_ and will resolve named
@@ -125,7 +132,7 @@ class Dataset:
         
         Args:
             operations (List[Union[str, OperationState]]): List of operations
-        """        
+        """
         for op in operations:
             if isinstance(op, str):
                 op_name = op
@@ -142,17 +149,13 @@ class Dataset:
 
             self.apply_(operation, *args, initial_state=initial_state, **kwargs)
 
-    def from_disk(
-        self,
-        path: Path,
-        loader_func: Callable = read_jsonl
-    ) -> "Dataset":
+    def from_disk(self, path: Path, loader_func: Callable = read_jsonl) -> "Dataset":
         """Load Dataset from disk given a path and a loader function that reads the data
         and returns an iterator of Examples
         
         Args:
             path (Path): path to load from
-            loader_func (Callable, optional): Callable that reads a file and returns a List of Examples. 
+            loader_func (Callable, optional): Callable that reads a file and returns a List of examples. 
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         path = ensure_path(path)
@@ -186,12 +189,16 @@ class Dataset:
         operations_to_run: Dict[str, OperationState] = {}
 
         for op in self.operations:
-            if op.name not in operations_to_run and op.name in registry.operations and op.status != OperationStatus.COMPLETED:
+            if (
+                op.name not in operations_to_run
+                and op.name in registry.operations
+                and op.status != OperationStatus.COMPLETED
+            ):
                 operations_to_run[op.name] = op
 
         for op_name, state in operations_to_run.items():
             op = registry.operations.get(op_name)
-            self.apply_(op, *state.args, initial_state=state, **state.kwargs)
+            self.apply_(op, *state.args, initial_state=state, **state.kwargs)  # type: ignore
 
         return self
 

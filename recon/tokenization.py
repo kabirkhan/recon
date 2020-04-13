@@ -1,5 +1,5 @@
-from collections import defaultdict
 import copy
+from collections import defaultdict
 from typing import Any, Dict, List, Set, Tuple
 
 from spacy.language import Language
@@ -13,8 +13,8 @@ from .types import (
     Span,
     Token,
     Transformation,
-    TransformationType,
     TransformationCallbacks,
+    TransformationType,
 )
 
 
@@ -22,7 +22,7 @@ from .types import (
 def fix_tokenization_and_spacing(
     examples: List[Example],
     *,
-    callbacks: TransformationCallbacks = None,
+    callbacks: TransformationCallbacks = TransformationCallbacks(),
     tokenizer: str = "default",
     verbose: bool = False,
 ) -> List[Example]:
@@ -32,15 +32,15 @@ def fix_tokenization_and_spacing(
     get two words pushed together where one is an entity so this can fix a lot of issues.
     
     Args:
-        dataset (Dataset): Input Dataset
+        examples (List[Example]): List of examples
         tokenizer (str, optional): Name of tokenizer in tokenizers registry to use
         verbose (bool, optional): Print status
     
     Returns:
-        Dataset: Dataset with fixed Examples
+        List[Example]: List of examples with fixed tokenization
     """
     fixed_examples = []
-    tokenization_errors: List[Tuple[Dict[str, Any], str]] = []
+    tokenization_errors: List[Tuple[Example, Span]] = []
     unfixable_examples: Set[str] = set()
 
     nlp = tokenizers.get("default")()
@@ -70,7 +70,7 @@ def fix_tokenization_and_spacing(
                 if span.start in token_starts and span.end not in token_ends:
                     # Span start aligns to token_start but end doesn't
                     # e.g. [customer][PERSONTYPE]s but should be annotated as [customers][PERSONTYPE]
-                    tokenization_errors.append((example, span.text))
+                    tokenization_errors.append((example, span))
                     # print("BAD END")
                     if span.end + 1 in token_ends:
                         # Likely off by 1 annotation
@@ -108,7 +108,7 @@ def fix_tokenization_and_spacing(
                     # Bad tokenization
                     # e.g. with[Raymond][PERSON] but text should be split to with [Raymond][PERSON]
                     # print("BAD START", span.text)
-                    tokenization_errors.append((example, span.text))
+                    tokenization_errors.append((example, span))
                     for j in range(span_i, len(example.spans)):
                         spans_to_increment[j] += 1
 
@@ -122,19 +122,13 @@ def fix_tokenization_and_spacing(
                         split_end += spans_to_increment.get(span_i, 0)
 
                     new_text = f"{fe_text[:split_start]} {span.text}{fe_text[split_end:]}"
-
-                    # print(fe_text)
-                    # print(new_text)
-                    # print(spans_to_increment)
-                    # print('=' * 100)
                     example.text = new_text
-
                 else:
                     # Something is super fucked up.
                     # print("SPAN CORRECTED OFF BY 1 unfixable", example.text, span)
                     before = span.start
                     after = span.end
-                    tokenization_errors.append((example, span.text))
+                    tokenization_errors.append((example, span))
 
                     # if (before >= 0 and after < len(span.text) and span[before] not in token_starts and span[before] != ' ' and span[after] not in token_ends and span[after] != ' '):
                     #     fe_text = example.text
@@ -168,22 +162,22 @@ def fix_tokenization_and_spacing(
 def add_tokens(
     examples: List[Example],
     *,
-    callbacks: TransformationCallbacks = None,
+    callbacks: TransformationCallbacks = TransformationCallbacks(),
     tokenizer: str = "default",
     verbose: bool = False,
 ) -> List[Example]:
     """Add tokens to each Example
     
     Args:
-        dataset (Dataset): Dataset to tokenize
-        force (bool, optional): Force add tokens
+        examples (List[Example]): List of examples
         tokenizer (str, optional): Name of tokenizer in tokenizers registry to use
+        verbose (bool, optional): Print status
     
     Returns:
-        Dataset: Dataset of Examples with tokens
+        List[Example]: List of examples with tokens
     """
     output_examples: List[Example] = []
-    tokenization_errors: List[Tuple[Dict[str, Any], str]] = []
+    tokenization_errors: List[Tuple[Example, Span]] = []
     unfixable_examples: Set[str] = set()
     nlp = tokenizers.get(tokenizer)()
     texts = (e.text for e in examples)
@@ -209,8 +203,7 @@ def add_tokens(
                     span.token_end = token_ends[span.end].i
 
                 if span.token_start is None or span.token_end is None:
-                    print(span)
-                    tokenization_errors.append((example, span.text))
+                    tokenization_errors.append((example, span))
                     unfixable_examples.add(example.text)
 
             if example.text not in unfixable_examples:

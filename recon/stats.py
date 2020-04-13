@@ -24,7 +24,7 @@ def get_ner_stats(
     """Compute statistics for NER data
     
     Args:
-        data (List[Example]): Data as a List of Examples
+        data (List[Example]): Data as a List of examples
         serialize (bool, optional): Serialize to a JSON string for printing.
         return_examples (bool, optional): Whether to return examples per type
     
@@ -120,7 +120,7 @@ def get_entity_coverage(
     annotating examples your Model already understands well.
     
     Args:
-        data (List[Example]): List of Examples
+        data (List[Example]): List of examples
         sep (str, optional): Separator used in coverage map, only change if || exists in your text
             or label.
         use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.

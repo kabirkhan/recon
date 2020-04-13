@@ -6,7 +6,6 @@ from spacy.language import Language
 
 from .types import Example
 
-
 loading_pipelines = catalogue.create("recon", "loading_pipelines", entry_points=True)
 tokenizers = catalogue.create("recon", "tokenizers", entry_points=True)
 

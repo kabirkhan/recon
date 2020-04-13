@@ -9,17 +9,15 @@ from .types import Example, TransformationCallbacks
 
 
 @operation("rename_labels")
-def rename_labels(
-    example: Example, label_map: Dict[str, str]
-) -> List[Example]:
+def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
     """Rename labels in a copy of List[Example] data
     
     Args:
-        data (List[Example]): List of Examples
+        example (Example): Input Example
         label_map (Dict[str, str]): One-to-one mapping of label names
     
     Returns:
-        List[Example]: Copy List of Examples with renamed labels
+        Example: Copy of Example with renamed labels
     """
     for span in example.spans:
         span.label = label_map.get(span.label, span.label)
@@ -28,10 +26,8 @@ def rename_labels(
 
 @operation("fix_annotations")
 def fix_annotations(
-    example: Example,
-    corrections: Dict[str, str],
-    case_sensitive: bool = False
-) -> List[Example]:
+    example: Example, corrections: Dict[str, str], case_sensitive: bool = False
+) -> Example:
     """Fix annotations in a copy of List[Example] data.
     
     This function will NOT add annotations to your data.

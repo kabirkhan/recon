@@ -26,7 +26,7 @@ def get_ents_by_label(data: List[Example], use_lower: bool = True) -> DefaultDic
     """Get a dictionary of unique text spans by label for your data
     
     Args:
-        data (List[Example]): List of Examples
+        data (List[Example]): List of examples
         use_lower (bool, optional): Use the lowercase form of the span text.
     
     Returns:
@@ -53,7 +53,7 @@ def get_label_disparities(
     """Identify annotated spans that have different labels in different examples
     
     Args:
-        data (List[Example]): Input List of Examples
+        data (List[Example]): Input List of examples
         label1 (str): First label to compare
         label2 (str): Second label to compare
         use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.
@@ -72,7 +72,7 @@ def top_label_disparities(
     in different examples for all label pairs in data.
     
     Args:
-        data (List[Example]): Input List of Examples
+        data (List[Example]): Input List of examples
         use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.
         dedupe (bool, optional): Whether to deduplicate for table view vs confusion matrix.
             False by default for easy confusion matrix display.
@@ -188,7 +188,7 @@ def top_prediction_errors(
                     error_examples[f"{text}||{label}||{NONE}"].append(pred_error_example_pair)
                     n_errors += 1
 
-    ranked_errors_map: Dict[str, List[PredictionError]] = defaultdict(list)
+    ranked_errors_map: Dict[str, PredictionError] = {}
 
     for label, errors_per_label in errors.items():
         for error_text, error_labels in errors_per_label.items():
@@ -239,7 +239,7 @@ def get_hardest_examples(
         remove_pred_error_examples (bool, optional): Whether to remove examples from returned PredictionError. Defaults to True.
     
     Raises:
-        ValueError: Each PredictionError must have a List of Examples 
+        ValueError: Each PredictionError must have a List of examples 
     
     Returns:
         List[HardestExample]: Sorted list of the hardest examples for a model to work on.

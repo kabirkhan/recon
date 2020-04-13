@@ -7,7 +7,7 @@ from spacy.util import ensure_path
 from .dataset import Dataset
 from .loaders import read_json, read_jsonl
 from .store import ExampleStore
-from .types import CorpusApplyResult, Example, OperationState, OperationResult
+from .types import CorpusApplyResult, Example, OperationResult, OperationState
 
 
 class Corpus:
@@ -21,9 +21,9 @@ class Corpus:
         """Initialize a Corpus.
         
         Args:
-            train (Dataset): List of Examples for **train** set
-            dev (Dataset): List of Examples for **dev** set
-            test (Dataset, optional): Defaults to None. List of Examples for **test** set
+            train (Dataset): List of examples for **train** set
+            dev (Dataset): List of examples for **dev** set
+            test (Dataset, optional): Defaults to None. List of examples for **test** set
         """
         if example_store is None:
             examples = train.data + dev.data
@@ -33,7 +33,7 @@ class Corpus:
         self.example_store = example_store
 
         if test is None:
-            test = Dataset("testsw")
+            test = Dataset("test")
 
         for ds in (train, dev, test):
             ds.example_store = example_store
@@ -85,7 +85,7 @@ class Corpus:
         
         Args:
             func (Callable[[List[Example], Any, Any], Any]): 
-                Function from an existing recon module that can operate on a List of Examples
+                Function from an existing recon module that can operate on a List of examples
         
         Returns:
             CorpusApplyResult: CorpusApplyResult mapping dataset name to return type of func Callable
@@ -104,20 +104,20 @@ class Corpus:
         """Apply a function to all data inplace.
         
         Args:
-            func (Callable[[Any], OperationResult]): Function from an existing recon module
-                that can operate on a List[Example] and return a List[Example]
+            operation (Callable[[Any], OperationResult]): Any operation that
+                changes data in place. See recon.operations.registry.operations
         """
         self._train.apply_(operation, *args, **kwargs)
         self._dev.apply_(operation, *args, **kwargs)
         self._test.apply_(operation, *args, **kwargs)
-    
+
     def pipe_(self, operations: List[Union[str, OperationState]]) -> None:
         """Run a sequence of operations on each dataset.
         Calls Dataset.pipe_ for each dataset
         
         Args:
             operations (List[Union[str, OperationState]]): List of operations
-        """        
+        """
         self._train.pipe_(operations)
         self._dev.pipe_(operations)
         self._test.pipe_(operations)
@@ -139,7 +139,7 @@ class Corpus:
             train_file (str, optional): Filename of train data under data_dir. Defaults to train.jsonl.
             dev_file (str, optional): Filename of dev data under data_dir. Defaults to dev.jsonl.
             test_file (str, optional): Filename of test data under data_dir. Defaults to test.jsonl.
-            loader_func (Callable, optional): Callable that reads a file and returns a List of Examples. 
+            loader_func (Callable, optional): Callable that reads a file and returns a List of examples. 
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         data_dir = ensure_path(data_dir)

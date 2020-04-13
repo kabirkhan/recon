@@ -1,7 +1,7 @@
 from typing import Dict, Iterable, Iterator, List, Set, Tuple
 
-from spacy.language import Language
 import srsly
+from spacy.language import Language
 from wasabi import Printer
 
 from .types import Example, Span, Token
