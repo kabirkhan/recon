@@ -69,7 +69,6 @@ all = [
 recon = "recon.cli:app"
 
 [tool.flit.entrypoints."prodigy_recipes"]
-"recon.ner_manual" = "recon:prodigy_ner_sidecar.manual"
 "recon.ner_correct" = "recon:prodigy_recipes.ner_correct"
 "recon.ner_merge" = "recon:prodigy_recipes.ner_merge"
 
