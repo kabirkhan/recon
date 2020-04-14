@@ -102,7 +102,7 @@ class Dataset:
 
     def apply_(
         self,
-        operation: Callable[[Any], OperationResult],
+        operation: Union[str, Callable[[Any], OperationResult]],
         *args: Any,
         initial_state: OperationState = None,
         **kwargs: Any,
@@ -113,6 +113,18 @@ class Dataset:
             operation (Callable[[Any], OperationResult]): Any operation that
                 changes data in place. See recon.operations.registry.operations
         """
+        if isinstance(operation, str):
+            operation = registry.operations.get(operation)
+            if operation:
+                operation = cast(Callable, operation)
+
+        if not hasattr(operation, "name") or (
+            hasattr(operation, "name") and operation.name not in registry.operations
+        ):
+            raise ValueError(
+                "This function is not an operation. Ensure your function is registered in the operations registry."
+            )
+
         result: OperationResult = operation(self, *args, initial_state=initial_state, **kwargs)  # type: ignore
         self.operations.append(result.state)
         dataset_changed = any(
