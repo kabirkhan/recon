@@ -118,9 +118,8 @@ class Dataset:
             if operation:
                 operation = cast(Callable, operation)
 
-        if not hasattr(operation, "name") or (
-            hasattr(operation, "name") and operation.name not in registry.operations
-        ):
+        name = getattr(operation, "name", None)
+        if name is None or name not in registry.operations:
             raise ValueError(
                 "This function is not an operation. Ensure your function is registered in the operations registry."
             )
