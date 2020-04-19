@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, Iterator, List, Set, Tuple, Union
 import catalogue
 import srsly
 
-from .preprocess import PreProccessor
+from .preprocess import PreProcessor
 from .types import (
     Example,
     OperationResult,
@@ -24,7 +24,7 @@ class registry:
 
 
 def op_iter(
-    data: List[Example], pre: List[PreProccessor]
+    data: List[Example], pre: List[PreProcessor]
 ) -> Iterator[Tuple[int, Example, Dict[str, Any]]]:
     """Iterate over list of examples for an operation
     yielding tuples of (example hash, example)
@@ -46,7 +46,7 @@ def op_iter(
 
 
 class operation:
-    def __init__(self, name: str, pre: List[PreProccessor] = []):
+    def __init__(self, name: str, pre: List[PreProcessor] = []):
         """Decorate an operation that makes some changes to a dataset.
 
         Args:
@@ -83,7 +83,7 @@ class Operation:
     """Operation class that takes care of calling and reporting
     the results of an operation on a Dataset"""
 
-    def __init__(self, name: str, pre: List[PreProccessor], op: Callable):
+    def __init__(self, name: str, pre: List[PreProcessor], op: Callable):
         """Initialize an Operation instance
         
         Args:
