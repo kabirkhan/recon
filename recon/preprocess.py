@@ -10,7 +10,7 @@ from .types import Example
 class PreProcessor(object):
     name = "recon.v1.preprocess"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._cache: Dict[Any, Any]
 
@@ -21,7 +21,7 @@ class PreProcessor(object):
 class SpacyPreProcessor(PreProcessor):
     name = "recon.v1.spacy"
 
-    def __init__(self, nlp: Language):
+    def __init__(self, nlp: Language) -> None:
         super().__init__()
         self._nlp = nlp
 
