@@ -18,7 +18,6 @@ from .types import (
     TransformationType,
 )
 
-
 tokenizer = tokenizers.get("default")
 nlp = tokenizer()
 spacy_pre_processor = SpacyPreProcessor(nlp)
@@ -26,9 +25,7 @@ spacy_pre_processor = SpacyPreProcessor(nlp)
 
 @operation("fix_tokenization_and_spacing", pre=[spacy_pre_processor])
 def fix_tokenization_and_spacing(
-    example: Example,
-    *,
-    preprocessed_outputs: Dict[str, Any] = {}
+    example: Example, *, preprocessed_outputs: Dict[str, Any] = {}
 ) -> Union[Example, None]:
     """Fix tokenization and spacing issues where there are annotation spans that 
     don't fall on a token boundary. This can happen if annotations are done at the
@@ -85,16 +82,10 @@ def fix_tokenization_and_spacing(
                 fe_text = example.text
 
                 split_start = span.start
-                if (
-                    len(spans_to_increment) > 1
-                    and span_i != list(spans_to_increment.keys())[0]
-                ):
+                if len(spans_to_increment) > 1 and span_i != list(spans_to_increment.keys())[0]:
                     split_start += spans_to_increment.get(span_i, 0)
                 split_end = span.end
-                if (
-                    len(spans_to_increment) > 1
-                    and span_i != list(spans_to_increment.keys())[0]
-                ):
+                if len(spans_to_increment) > 1 and span_i != list(spans_to_increment.keys())[0]:
                     split_end += spans_to_increment.get(span_i, 0)
                 new_text = f"{fe_text[:split_start]}{span.text} {fe_text[split_end:]}"
 
@@ -146,11 +137,7 @@ def fix_tokenization_and_spacing(
 
 
 @operation("add_tokens", pre=[spacy_pre_processor])
-def add_tokens(
-    example: Example,
-    *,
-    preprocessed_outputs: Dict[str, Any]
-) -> Union[Example, None]:
+def add_tokens(example: Example, *, preprocessed_outputs: Dict[str, Any]) -> Union[Example, None]:
     """Add tokens to each Example
     
     Args:

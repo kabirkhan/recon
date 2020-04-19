@@ -1,5 +1,6 @@
 from functools import chain
 from typing import Any, Dict, Iterator, List
+
 import spacy
 from spacy.language import Language
 from spacy.tokens import Doc
@@ -9,6 +10,7 @@ from .types import Example
 
 class PreProcessor(object):
     name = "recon.v1.preprocess"
+
     def __init__(self):
         super().__init__()
         self._cache: Dict[Any, Any]

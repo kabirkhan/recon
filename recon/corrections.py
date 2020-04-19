@@ -77,7 +77,9 @@ def fix_annotations(
 
 
 @operation("strip_annotations")
-def strip_annotations(example: Example, strip_chars: List[str] = [".", "!", "?", "-", ":", " "]) -> Example:
+def strip_annotations(
+    example: Example, strip_chars: List[str] = [".", "!", "?", "-", ":", " "]
+) -> Example:
     """Strip punctuation and spaces from start and end of annotations.
     These characters are almost always a mistake and will confuse a model
     
@@ -87,13 +89,13 @@ def strip_annotations(example: Example, strip_chars: List[str] = [".", "!", "?",
     
     Returns:
         Example: Example with stripped spans
-    """    
+    """
 
     for s in example.spans:
         for ch in strip_chars:
             if s.text.startswith(ch):
                 ch = s.text[0]
-               
+
                 while ch in strip_chars:
                     s.text = s.text[1:]
                     s.start += 1
