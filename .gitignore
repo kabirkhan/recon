@@ -10,7 +10,7 @@ dist
 site
 .coverage
 htmlcov
-examples/cs_data_test.ipynb
+examples/cs_data*.ipynb
 examples/skills_data*.ipynb
 **/.ipynb_checkpoints
 **/.pytest_cache
