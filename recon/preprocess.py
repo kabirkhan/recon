@@ -1,4 +1,3 @@
-from functools import chain
 from typing import Any, Dict, Iterator, List
 
 import spacy
