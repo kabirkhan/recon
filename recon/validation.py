@@ -8,7 +8,7 @@ from .operations import operation
 from .types import Example, Span, TransformationCallbacks
 
 
-@operation("upcase_labels")
+@operation("recon.v1.upcase_labels")
 def upcase_labels(example: Example) -> Example:
     """Convert all span labels to uppercase to normalize
     
@@ -23,7 +23,7 @@ def upcase_labels(example: Example) -> Example:
     return example
 
 
-@operation("filter_overlaps")
+@operation("recon.v1.filter_overlaps")
 def filter_overlaps(example: Example) -> Example:
     """Filter overlapping entity spans by picking the longest one.
     

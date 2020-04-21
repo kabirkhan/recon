@@ -65,7 +65,7 @@ def test_apply_(example_data):
 
     assert len(train_dataset.operations) == 0
 
-    train_dataset.apply_(registry.operations.get("upcase_labels"))
+    train_dataset.apply_("recon.v1.upcase_labels")
 
     ner_stats_post: NERStats = cast(NERStats, train_dataset.apply(get_ner_stats))
 
@@ -81,7 +81,7 @@ def test_apply_(example_data):
 
     op = train_dataset.operations[0]
 
-    assert op.name == "upcase_labels"
+    assert op.name == "recon.v1.upcase_labels"
     assert op.status == OperationStatus.COMPLETED
     assert len(op.transformations) == 3
 
@@ -103,7 +103,7 @@ def test_dataset_to_from_disk(example_data, tmp_path):
     assert len(train_dataset_loaded.operations) == 0
     assert train_dataset_loaded.commit_hash == train_dataset.commit_hash
 
-    train_dataset.apply_(registry.operations.get("upcase_labels"))
+    train_dataset.apply_("recon.v1.upcase_labels")
 
     train_dataset.to_disk(tmp_path / "train.jsonl", force=True)
     train_dataset_loaded_2 = Dataset("train").from_disk(tmp_path / "train.jsonl")
@@ -114,7 +114,7 @@ def test_dataset_to_from_disk(example_data, tmp_path):
 
     op = train_dataset_loaded_2.operations[0]
 
-    assert op.name == "upcase_labels"
+    assert op.name == "recon.v1.upcase_labels"
     assert op.status == OperationStatus.COMPLETED
     assert len(op.transformations) == 3
 

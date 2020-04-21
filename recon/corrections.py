@@ -8,7 +8,7 @@ from .operations import operation
 from .types import Example, TransformationCallbacks
 
 
-@operation("rename_labels")
+@operation("recon.v1.rename_labels")
 def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
     """Rename labels in a copy of List[Example] data
     
@@ -24,7 +24,7 @@ def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
     return example
 
 
-@operation("fix_annotations")
+@operation("recon.v1.fix_annotations")
 def fix_annotations(
     example: Example, corrections: Dict[str, str], case_sensitive: bool = False
 ) -> Example:
@@ -76,7 +76,7 @@ def fix_annotations(
     return example
 
 
-@operation("strip_annotations")
+@operation("recon.v1.strip_annotations")
 def strip_annotations(
     example: Example, strip_chars: List[str] = [".", "!", "?", "-", ":", " "]
 ) -> Example:

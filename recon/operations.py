@@ -37,9 +37,10 @@ def op_iter(
     """
     preprocessed_outputs: Dict[Example, Dict[str, Any]] = defaultdict(dict)
     for processor in pre:
-        processor_outputs = processor(data)
-        for example, output in processor_outputs:
-            preprocessed_outputs[example][processor.name] = processor_outputs
+        processor_outputs = list(processor(data))
+
+        for i, (example, output) in enumerate(zip(data, processor_outputs)):
+            preprocessed_outputs[example][processor.name] = processor_outputs[i]
 
     for example in data:
         yield hash(example), example.copy(deep=True), preprocessed_outputs[example]
@@ -62,7 +63,7 @@ class operation:
         This function can either operate on a List[Example]
         and in that case self.batch should be True.
 
-        e.g. @operation("some_name", batch=True)
+        e.g. @operation("recon.v1.some_name", batch=True)
 
         Or it should operate on a single example and 
         recon will take care of applying it to a full Dataset
@@ -107,7 +108,7 @@ class Operation:
         Returns:
             OperationResult: Container holding new data and the state of the Operation
         """
-        initial_state = kwargs.pop("initial_state")
+        initial_state = kwargs.pop("initial_state") if "initial_state" in kwargs else None
         if not initial_state:
             initial_state = OperationState(name=self.name)
         state = initial_state.copy(deep=True)
