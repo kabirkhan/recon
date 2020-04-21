@@ -8,7 +8,7 @@ from .operations import operation
 from .types import Example, TransformationCallbacks
 
 
-@operation("rename_labels")
+@operation("recon.v1.rename_labels")
 def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
     """Rename labels in a copy of List[Example] data
     
@@ -24,7 +24,7 @@ def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
     return example
 
 
-@operation("fix_annotations")
+@operation("recon.v1.fix_annotations")
 def fix_annotations(
     example: Example, corrections: Dict[str, str], case_sensitive: bool = False
 ) -> Example:
@@ -73,4 +73,37 @@ def fix_annotations(
         for line in prints[k]:
             print(line)
 
+    return example
+
+
+@operation("recon.v1.strip_annotations")
+def strip_annotations(
+    example: Example, strip_chars: List[str] = [".", "!", "?", "-", ":", " "]
+) -> Example:
+    """Strip punctuation and spaces from start and end of annotations.
+    These characters are almost always a mistake and will confuse a model
+    
+    Args:
+        example (Example): Input Example
+        strip_chars (List[str], optional): Characters to strip.
+    
+    Returns:
+        Example: Example with stripped spans
+    """
+
+    for s in example.spans:
+        for ch in strip_chars:
+            if s.text.startswith(ch):
+                ch = s.text[0]
+
+                while ch in strip_chars:
+                    s.text = s.text[1:]
+                    s.start += 1
+                    ch = s.text[0]
+            elif s.text.endswith(ch):
+                ch = s.text[-1]
+                while ch in strip_chars:
+                    s.text = s.text[:-1]
+                    ch = s.text[-1]
+                    s.end -= 1
     return example

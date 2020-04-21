@@ -26,7 +26,7 @@ def test_upcase_labels(example_corpus):
     assert "product" in stats.n_annotations_per_type
     assert "SKILL" in stats.n_annotations_per_type
 
-    example_corpus._train.pipe_(["upcase_labels"])
+    example_corpus._train.apply_("recon.v1.upcase_labels")
     fixed_stats = cast(NERStats, get_ner_stats(example_corpus.train))
     assert "skill" not in fixed_stats.n_annotations_per_type
     assert "product" not in fixed_stats.n_annotations_per_type
