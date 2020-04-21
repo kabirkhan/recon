@@ -24,7 +24,8 @@ import spacy
 import srsly
 from wasabi import msg
 from recon.constants import NONE
-from recon.loaders import read_jsonl
+from recon.dataset import Dataset
+from recon.operations import op_iter, operation, Operation
 from recon.types import HardestExample, Example, Span
 from recon.validation import remove_overlapping_entities
 
@@ -272,15 +273,17 @@ def ner_correct(
     "recon.ner_merge",
     # fmt: off
     dataset=("Dataset with saved annotations to from recon.ner_correct", "positional", None, str),
+    recon_dataset=("Recon dataset name", "positional", None, str),
     source=("Source data to merge examples with (file path or List of examples)", "positional", None, str),
-    output_file=("Optional output file", "positional", None, str),
+    output_dir=("Optional output directory to save dataset to", "positional", None, str),
     exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
     # fmt: on
 )
 def ner_merge(
     dataset: str,
-    source: Union[str, Iterable[Example]],
-    output_file: Optional[str] = None,
+    recon_dataset: str,
+    source: Union[str, Dataset],
+    output_dir: Optional[str] = None,
     exclude: Optional[List[str]] = None,
 ):
     """
@@ -290,30 +293,30 @@ def ner_merge(
     """
     log("RECIPE: Starting recipe recon.ner_merge", locals())
     if isinstance(source, str):
-        data = read_jsonl(source)
+        dataset = Dataset(recon_dataset).from_disk(source)
     else:
-        data = source
+        dataset = source
 
     DB = connect()
     if dataset not in DB:
         msg.fail(f"Can't find dataset '{dataset}'", exits=1)
 
     prodigy_raw_examples = DB.get_dataset(dataset)
-    for eg in prodigy_raw_examples:
-        for span in eg["spans"]:
-            span["text"] = eg["text"][span["start"] : span["end"]]
     prodigy_examples = [Example(**eg) for eg in prodigy_raw_examples if eg["answer"] == "accept"]
-    prodigy_example_texts = {e.text for e in prodigy_examples}
+    prodigy_texts_to_examples = {e.text: e for e in prodigy_examples}
 
-    merged_examples = prodigy_examples
+    prev_len = len(dataset)
+    dataset.apply_("recon.v1.prodigy.merge_examples", prodigy_texts_to_examples)
+    assert len(dataset) == prev_len
 
-    for example in data:
-        if example.text not in prodigy_example_texts:
-            merged_examples.append(example)
-
-    assert len(merged_examples) == len(prodigy_examples)
-
-    if output_file:
+    if output_dir:
         log(f"RECIPE: Fixing {len(prodigy_examples)} examples in data")
-        srsly.write_jsonl(output_file, [e.dict() for e in merged_examples])
-        msg.good(f"Exported {len(merged_examples)} examples to file", output_file)
+        dataset.to_disk(output_dir)
+
+
+@operation("recon.v1.prodigy.merge_examples")
+def merge_examples(example, prodigy_texts_to_examples):
+    if example.text in prodigy_texts_to_examples:
+        return prodigy_texts_to_examples[example.text]
+    else:
+        return example

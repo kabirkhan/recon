@@ -1,15 +1,17 @@
+from recon.operations import op_iter
+from recon.preprocess import SpacyPreProcessor
 from recon.tokenization import add_tokens
 from recon.types import Example
 
 
-def test_add_tokens(transformation_callbacks):
+def test_add_tokens(spacy_preprocessor):
     # fmt: off
-    raw_examples = [
+    untokenized_examples = [Example(**example) for example in [
         {"text": "Have you used the new version of my model?", "spans": [{"start": 36, "end": 41, "label": "SKILL"}]},
         {"text": "I'd like to work as an actor or model if possible.", "spans": [{"text": "actor", "start": 23, "end": 28, "label": "JOB_ROLE"}, {"text": "model", "start": 32, "end": 37, "label": "JOB_ROLE"}]},
         {"text": "We are looking for a Software Development Engineer who has solid coding skills, a strong machine learning background, and is passionate about developing new AI products.", "spans": [{"start": 21, "end": 50, "label": "SKILL"}, {"start": 65, "end": 71, "label": "SKILL"}, {"start": 89, "end": 105, "label": "SKILL"}, {"start": 142, "end": 152, "label": "SKILL"}, {"start": 157, "end": 159, "label": "SKILL"}]},
         {"text": "Responsibilities As a SOFTWARE DEVELOPMENT ENGINEER II you will work / collaborate with other talented engineers to build features and technologies that will affect millions of your fellow developers in the community.", "spans": [{"start": 22, "end": 51, "label": "JOB_ROLE"}, {"start": 71, "end": 82, "label": "SKILL"}, {"start": 103, "end": 112, "label": "JOB_ROLE"}, {"start": 135, "end": 147, "label": "SKILL"}, {"start": 189, "end": 199, "label": "JOB_ROLE"}]}
-    ]
+    ]]
 
     tokenized_examples = [Example(**example) for example in [
         {"text": "Have you used the new version of my model?", "spans": [{"start": 36, "end": 41, "token_start": 8, "token_end": 8, "label": "SKILL"}], "tokens": [{"text": "Have", "start": 0, "end": 4, "id": 0}, {"text": "you", "start": 5, "end": 8, "id": 1}, {"text": "used", "start": 9, "end": 13, "id": 2}, {"text": "the", "start": 14, "end": 17, "id": 3}, {"text": "new", "start": 18, "end": 21, "id": 4}, {"text": "version", "start": 22, "end": 29, "id": 5}, {"text": "of", "start": 30, "end": 32, "id": 6}, {"text": "my", "start": 33, "end": 35, "id": 7}, {"text": "model", "start": 36, "end": 41, "id": 8}, {"text": "?", "start": 41, "end": 42, "id": 9}]},
@@ -19,8 +21,11 @@ def test_add_tokens(transformation_callbacks):
     ]]
     # fmt: on
 
-    data = [Example(**example) for example in raw_examples]
-    fixed_examples = add_tokens(data, callbacks=transformation_callbacks)
+    fixed_examples = []
+    for orig_example_hash, example, preprocessed_outputs in op_iter(
+        untokenized_examples, pre=[spacy_preprocessor]
+    ):
+        fixed_examples.append(add_tokens(example, preprocessed_outputs=preprocessed_outputs))
 
     for fixed_example, tokenized_example in zip(fixed_examples, tokenized_examples):
         assert fixed_example.text == tokenized_example.text
@@ -28,7 +33,7 @@ def test_add_tokens(transformation_callbacks):
         assert fixed_example.tokens == tokenized_example.tokens
 
 
-def test_add_tokens_bad_example(transformation_callbacks):
+def test_add_tokens_bad_example(spacy_preprocessor):
 
     bad_example = {
         "text": "The primary outcome was spontaneous delivery before 34 weeks.face=+Italic; Resultsface=-Italic; Spontaneous delivery before 34 weeks of gestation was less frequent in the progesterone group than in the placebo group (19.2% vs. 34.4%; relative risk, 0.56; 95% confidence interval [CI], 0.36 to 0.86).",
@@ -43,13 +48,21 @@ def test_add_tokens_bad_example(transformation_callbacks):
         ],
     }
 
-    data = [Example(text=bad_example["text"], spans=[]), Example(**bad_example)]
-    fixed_examples = add_tokens(data, callbacks=transformation_callbacks)
+    examples = [Example(text=bad_example["text"], spans=[]), Example(**bad_example)]
+
+    fixed_examples = []
+    for orig_example_hash, example, preprocessed_outputs in op_iter(
+        examples, pre=[spacy_preprocessor]
+    ):
+        fixed_example = add_tokens(example, preprocessed_outputs=preprocessed_outputs)
+        if fixed_example:
+            fixed_examples.append(fixed_example)
+
+    assert len(fixed_examples) == 1
+    fixed_example = fixed_examples[0]
 
     # Since add_tokens cannot resolve token start and ends from the spans above.
-    assert len(fixed_examples) == 1
-
-    fixed_example = fixed_examples[0]
+    assert isinstance(fixed_example, Example)
 
     assert isinstance(fixed_example.tokens, list)
     assert len(fixed_example.tokens) == 56

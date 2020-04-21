@@ -23,7 +23,7 @@ nlp = tokenizer()
 spacy_pre_processor = SpacyPreProcessor(nlp)
 
 
-@operation("fix_tokenization_and_spacing", pre=[spacy_pre_processor])
+@operation("recon.v1.fix_tokenization_and_spacing", pre=[spacy_pre_processor])
 def fix_tokenization_and_spacing(
     example: Example, *, preprocessed_outputs: Dict[str, Any] = {}
 ) -> Union[Example, None]:
@@ -136,7 +136,7 @@ def fix_tokenization_and_spacing(
     return example
 
 
-@operation("add_tokens", pre=[spacy_pre_processor])
+@operation("recon.v1.add_tokens", pre=[spacy_pre_processor])
 def add_tokens(example: Example, *, preprocessed_outputs: Dict[str, Any]) -> Union[Example, None]:
     """Add tokens to each Example
     

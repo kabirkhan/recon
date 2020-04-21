@@ -4,6 +4,7 @@ from typing import Dict, List
 import pytest
 from recon.corpus import Corpus
 from recon.loaders import read_jsonl
+from recon.preprocess import SpacyPreProcessor
 from recon.recognizer import SpacyEntityRecognizer
 from recon.types import Example, TransformationCallbacks
 from spacy.lang.en import English
@@ -12,6 +13,11 @@ from spacy.lang.en import English
 @pytest.fixture()
 def nlp():
     return English()
+
+
+@pytest.fixture()
+def spacy_preprocessor(nlp):
+    return SpacyPreProcessor(nlp)
 
 
 @pytest.fixture()
@@ -57,7 +63,14 @@ def example_corpus_processed() -> Corpus:
     """
     base_path = Path(__file__).parent.parent / "examples/data/skills"
     corpus = Corpus.from_disk(base_path)
-    corpus.pipe_(["fix_tokenization_and_spacing", "add_tokens", "upcase_labels", "filter_overlaps"])
+    corpus.pipe_(
+        [
+            "recon.v1.fix_tokenization_and_spacing",
+            "recon.v1.add_tokens",
+            "recon.v1.upcase_labels",
+            "recon.v1.filter_overlaps",
+        ]
+    )
     return corpus
 
 
@@ -73,8 +86,3 @@ def recognizer(nlp, example_corpus):
 
     recognizer = SpacyEntityRecognizer(nlp)
     return recognizer
-
-
-@pytest.fixture()
-def transformation_callbacks():
-    return TransformationCallbacks()

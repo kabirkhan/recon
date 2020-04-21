@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterable, List
 
 import spacy
 from spacy.language import Language
@@ -12,9 +12,9 @@ class PreProcessor(object):
 
     def __init__(self) -> None:
         super().__init__()
-        self._cache: Dict[Any, Any]
+        self._cache: Dict[Any, Any] = {}
 
-    def __call__(self, data: List[Example]) -> Iterator[Any]:
+    def __call__(self, data: List[Example]) -> Iterable[Any]:
         raise NotImplementedError
 
 
@@ -25,7 +25,7 @@ class SpacyPreProcessor(PreProcessor):
         super().__init__()
         self._nlp = nlp
 
-    def __call__(self, data: List[Example]) -> Iterator[Any]:
+    def __call__(self, data: List[Example]) -> Iterable[Any]:
         unseen_texts = (e.text for i, e in enumerate(data) if hash(e) not in self._cache)
         seen_texts = ((i, e.text) for i, e in enumerate(data) if hash(e) in self._cache)
 
@@ -35,4 +35,4 @@ class SpacyPreProcessor(PreProcessor):
         for idx, st in seen_texts:
             docs.insert(idx, self._cache[st])
 
-        return (doc for doc in docs)
+        return docs
