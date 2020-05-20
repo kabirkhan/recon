@@ -137,30 +137,35 @@ examples/fixed_data/skills/
 $ cat examples/fixed_data/skills/.recon/train/state.json
 
 {
-    "name":"recon.v1.upcase_labels",
-    "batch":false,
-    "args":[],
-    "kwargs":{},
-    "status":"COMPLETED",
-    "ts":1586687281,
-    "examples_added":0,
-    "examples_removed":0,
-    "examples_changed":3,
-    "transformations":[
+    "name": "train",
+    "commit_hash": "375a4cdec36fa9e0efd1d7b2a02fb4287b99dbdc",
+    "operations": [
         {
-            "prev_example":1923088532738022750,
-            "example":1401028415299739275,
-            "type":"EXAMPLE_CHANGED"
-        },
-        {
-            "prev_example":459906967662468309,
-            "example":1525998324968157929,
-            "type":"EXAMPLE_CHANGED"
-        },
-        {
-            "prev_example":200276835658424828,
-            "example":407710308633891847,
-            "type":"EXAMPLE_CHANGED"
+            "name":"recon.v1.upcase_labels",
+            "args":[],
+            "kwargs":{},
+            "status":"COMPLETED",
+            "ts":1586687281,
+            "examples_added":0,
+            "examples_removed":0,
+            "examples_changed":3,
+            "transformations":[
+                {
+                    "prev_example":1923088532738022750,
+                    "example":1401028415299739275,
+                    "type":"EXAMPLE_CHANGED"
+                },
+                {
+                    "prev_example":459906967662468309,
+                    "example":1525998324968157929,
+                    "type":"EXAMPLE_CHANGED"
+                },
+                {
+                    "prev_example":200276835658424828,
+                    "example":407710308633891847,
+                    "type":"EXAMPLE_CHANGED"
+                }
+            ]
         }
     ]
 }
@@ -189,7 +194,7 @@ This can happen if you add new examples and want to rerun or run new operations 
 ```json hl_lines="4 6 7 8 9 10"
 {
     "name": "train",
-    "commit_hash": "1923088532738022750",
+    "commit_hash": "375a4cdec36fa9e0efd1d7b2a02fb4287b99dbdc",
     "operations": [
         {
             "name":"recon.v1.upcase_labels",
@@ -238,7 +243,7 @@ The `examples_added`, `examples_removed`, `examples_changed` give you a summary 
 ```json hl_lines="11 12 13"
 {
     "name": "train",
-    "commit_hash": "1923088532738022750",
+    "commit_hash": "375a4cdec36fa9e0efd1d7b2a02fb4287b99dbdc",
     "operations": [
         {
             "name":"recon.v1.upcase_labels",
@@ -273,11 +278,29 @@ The `examples_added`, `examples_removed`, `examples_changed` give you a summary 
 
 
 Finally, the `transformations` property is the most useful for actually auditing and tracking your data changes.
+Each transformation has a `prev_example`, `example` and transformation `type`. 
+
+The example properties contain the Example hash or the example before and after the transformation occured. This is really not useful by itself, but these hashes coincide to the hash -> Example mappings in the example_store.jsonl file that Recon saves for you. The ExampleStore is a central store that keeps track of all examples you've ever had in your dataset. This way, we can always revert back or see a concrete comparison of what each operation added/removed/changed by resolving the transformations to their corresponding examples.
+
+!!!note
+    Having an ExampleStore is obviously more than doubling the storage required for your data but NER datasets are ususually not that big since they're hard to annotate. For reference, Recon has been tested on a Dataset of 200K examples with no issue.
+
+The transformation `type` will always be one of (EXAMPLE_ADDED, EXAMPLE_REMOVED, or EXAMPLE_CHANGED).
+
+* EXAMPLE_ADDED - In this case, the `prev_example` property will be `null` since we're just adding an example to our dataset.
+    This can happen if an operation returns more than one example for every example it sees. A good reference example is the [`recon.v1.split_sentences`](link/to/split_sentences) operation. This operation will find all the sentences in an example and split them out into separate examples. 
+
+!!!tip
+    So if an example has 2 sentences, Recon will track this operation as removing the original example and adding 2 examples. You'll see those reflected in the transformations
+
+* EXAMPLE_REMOVED - By default, Recon removes Examples that have bad final annotations that can't be properly resolved to token boundaries. Good reference examples for this behavior are the operations [`recon.v1.fix_tokenization_and_spacing`](link/to/fix_tokenization_and_spacing) and [`recon.v1.add_tokens`](link/to/add_tokens)
+
+
 
 ```json hl_lines="14 16 17 18"
 {
     "name": "train",
-    "commit_hash": "1923088532738022750",
+    "commit_hash": "375a4cdec36fa9e0efd1d7b2a02fb4287b99dbdc",
     "operations": [
         {
             "name":"recon.v1.upcase_labels",
