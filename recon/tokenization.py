@@ -33,12 +33,11 @@ def fix_tokenization_and_spacing(
     get two words pushed together where one is an entity so this can fix a lot of issues.
     
     Args:
-        examples (List[Example]): List of examples
-        tokenizer (str, optional): Name of tokenizer in tokenizers registry to use
-        verbose (bool, optional): Print status
-    
+        example (Example): Input Example
+        preprocessed_outputs (Dict[str, Any]): Outputs of preprocessors
+
     Returns:
-        List[Example]: List of examples with fixed tokenization
+        Example: Example with spans fixed to align to token boundaries.
     """
 
     doc = preprocessed_outputs["recon.v1.spacy"]
@@ -141,12 +140,11 @@ def add_tokens(example: Example, *, preprocessed_outputs: Dict[str, Any]) -> Uni
     """Add tokens to each Example
     
     Args:
-        examples (List[Example]): List of examples
-        tokenizer (str, optional): Name of tokenizer in tokenizers registry to use
-        verbose (bool, optional): Print status
-    
+        example (Example): Input Example
+        preprocessed_outputs (Dict[str, Any]): Outputs of preprocessors
+
     Returns:
-        List[Example]: List of examples with tokens
+        Example: Example with tokens
     """
     doc = preprocessed_outputs["recon.v1.spacy"]
 
@@ -166,7 +164,7 @@ def add_tokens(example: Example, *, preprocessed_outputs: Dict[str, Any]) -> Uni
     for span in example.spans:
         if span.start in token_starts and span.end in token_ends:
             span.token_start = token_starts[span.start].i
-            span.token_end = token_ends[span.end].i
+            span.token_end = token_ends[span.end].i + 1
 
         if span.token_start is None or span.token_end is None:
             return None

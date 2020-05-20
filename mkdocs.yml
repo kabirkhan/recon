@@ -20,7 +20,10 @@ nav:
     - Tutorial:
         - Loading your data: 'tutorial/1_loading_data.md'
         - NER Stats: 'tutorial/2_ner_stats.md'
-        - Using a Corpus: 'tutorial/3_corpus_apply.md'
+        - Dataset:
+            - Introduction: 'tutorial/3_dataset_intro.md'
+            - Making changes to a Dataset: 'tutorial/3_dataset_mutate.md'
+        - Using a Corpus: 'tutorial/4_corpus.md'
         - More NER Stats: 'tutorial/4_more_stats.md'
         - Getting Insights: 'tutorial/5_getting_insights.md'
         - Custom EntityRecognizer: 'tutorial/custom_entity_recognizer.md'

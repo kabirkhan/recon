@@ -31,6 +31,7 @@ def op_iter(
     
     Args:
         data (List[Example]): List of examples to iterate
+        pre (List[PreProcessor]): List of preprocessors to run
     
     Yields:
         Iterator[Tuple[int, Example]]: Tuples of (example hash, example)
@@ -52,7 +53,7 @@ class operation:
 
         Args:
             name (str): Operation name.
-            batch (bool): Send all examples in dataset for batch operation. 
+            pre (List[PreProcessor]): List of preprocessors to run
         """
         self.name = name
         self.pre = pre
@@ -89,7 +90,7 @@ class Operation:
         
         Args:
             name (str): Name of operation
-            batch (bool): Whether the operation handles a batch of data or not
+            pre (List[PreProcessor]): List of preprocessors to run
             op (Callable): Decorated function
         """
         self.name = name
