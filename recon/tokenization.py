@@ -136,7 +136,9 @@ def fix_tokenization_and_spacing(
 
 
 @operation("recon.v1.add_tokens", pre=[spacy_pre_processor])
-def add_tokens(example: Example, *, preprocessed_outputs: Dict[str, Any]) -> Union[Example, None]:
+def add_tokens(
+    example: Example, *, use_spacy_token_ends: bool = False, preprocessed_outputs: Dict[str, Any]
+) -> Union[Example, None]:
     """Add tokens to each Example
     
     Args:
@@ -164,7 +166,10 @@ def add_tokens(example: Example, *, preprocessed_outputs: Dict[str, Any]) -> Uni
     for span in example.spans:
         if span.start in token_starts and span.end in token_ends:
             span.token_start = token_starts[span.start].i
-            span.token_end = token_ends[span.end].i + 1
+            if use_spacy_token_ends:
+                span.token_end = token_ends[span.end].i + 1
+            else:
+                span.token_end = token_ends[span.end].i
 
         if span.token_start is None or span.token_end is None:
             return None
