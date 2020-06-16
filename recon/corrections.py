@@ -112,7 +112,7 @@ def strip_annotations(
     return example
 
 
-nlp = spacy.blank("")
+nlp = spacy.blank("en")
 nlp.add_pipe(nlp.create_pipe("sentencizer"))
 spacy_pre = SpacyPreProcessor(nlp)
 
