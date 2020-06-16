@@ -20,10 +20,10 @@ from .types import (
 
 tokenizer = tokenizers.get("default")
 nlp = tokenizer()
-spacy_pre_processor = SpacyPreProcessor(nlp)
+spacy_pre = SpacyPreProcessor(nlp)
 
 
-@operation("recon.v1.fix_tokenization_and_spacing", pre=[spacy_pre_processor])
+@operation("recon.v1.fix_tokenization_and_spacing", pre=[spacy_pre])
 def fix_tokenization_and_spacing(
     example: Example, *, preprocessed_outputs: Dict[str, Any] = {}
 ) -> Union[Example, None]:
@@ -135,7 +135,7 @@ def fix_tokenization_and_spacing(
     return example
 
 
-@operation("recon.v1.add_tokens", pre=[spacy_pre_processor])
+@operation("recon.v1.add_tokens", pre=[spacy_pre])
 def add_tokens(
     example: Example, *, use_spacy_token_ends: bool = False, preprocessed_outputs: Dict[str, Any]
 ) -> Union[Example, None]:
