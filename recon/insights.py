@@ -13,6 +13,7 @@ from wasabi import Printer
 from .constants import NONE
 from .recognizer import EntityRecognizer
 from .types import (
+    AnnotationCount,
     Example,
     HardestExample,
     LabelDisparity,
@@ -24,10 +25,22 @@ from .types import (
 
 def get_ents_by_label(data: List[Example], use_lower: bool = True) -> DefaultDict[str, List[str]]:
     """Get a dictionary of unique text spans by label for your data
+
+    # TODO: Ok so this needs to return more than just a set for each label.
+
+    We want to return a dictionary that maps labels to AnnotationCount objects where each 
+    AnnotationCount contains the text of the annotation text, the total number of times it's mentioned (e.g. what entity_coverage does)
+    but also the examples it is in. 
+
+    So maybe I can get this info from entity_coverage? IDK but this is dumb rn and not very flexible.
+
+    Maybe I should keep this function returning a set of strings for each label for compatability but I need the other way too
+    so I know what to focus on in editing and a 
     
     Args:
         data (List[Example]): List of examples
         use_lower (bool, optional): Use the lowercase form of the span text.
+        sort_by (SortBy): Sort by text or by count
     
     Returns:
         DefaultDict[str, List[str]]: DefaultDict mapping label to sorted list of the unique
@@ -41,8 +54,8 @@ def get_ents_by_label(data: List[Example], use_lower: bool = True) -> DefaultDic
             span_text = s.text.lower() if use_lower else s.text
             annotations[s.label].add(span_text)
 
-    for label in annotations.keys():
-        sorted_annotations[label] = sorted(annotations[label])
+    for label, anns in annotations.items():
+        sorted_annotations[label] = sorted(anns)
 
     return sorted_annotations
 

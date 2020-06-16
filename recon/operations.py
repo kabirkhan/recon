@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, Iterator, List, Set, Tuple, Union
 
 import catalogue
 import srsly
+from wasabi import Printer
 
 from .preprocess import PreProcessor
 from .types import (
@@ -24,7 +25,7 @@ class registry:
 
 
 def op_iter(
-    data: List[Example], pre: List[PreProcessor]
+    data: List[Example], pre: List[PreProcessor], verbose: bool = True
 ) -> Iterator[Tuple[int, Example, Dict[str, Any]]]:
     """Iterate over list of examples for an operation
     yielding tuples of (example hash, example)
@@ -32,13 +33,17 @@ def op_iter(
     Args:
         data (List[Example]): List of examples to iterate
         pre (List[PreProcessor]): List of preprocessors to run
+        verbose (bool, optional): Show verbose output.
     
     Yields:
         Iterator[Tuple[int, Example]]: Tuples of (example hash, example)
     """
+    msg = Printer(no_print=verbose == False, hide_animation=verbose == False)
     preprocessed_outputs: Dict[Example, Dict[str, Any]] = defaultdict(dict)
     for processor in pre:
-        processor_outputs = list(processor(data))
+        with msg.loading(f"\t=> Running preprocessor {processor.name}..."):
+            processor_outputs = list(processor(data))
+            msg.good("Done")
 
         for i, (example, output) in enumerate(zip(data, processor_outputs)):
             preprocessed_outputs[example][processor.name] = processor_outputs[i]
@@ -109,7 +114,11 @@ class Operation:
         Returns:
             OperationResult: Container holding new data and the state of the Operation
         """
+        verbose = True
+        msg = Printer(no_print=verbose == False)
+    
         initial_state = kwargs.pop("initial_state") if "initial_state" in kwargs else None
+        verbose = kwargs.pop("verbose") if "verbose" in kwargs else None
         if not initial_state:
             initial_state = OperationState(name=self.name)
         state = initial_state.copy(deep=True)
@@ -141,7 +150,7 @@ class Operation:
             dataset.example_store.add(new_example)
 
         new_data = []
-        for orig_example_hash, example, preprocessed_outputs in op_iter(dataset.data, self.pre):
+        for orig_example_hash, example, preprocessed_outputs in op_iter(dataset.data, self.pre, verbose=verbose):
             if preprocessed_outputs:
                 res = self.op(example, *args, preprocessed_outputs=preprocessed_outputs, **kwargs)
             else:

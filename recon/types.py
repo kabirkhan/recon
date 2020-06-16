@@ -143,6 +143,12 @@ class CorpusApplyResult(BaseModel):
         return [("train", self.train), ("dev", self.dev), ("test", self.test), ("all", self.all)]
 
 
+class AnnotationCount(BaseModel):
+    text: str
+    count: int
+    examples: List[Example]
+
+
 class PredictionErrorExamplePair(BaseModel):
     """Dataclass representation of original Example in a PredictionError
     vs the predicted Example from an EntityRecognizer 

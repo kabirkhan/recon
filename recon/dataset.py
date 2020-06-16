@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List, Set, Tuple, Union, cast
 
 import srsly
 from spacy.util import ensure_path
+from wasabi import Printer
 
 from .hashing import dataset_hash
 from .loaders import read_json, read_jsonl
@@ -65,6 +66,7 @@ class Dataset:
         data: List[Example] = [],
         operations: List[OperationState] = None,
         example_store: ExampleStore = None,
+        verbose: bool = False
     ):
         self.name = name
         self.data = data
@@ -75,6 +77,7 @@ class Dataset:
         if example_store is None:
             example_store = ExampleStore(data)
         self.example_store = example_store
+        self.verbose = verbose
 
     @property
     def commit_hash(self) -> str:
@@ -124,7 +127,11 @@ class Dataset:
                 "This function is not an operation. Ensure your function is registered in the operations registry."
             )
 
-        result: OperationResult = operation(self, *args, initial_state=initial_state, **kwargs)  # type: ignore
+        msg = Printer(no_print=self.verbose == False)
+        msg.text(f"=> Applying operation '{name}' inplace")
+        result: OperationResult = operation(self, *args, initial_state=initial_state, verbose=self.verbose, **kwargs)  # type: ignore
+        msg.good(f"Completed operation '{name}'")
+
         self.operations.append(result.state)
         dataset_changed = any(
             (
@@ -144,6 +151,14 @@ class Dataset:
         Args:
             operations (List[Union[str, OperationState]]): List of operations
         """
+        
+        msg = Printer(no_print=self.verbose == False)
+        msg.text(f"Applying pipeline of operations inplace to the dataset: {self.name}")
+        
+        for op in operations:
+            op_name = op.name if isinstance(op, OperationState) else op
+            msg.text(f"|_ {op_name}")
+
         for op in operations:
             if isinstance(op, str):
                 op_name = op

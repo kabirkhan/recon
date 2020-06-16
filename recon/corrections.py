@@ -3,9 +3,12 @@
 import copy
 from collections import defaultdict
 from typing import DefaultDict, Dict, List
+import spacy
+from spacy.tokens import Doc as SpacyDoc, Span as SpacySpan
 
 from .operations import operation
-from .types import Example, TransformationCallbacks
+from .preprocess import SpacyPreProcessor
+from .types import Example, Span, Token, TransformationCallbacks
 
 
 @operation("recon.v1.rename_labels")
@@ -107,3 +110,51 @@ def strip_annotations(
                     ch = s.text[-1]
                     s.end -= 1
     return example
+
+
+nlp = spacy.blank("")
+nlp.add_pipe(nlp.create_pipe("sentencizer"))
+spacy_pre = SpacyPreProcessor(nlp)
+
+
+@operation("recon.v1.split_sentences", pre=[spacy_pre])
+def split_sentences(example, preprocessed_outputs = {}):    
+    doc = preprocessed_outputs["recon.v1.spacy"]
+    
+    new_examples = []
+    ents = []
+    for ent in example.spans:
+        span = doc.char_span(ent.start, ent.end, label=ent.label)
+        if not span:
+            token = None
+            text = doc.text[ent.start:ent.end]
+            for t in doc:
+                if t.text == text:
+                    token = t 
+            if token:
+                span = SpacySpan(doc, token.i, token.i + 1, label=ent.label)
+        ents.append(span)
+
+    doc.ents = ents
+
+    for sent in doc.sents:
+        sent_doc = sent.as_doc()
+        new_example = Example(
+            text=sent_doc.text,
+            spans=[Span(
+                text=e.text,
+                start=e.start_char,
+                end=e.end_char,
+                token_start=e.start,
+                token_end=e.end,
+                label=e.label_
+            ) for e in sent_doc.ents],
+            tokens=[Token(
+                text=t.text,
+                start=t.idx,
+                end=t.idx + len(t.text),
+                id=i
+            ) for i, t in enumerate(sent_doc)]
+        )
+        new_examples.append(new_example)
+    return new_examples
