@@ -66,7 +66,7 @@ class Dataset:
         data: List[Example] = [],
         operations: List[OperationState] = None,
         example_store: ExampleStore = None,
-        verbose: bool = False
+        verbose: bool = False,
     ):
         self.name = name
         self.data = data
@@ -151,10 +151,10 @@ class Dataset:
         Args:
             operations (List[Union[str, OperationState]]): List of operations
         """
-        
+
         msg = Printer(no_print=self.verbose == False)
         msg.text(f"Applying pipeline of operations inplace to the dataset: {self.name}")
-        
+
         for op in operations:
             op_name = op.name if isinstance(op, OperationState) else op
             msg.text(f"|_ {op_name}")

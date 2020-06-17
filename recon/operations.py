@@ -116,7 +116,7 @@ class Operation:
         """
         verbose = True
         msg = Printer(no_print=verbose == False)
-    
+
         initial_state = kwargs.pop("initial_state") if "initial_state" in kwargs else None
         verbose = kwargs.pop("verbose") if "verbose" in kwargs else None
         if not initial_state:
@@ -150,7 +150,9 @@ class Operation:
             dataset.example_store.add(new_example)
 
         new_data = []
-        for orig_example_hash, example, preprocessed_outputs in op_iter(dataset.data, self.pre, verbose=verbose):
+        for orig_example_hash, example, preprocessed_outputs in op_iter(
+            dataset.data, self.pre, verbose=verbose
+        ):
             if preprocessed_outputs:
                 res = self.op(example, *args, preprocessed_outputs=preprocessed_outputs, **kwargs)
             else:
