@@ -80,10 +80,11 @@ def fix_annotations(
         del example.spans[idx]
         i -= 1
 
-    msg.divider("Example Text")
-    msg.text(example.text)
-    for line in prints:
-        msg.text(line)
+    if dryrun:
+        msg.divider("Example Text")
+        msg.text(example.text)
+        for line in prints:
+            msg.text(line)
 
     return example
 
