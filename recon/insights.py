@@ -23,7 +23,9 @@ from .types import (
 )
 
 
-def get_ents_by_label(data: List[Example], case_sensitive: bool = False) -> DefaultDict[str, List[str]]:
+def get_ents_by_label(
+    data: List[Example], case_sensitive: bool = False
+) -> DefaultDict[str, List[str]]:
     """Get a dictionary of unique text spans by label for your data
 
     # TODO: Ok so this needs to return more than just a set for each label.

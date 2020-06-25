@@ -112,7 +112,10 @@ def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) 
 
 
 def get_entity_coverage(
-    data: List[Example], sep: str = "||", case_sensitive: bool = False, return_examples: bool = False,
+    data: List[Example],
+    sep: str = "||",
+    case_sensitive: bool = False,
+    return_examples: bool = False,
 ) -> List[EntityCoverage]:
     """Identify how well you dataset covers an entity type. Get insights
     on the how many times certain text/label span combinations exist across your
