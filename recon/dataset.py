@@ -193,6 +193,8 @@ class Dataset:
 
         data = loader_func(path)
         self.data = data
+        for example in self.data:
+            self.example_store.add(example)
 
         if ds_op_state and self.commit_hash != ds_op_state.commit:
             # Dataset changed, examples added

@@ -23,7 +23,7 @@ from .types import (
 )
 
 
-def get_ents_by_label(data: List[Example], use_lower: bool = True) -> DefaultDict[str, List[str]]:
+def get_ents_by_label(data: List[Example], case_sensitive: bool = False) -> DefaultDict[str, List[str]]:
     """Get a dictionary of unique text spans by label for your data
 
     # TODO: Ok so this needs to return more than just a set for each label.
@@ -39,7 +39,7 @@ def get_ents_by_label(data: List[Example], use_lower: bool = True) -> DefaultDic
     
     Args:
         data (List[Example]): List of examples
-        use_lower (bool, optional): Use the lowercase form of the span text.
+        case_sensitive (bool, optional): Consider case of text for each annotation
         sort_by (SortBy): Sort by text or by count
     
     Returns:
@@ -51,7 +51,7 @@ def get_ents_by_label(data: List[Example], use_lower: bool = True) -> DefaultDic
 
     for e in data:
         for s in e.spans:
-            span_text = s.text.lower() if use_lower else s.text
+            span_text = s.text if case_sensitive else s.text.lower()
             annotations[s.label].add(span_text)
 
     for label, anns in annotations.items():
@@ -61,7 +61,7 @@ def get_ents_by_label(data: List[Example], use_lower: bool = True) -> DefaultDic
 
 
 def get_label_disparities(
-    data: List[Example], label1: str, label2: str, use_lower: bool = True
+    data: List[Example], label1: str, label2: str, case_sensitive: bool = False
 ) -> Set[str]:
     """Identify annotated spans that have different labels in different examples
     
@@ -69,24 +69,24 @@ def get_label_disparities(
         data (List[Example]): Input List of examples
         label1 (str): First label to compare
         label2 (str): Second label to compare
-        use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.
+        case_sensitive (bool, optional): Consider case of text for each annotation
     
     Returns:
         Set[str]: Set of all unique text spans that overlap between label1 and label2
     """
-    annotations = get_ents_by_label(data, use_lower=use_lower)
+    annotations = get_ents_by_label(data, case_sensitive=case_sensitive)
     return set(annotations[label1]).intersection(set(annotations[label2]))
 
 
 def top_label_disparities(
-    data: List[Example], use_lower: bool = True, dedupe: bool = False
+    data: List[Example], case_sensitive: bool = False, dedupe: bool = False
 ) -> List[LabelDisparity]:
     """Identify annotated spans that have different labels
     in different examples for all label pairs in data.
     
     Args:
         data (List[Example]): Input List of examples
-        use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.
+        case_sensitive (bool, optional): Consider case of text for each annotation
         dedupe (bool, optional): Whether to deduplicate for table view vs confusion matrix.
             False by default for easy confusion matrix display.
     
@@ -94,7 +94,7 @@ def top_label_disparities(
         List[LabelDisparity]: List of LabelDisparity objects for each label pair combination
             sorted by the number of disparities between them.
     """
-    annotations = get_ents_by_label(data, use_lower=use_lower)
+    annotations = get_ents_by_label(data, case_sensitive=case_sensitive)
     label_disparities = {}
     for label1 in annotations.keys():
         for label2 in annotations.keys():

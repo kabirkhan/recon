@@ -112,7 +112,7 @@ def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) 
 
 
 def get_entity_coverage(
-    data: List[Example], sep: str = "||", use_lower: bool = True, return_examples: bool = False,
+    data: List[Example], sep: str = "||", case_sensitive: bool = False, return_examples: bool = False,
 ) -> List[EntityCoverage]:
     """Identify how well you dataset covers an entity type. Get insights
     on the how many times certain text/label span combinations exist across your
@@ -123,7 +123,7 @@ def get_entity_coverage(
         data (List[Example]): List of examples
         sep (str, optional): Separator used in coverage map, only change if || exists in your text
             or label.
-        use_lower (bool, optional): Use the lowercase form of the span text in ents_to_label.
+        case_sensitive (bool, optional): Consider case of text for each annotation
         return_examples (bool, optional): Return Examples that contain the entity label annotation.
     
     Returns:
@@ -135,9 +135,7 @@ def get_entity_coverage(
 
     for example in data:
         for span in example.spans:
-            text = span.text
-            if use_lower:
-                text = text.lower()
+            text = span.text if case_sensitive else span.text.lower()
             key = f"{text}{sep}{span.label}"
             coverage_map[key] += 1
             examples_map[key].append(example)
