@@ -1,5 +1,5 @@
 import pytest
-from recon.corrections import fix_annotations, rename_labels
+from recon.corrections import corrections_from_dict, fix_annotations, rename_labels
 from recon.insights import get_label_disparities
 from recon.types import Example
 
@@ -36,7 +36,8 @@ def test_fix_annotations(test_examples):
 
     fixed_examples = []
     for e in test_examples:
-        example = fix_annotations(e.copy(deep=True), {"software development engineer": "JOB_ROLE"})
+        corrections = corrections_from_dict({"software development engineer": "JOB_ROLE"})
+        example = fix_annotations(e.copy(deep=True), corrections)
         fixed_examples.append(example)
 
     disparities_fixed = get_label_disparities(fixed_examples, label1="SKILL", label2="JOB_ROLE")
