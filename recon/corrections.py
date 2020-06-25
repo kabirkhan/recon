@@ -6,10 +6,11 @@ from typing import Any, DefaultDict, Dict, List
 
 import spacy
 from spacy.tokens import Doc as SpacyDoc, Span as SpacySpan
+from wasabi import msg
 
 from .operations import operation
 from .preprocess import SpacyPreProcessor
-from .types import Example, Span, Token, TransformationCallbacks
+from .types import Correction, Example, Span, Token, TransformationCallbacks
 
 
 @operation("recon.v1.rename_labels")
@@ -30,7 +31,7 @@ def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
 
 @operation("recon.v1.fix_annotations")
 def fix_annotations(
-    example: Example, corrections: Dict[str, str], case_sensitive: bool = False
+    example: Example, corrections: List[Correction], case_sensitive: bool = False, dryrun: bool = False
 ) -> Example:
     """Fix annotations in a copy of List[Example] data.
     
@@ -43,28 +44,35 @@ def fix_annotations(
         corrections (Dict[str, str]): Dictionary of corrections mapping entity text to a new label.
             If the value is set to None, the annotation will be removed
         case_sensitive (bool, optional): Consider case of text for each correction
+        dryrun (bool, optional): Treat corrections as a dryrun and just print all changes to be made
     
     Returns:
         Example: Example with fixed annotations
     """
-    if case_sensitive:
-        corrections = {t: l for t, l in corrections.items()}
-    else:
-        corrections = {t.lower(): l for t, l in corrections.items()}
+    
+    if not case_sensitive:
+        for c in corrections:
+            c.text = c.text.lower()
 
-    prints: DefaultDict[str, List[str]] = defaultdict(list)
+    corrections_map: Dict[str, Correction] = {c.annotation: c for c in corrections}
+    prints: List[str] = []
 
-    ents_to_remove = []
+    ents_to_remove: List[int] = []
     for i, s in enumerate(example.spans):
         t = s.text if case_sensitive else s.text.lower()
 
-        if t in corrections:
-            if corrections[t] is print:
-                prints[t] += [("=" * 100), example.text, s.label]
-            elif corrections[t] is None:
-                ents_to_remove.append(i)
-            else:
-                s.label = corrections[t]
+        if t in corrections_map:
+            c = corrections_map[t]
+            if c.to_label is None and s.label == c.from_label:
+                if dryrun:
+                    prints.append(f"Deleting span: {s.text}")
+                else:
+                    ents_to_remove.append(i)
+            elif s.label == c.from_label:
+                if dryrun:
+                    prints.append(f"Correction span: {s.text} from label: {c.from_label} to label: {c.to_label}")
+                else:
+                    s.label = c.to_label
 
     i = len(ents_to_remove) - 1
     while i >= 0:
@@ -72,12 +80,53 @@ def fix_annotations(
         del example.spans[idx]
         i -= 1
 
-    for k in sorted(prints):
-        print(f"**{k}**")
-        for line in prints[k]:
-            print(line)
+    msg.divider("Example Text")
+    msg.text(example.text)
+    for line in prints:
+        msg.text(line)
 
     return example
+
+
+def corrections_from_dict(corrections_dict: Dict[str, Any]):
+    """Create a list of Correction objects from a simpler config for
+    corrections using a Dict representation mapping keys to either the label to 
+    convert to or a tuple of (from_label, to_label) pairings or (List[from_labels], to_label)
+    pairings if you want to convert as subset of labels at a time
+
+    Args:
+        corrections_dict (Dict[str, Any]): Corrections formatted dict
+            e.g. {
+                "united states": "GPE",
+                "London": (["LOC"], "GPE")
+            }
+
+    Raises:
+        ValueError: If the format of the dict
+
+    Returns:
+        [type]: [description]
+    """    
+    corrections: List[Correction] = []
+    for key, val in corrections_dict.items():
+        if isinstance(val, str):
+            from_label = "ANY"
+            to_label = val
+        elif isinstance(val, tuple):
+            if isinstance(val[0], str): 
+                from_labels = [val[0]]
+            else:
+                from_labels = val[0]
+            to_label = val[1]
+        else:
+            raise ValueError("Cannot parse corrections dict. Value must be either a str of the label " +
+                             "to change the annotation to (TO_LABEL) or a tuple of (FROM_LABEL, TO_LABEL)")
+        corrections.append(Correction(
+            annotation=key,
+            from_labels=from_labels,
+            to_label=to_label
+        ))
+    return corrections
 
 
 @operation("recon.v1.strip_annotations")

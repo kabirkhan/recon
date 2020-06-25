@@ -250,3 +250,11 @@ class Outliers(BaseModel):
 
     low: List[int]
     high: List[int]
+
+
+class Correction(BaseModel):
+    """Container for an annotation correction, mapping an annotation from a label to a label"""
+
+    annotation: str
+    from_labels: List[str]
+    to_label: str
