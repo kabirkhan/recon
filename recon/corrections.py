@@ -52,7 +52,7 @@ def fix_annotations(
     
     if not case_sensitive:
         for c in corrections:
-            c.text = c.text.lower()
+            c.annotation = c.annotation.lower()
 
     corrections_map: Dict[str, Correction] = {c.annotation: c for c in corrections}
     prints: List[str] = []
@@ -68,9 +68,9 @@ def fix_annotations(
                     prints.append(f"Deleting span: {s.text}")
                 else:
                     ents_to_remove.append(i)
-            elif s.label == c.from_label:
+            elif s.label in c.from_labels or "ANY" in c.from_labels:
                 if dryrun:
-                    prints.append(f"Correction span: {s.text} from label: {c.from_label} to label: {c.to_label}")
+                    prints.append(f"Correction span: {s.text} from labels: {c.from_labels} to label: {c.to_label}")
                 else:
                     s.label = c.to_label
 
@@ -111,7 +111,7 @@ def corrections_from_dict(corrections_dict: Dict[str, Any]):
     corrections: List[Correction] = []
     for key, val in corrections_dict.items():
         if isinstance(val, str):
-            from_label = "ANY"
+            from_labels = ["ANY"]
             to_label = val
         elif isinstance(val, tuple):
             if isinstance(val[0], str): 
