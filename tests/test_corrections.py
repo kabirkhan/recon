@@ -36,9 +36,11 @@ def test_fix_annotations(test_examples):
 
     fixed_examples = []
     for e in test_examples:
-        corrections = corrections_from_dict({"software development engineer": "JOB_ROLE"})
+        corrections = corrections_from_dict(
+            {"software development engineer": "JOB_ROLE", "model": None}
+        )
         example = fix_annotations(e.copy(deep=True), corrections)
         fixed_examples.append(example)
 
     disparities_fixed = get_label_disparities(fixed_examples, label1="SKILL", label2="JOB_ROLE")
-    assert disparities_fixed == {"model"}
+    assert disparities_fixed == set()

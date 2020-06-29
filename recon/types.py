@@ -257,4 +257,4 @@ class Correction(BaseModel):
 
     annotation: str
     from_labels: List[str]
-    to_label: str
+    to_label: Optional[str] = None

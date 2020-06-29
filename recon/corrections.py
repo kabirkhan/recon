@@ -2,7 +2,7 @@
 
 import copy
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List
+from typing import Any, DefaultDict, Dict, List, cast
 
 import spacy
 from spacy.tokens import Doc as SpacyDoc, Span as SpacySpan
@@ -66,7 +66,7 @@ def fix_annotations(
 
         if t in corrections_map:
             c = corrections_map[t]
-            if c.to_label is None and s.label == c.from_label:
+            if c.to_label is None and s.label in c.from_labels:
                 if dryrun:
                     prints.append(f"Deleting span: {s.text}")
                 else:
@@ -77,7 +77,7 @@ def fix_annotations(
                         f"Correction span: {s.text} from labels: {c.from_labels} to label: {c.to_label}"
                     )
                 else:
-                    s.label = c.to_label
+                    s.label = cast(str, c.to_label)
 
     i = len(ents_to_remove) - 1
     while i >= 0:
