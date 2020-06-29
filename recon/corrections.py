@@ -115,7 +115,7 @@ def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
     """
     corrections: List[Correction] = []
     for key, val in corrections_dict.items():
-        if isinstance(val, str):
+        if isinstance(val, str) or val == None:
             from_labels = ["ANY"]
             to_label = val
         elif isinstance(val, tuple):
