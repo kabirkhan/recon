@@ -3,6 +3,7 @@ from typing import Dict, List
 
 import pytest
 from recon.corpus import Corpus
+from recon.dataset import Dataset
 from recon.loaders import read_jsonl
 from recon.preprocess import SpacyPreProcessor
 from recon.recognizer import SpacyEntityRecognizer
@@ -31,7 +32,7 @@ def test_texts():
 @pytest.fixture()
 def example_data() -> Dict[str, List[Example]]:
     """Fixture to load example train/dev/test data that has inconsistencies.
-    
+
     Returns:
         Dict[str, List[Example]]: Dataset containing the train/dev/test split
     """
@@ -46,7 +47,7 @@ def example_data() -> Dict[str, List[Example]]:
 @pytest.fixture()
 def example_corpus() -> Corpus:
     """Fixture to load example train/dev/test data that has inconsistencies.
-    
+
     Returns:
         Corpus: Example data
     """
@@ -57,7 +58,7 @@ def example_corpus() -> Corpus:
 @pytest.fixture()
 def example_corpus_processed() -> Corpus:
     """Fixture to load example train/dev/test data that has inconsistencies.
-    
+
     Returns:
         Corpus: Example data
     """
