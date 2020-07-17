@@ -30,20 +30,20 @@ def get_ents_by_label(
 
     # TODO: Ok so this needs to return more than just a set for each label.
 
-    We want to return a dictionary that maps labels to AnnotationCount objects where each 
+    We want to return a dictionary that maps labels to AnnotationCount objects where each
     AnnotationCount contains the text of the annotation text, the total number of times it's mentioned (e.g. what entity_coverage does)
-    but also the examples it is in. 
+    but also the examples it is in.
 
     So maybe I can get this info from entity_coverage? IDK but this is dumb rn and not very flexible.
 
     Maybe I should keep this function returning a set of strings for each label for compatability but I need the other way too
-    so I know what to focus on in editing and a 
-    
+    so I know what to focus on in editing and a
+
     Args:
         data (List[Example]): List of examples
         case_sensitive (bool, optional): Consider case of text for each annotation
         sort_by (SortBy): Sort by text or by count
-    
+
     Returns:
         DefaultDict[str, List[str]]: DefaultDict mapping label to sorted list of the unique
             spans annotated for that label.
@@ -66,13 +66,13 @@ def get_label_disparities(
     data: List[Example], label1: str, label2: str, case_sensitive: bool = False
 ) -> Set[str]:
     """Identify annotated spans that have different labels in different examples
-    
+
     Args:
         data (List[Example]): Input List of examples
         label1 (str): First label to compare
         label2 (str): Second label to compare
         case_sensitive (bool, optional): Consider case of text for each annotation
-    
+
     Returns:
         Set[str]: Set of all unique text spans that overlap between label1 and label2
     """
@@ -85,13 +85,13 @@ def top_label_disparities(
 ) -> List[LabelDisparity]:
     """Identify annotated spans that have different labels
     in different examples for all label pairs in data.
-    
+
     Args:
         data (List[Example]): Input List of examples
         case_sensitive (bool, optional): Consider case of text for each annotation
         dedupe (bool, optional): Whether to deduplicate for table view vs confusion matrix.
             False by default for easy confusion matrix display.
-    
+
     Returns:
         List[LabelDisparity]: List of LabelDisparity objects for each label pair combination
             sorted by the number of disparities between them.
@@ -127,18 +127,18 @@ def top_prediction_errors(
     verbose: bool = False,
 ) -> List[PredictionError]:
     """Get a sorted list of examples your model is worst at predicting.
-    
+
     Args:
         recognizer (EntityRecognizer): An instance of EntityRecognizer
         data (List[Example]): List of annotated Examples
-        labels (List[str], optional): List of labels to get errors for. 
+        labels (List[str], optional): List of labels to get errors for.
             Defaults to the labels property of `recognizer`.
         n (int, optional): If set, only use the top n examples from data.
         k (int, optional): If set, return the top k prediction errors, otherwise the whole list.
         exclude_fp (bool, optional): Flag to exclude False Positive errors.
         exclude_fn (bool, optional): Flag to exclude False Negative errors.
         verbose (bool, optional): Show verbose output.
-    
+
     Returns:
         List[PredictionError]: List of Prediction Errors your model is making, sorted by the
             spans your model has the most trouble with.
@@ -247,15 +247,15 @@ def get_hardest_examples(
     remove_pred_error_examples: bool = True,
 ) -> List[HardestExample]:
     """Get hardest examples from list of PredictionError types
-    
+
     Args:
         pred_errors (List[PredictionError]): list of PredictionError
         return_pred_errors (bool, optional): Whether to return prediction errors. Defaults to True.
         remove_pred_error_examples (bool, optional): Whether to remove examples from returned PredictionError. Defaults to True.
-    
+
     Raises:
-        ValueError: Each PredictionError must have a List of examples 
-    
+        ValueError: Each PredictionError must have a List of examples
+
     Returns:
         List[HardestExample]: Sorted list of the hardest examples for a model to work on.
     """
@@ -316,3 +316,23 @@ def get_hardest_examples(
 
     sorted_hardest_examples = sorted(hardest_examples, key=lambda he: he.count, reverse=True)
     return sorted_hardest_examples
+
+
+def get_annotation_labels(examples: List[Example], case_sensitive: bool = False) -> Dict[str, Dict[str, list]]:
+    """Constructs a map of each annotation in the list of examples to each label that annotation
+    has and references all examples associated with that label.
+
+    Args:
+        examples (List[Example]): Input examples
+        case_sensitive (bool, optional): Consider case of text for each annotation
+
+    Returns:
+        Dict[str, Dict[str, list]]: Annotation map
+    """
+    annotation_labels_map: Dict[str, Dict[str, list]] = defaultdict(lambda: defaultdict(list))
+    for e in examples:
+        for s in e.spans:
+            text = s.text if case_sensitive else s.text.lower()
+            annotation_labels_map[text][s.label].append(e)
+
+    return annotation_labels_map

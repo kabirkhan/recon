@@ -29,12 +29,12 @@ def op_iter(
 ) -> Iterator[Tuple[int, Example, Dict[str, Any]]]:
     """Iterate over list of examples for an operation
     yielding tuples of (example hash, example)
-    
+
     Args:
         data (List[Example]): List of examples to iterate
         pre (List[PreProcessor]): List of preprocessors to run
         verbose (bool, optional): Show verbose output.
-    
+
     Yields:
         Iterator[Tuple[int, Example]]: Tuples of (example hash, example)
     """
@@ -64,19 +64,19 @@ class operation:
         self.pre = pre
 
     def __call__(self, *args: Any, **kwargs: Any) -> Callable:
-        """Decorator for an operation. 
+        """Decorator for an operation.
         The first arg is the function being decorated.
         This function can either operate on a List[Example]
         and in that case self.batch should be True.
 
         e.g. @operation("recon.v1.some_name", batch=True)
 
-        Or it should operate on a single example and 
+        Or it should operate on a single example and
         recon will take care of applying it to a full Dataset
-        
+
         Args:
             args: First arg is function to decorate
-        
+
         Returns:
             Callable: Original function
         """
@@ -92,7 +92,7 @@ class Operation:
 
     def __init__(self, name: str, pre: List[PreProcessor], op: Callable):
         """Initialize an Operation instance
-        
+
         Args:
             name (str): Name of operation
             pre (List[PreProcessor]): List of preprocessors to run
@@ -104,13 +104,13 @@ class Operation:
 
     def __call__(self, dataset: Any, *args: Any, **kwargs: Any) -> OperationResult:
         """Runs op on a dataset and records the results
-        
+
         Args:
             dataset (Dataset): Dataset to operate on
-        
+
         Raises:
             ValueError: if track_example is called in the op with no data
-        
+
         Returns:
             OperationResult: Container holding new data and the state of the Operation
         """
@@ -163,10 +163,10 @@ class Operation:
             elif isinstance(res, list):
                 old_example_present = False
                 for new_example in res:
+                    new_data.append(new_example)
                     if hash(new_example) == orig_example_hash:
                         old_example_present = True
                     else:
-                        new_data.append(new_example)
                         add_example(new_example)
                 if not old_example_present:
                     remove_example(orig_example_hash)
