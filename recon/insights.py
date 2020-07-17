@@ -318,7 +318,9 @@ def get_hardest_examples(
     return sorted_hardest_examples
 
 
-def get_annotation_labels(examples: List[Example], case_sensitive: bool = False) -> Dict[str, Dict[str, list]]:
+def get_annotation_labels(
+    examples: List[Example], case_sensitive: bool = False
+) -> Dict[str, Dict[str, list]]:
     """Constructs a map of each annotation in the list of examples to each label that annotation
     has and references all examples associated with that label.
 
