@@ -171,8 +171,7 @@ class Operation:
                 if not old_example_present:
                     remove_example(orig_example_hash)
             else:
-                assert isinstance(res.text, str)
-                assert isinstance(res.spans, list)
+                assert isinstance(res, Example)
                 new_data.append(res)
                 if hash(res) != orig_example_hash:
                     change_example(orig_example_hash, res)
