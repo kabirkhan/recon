@@ -191,9 +191,9 @@ class Corpus:
 
         try:
             test = Dataset("test").from_disk(data_dir / test_file)
-            corpus = cls(train, dev, test=test)
+            corpus = self(self.name, train, dev, test=test)
         except ValueError as e:
-            corpus = cls(train, dev)
+            corpus = self(self.name, train, dev)
         return corpus
 
     def to_disk(self, data_dir: Path, force: bool = False) -> None:
