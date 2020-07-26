@@ -24,14 +24,14 @@ from .types import (
 class Dataset:
     """A Dataset is a around a List of examples.
     Datasets are responsible for tracking all Operations done on them.
-    This ensures data lineage and easy reporting of how changes in the 
+    This ensures data lineage and easy reporting of how changes in the
     data based on various Operations effects overall quality.
-    
+
     Dataset holds state (let's call it self.operations for now)
     self.operations is a list of every function run on the Dataset since it's
     initial creation. If loading from disk, track everything that happens in loading
     phase in operations as well by simply initializing self.operations in constructors
-    
+
     Each operation should has the following attributes:
         operation hash
         name: function/callable name ideally, could be added with a decorator
@@ -53,11 +53,11 @@ class Dataset:
 
     So if I have 10 possible transformations.
 
-    I can run 1..5, save to disk train a model and check results. 
+    I can run 1..5, save to disk train a model and check results.
     Then I can load that model from disk with all previous operations already tracked
     in self.operations. Then I can run 6..10, save to disk and train model.
     Now I have git-like "commits" for the data used in each model.
-    
+
     """
 
     def __init__(
@@ -89,15 +89,21 @@ class Dataset:
     def __len__(self) -> int:
         return len(self.data)
 
+    def __getitem__(self, example_hash: int) -> Example:
+        for e in self.data:
+            if hash(e) == example_hash:
+                return e
+        raise KeyError(f"Example with hash {example_hash} does not exist")
+
     def apply(
         self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
     ) -> Any:
         """Apply a function to the dataset
-        
+
         Args:
-            func (Callable[[List[Example], Any, Any], Any]): 
+            func (Callable[[List[Example], Any, Any], Any]):
                 Function from an existing recon module that can operate on a List of examples
-        
+
         Returns:
             Result of running func on List of examples
         """
@@ -111,7 +117,7 @@ class Dataset:
         **kwargs: Any,
     ) -> None:
         """Apply an operation to all data inplace.
-        
+
         Args:
             operation (Callable[[Any], OperationResult]): Any operation that
                 changes data in place. See recon.operations.registry.operations
@@ -147,7 +153,7 @@ class Dataset:
         """Run a sequence of operations on dataset data.
         Internally calls Dataset.apply_ and will resolve named
         operations in registry.operations
-        
+
         Args:
             operations (List[Union[str, OperationState]]): List of operations
         """
@@ -178,10 +184,10 @@ class Dataset:
     def from_disk(self, path: Path, loader_func: Callable = read_jsonl) -> "Dataset":
         """Load Dataset from disk given a path and a loader function that reads the data
         and returns an iterator of Examples
-        
+
         Args:
             path (Path): path to load from
-            loader_func (Callable, optional): Callable that reads a file and returns a List of examples. 
+            loader_func (Callable, optional): Callable that reads a file and returns a List of examples.
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         path = ensure_path(path)
@@ -232,7 +238,7 @@ class Dataset:
 
     def to_disk(self, output_path: Path, force: bool = False, save_examples: bool = True) -> None:
         """Save Corpus to Disk
-        
+
         Args:
             output_path (Path): Output file path to save data to
             force (bool): Force save to directory. Create parent directories
@@ -257,3 +263,31 @@ class Dataset:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
 
         srsly.write_jsonl(output_path, [e.dict() for e in self.data])
+
+    def from_prodigy(self, prodigy_datasets: List[str]) -> "Dataset":
+        """Need to have from_prodigy accept multiple datasets as a list of str so Prodigy
+        can stay separate and new annotation sessions can happen often. Basically prodigy db-merge
+
+        Need to save to only 1 prodigy dataset though for consistency
+
+        Args:
+            prodigy_datasets (List[str]): List of prodigy datasets to load from
+
+        Returns:
+            Dataset: Initialized dataset with Prodigy data
+        """
+        from recon.prodigy.util import from_prodigy
+
+        print(f"Loading data from prodigy datasets: {', '.join(prodigy_datasets)}")
+        for prodigy_dataset in prodigy_datasets:
+            self.data += from_prodigy(prodigy_dataset)
+        return self
+
+    def to_prodigy(self, prodigy_dataset: str = None):
+        from recon.prodigy.util import to_prodigy
+
+        if not prodigy_dataset:
+            prodigy_dataset = f"{self.name}_{self.commit_hash}"
+
+        print(f"Saving dataset to prodigy dataset: {prodigy_dataset}")
+        to_prodigy(self.data, prodigy_dataset)
