@@ -5,15 +5,20 @@
     <em>Recon NER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>
 </p>
 <p align="center">
-<a href="https://dev.azure.com/kabirkhan1137/ReconNER/_build" target="_blank">
-    <img src="https://dev.azure.com/kabirkhan1137/ReconNER/_apis/build/status/microsoft.reconner?branchName=master" alt="Build Status">
-</a>
-<a href="https://codecov.io/gh/microsoft/reconner">
-  <img src="https://codecov.io/gh/microsoft/reconner/branch/master/graph/badge.svg" alt="Coverage"/>
-</a>
 <a href="https://pypi.org/project/reconner" target="_blank">
-    <img src="https://badge.fury.io/py/reconner.svg" alt="Package version">
+    <img src="https://img.shields.io/pypi/v/reconner?style=for-the-badge" alt="PyPi Package version">
 </a>
+<a href="https://dev.azure.com/kabirkhan1137/ReconNER/_build" target="_blank">
+    <img alt="Azure Pipelines Build badge" src="https://img.shields.io/azure-devops/build/kabirkhan1137/ReconNER/microsoft.reconner?style=for-the-badge">
+</a>
+<a href="https://codecov.io/gh/microsoft/reconner" rel="nofollow">
+  <img alt="Codecov badge" src="https://img.shields.io/codecov/c/gh/microsoft/reconner?style=for-the-badge" style="max-width:100%;">
+</a>
+
+<a href="https://pypi.org/project/reconner" target="_blank">
+    <img src="https://img.shields.io/pypi/l/reconner?style=for-the-badge" alt="PyPi Package license">
+</a>
+
 </p>
 
 ---
@@ -24,7 +29,7 @@
 
 ---
 
-ReconNER is a library to help you fix your annotated NER data and identify examples that are hardest for your model to predict so you can strategically prioritize the examples you annotate. 
+ReconNER is a library to help you fix your annotated NER data and identify examples that are hardest for your model to predict so you can strategically prioritize the examples you annotate.
 
 The key features are:
 
@@ -32,7 +37,7 @@ The key features are:
 * **Model Insights**: Analyze how well your model does on your Dataset. Identify the top errors your model is making so you can prioritize data collection and correction strategically.
 * **Model Insights**: Analyze how well your model does on your Dataset. Identify the top errors your model is making so you can prioritize data collection and correction strategically.
 * **Dataset Management**: ReconNER provides a `Dataset` class to manage the train/dev/test split of your data and apply the same functions across all splits in your data + a concatenation of all examples. Operate inplace to consistently transform your data.
-* **Serializable Dataset**: Serialize and Deserialize your data to and from JSON to the ReconNER type system. 
+* **Serializable Dataset**: Serialize and Deserialize your data to and from JSON to the ReconNER type system.
 * **Type Hints**: Comprehensive Typing system based on Python 3.6+ Type Hints
 
 ## Requirements
