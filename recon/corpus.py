@@ -238,7 +238,7 @@ class Corpus:
         train_ds = Dataset("train").from_prodigy(prodigy_train_datasets)
         dev_ds = Dataset("dev").from_prodigy(prodigy_dev_datasets)
         test_ds = (
-            Dataset("test").from_prodigy(prodigy_train_datasets) if prodigy_test_dataset else None
+            Dataset("test").from_prodigy(prodigy_train_datasets) if prodigy_test_datasets else None
         )
 
         ds = self(self.name, train_ds, dev_ds, test_ds)
