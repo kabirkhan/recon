@@ -128,6 +128,16 @@ class DatasetOperationsState(BaseModel):
     operations: List[OperationState]
 
 
+# class DatasetMeta(BaseModel):
+#     name: str
+#     version: str
+
+
+class CorpusMeta(BaseModel):
+    name: str
+    # versions: List[DatasetMeta]
+
+
 class OperationResult(BaseModel):
     data: Any
     state: OperationState
@@ -151,8 +161,8 @@ class AnnotationCount(BaseModel):
 
 class PredictionErrorExamplePair(BaseModel):
     """Dataclass representation of original Example in a PredictionError
-    vs the predicted Example from an EntityRecognizer 
-    
+    vs the predicted Example from an EntityRecognizer
+
     Attributes:
         original (Example): Original Example
         spans (List[Span]): List of entity spans
@@ -165,7 +175,7 @@ class PredictionErrorExamplePair(BaseModel):
 
 class PredictionError(BaseModel):
     """Representation of errors an EntityRecognizer makes on a labeled dataset.
-    
+
     Attributes:
         text (str): Span text with error
         true_label (str): True label in annotated Example
@@ -195,7 +205,7 @@ class HardestExample(BaseModel):
 class LabelDisparity(BaseModel):
     """Container for the number of disparities in a Dataset
     where some text is tagged as label1 in some places and label2 in others
-    
+
     Attributes:
         label1 (str): Label1
         label2 (str): Label2
@@ -221,7 +231,7 @@ class NERStats(BaseModel):
 
 class EntityCoverage(BaseModel):
     """Container for tracking how well an Entity is covered.
-    
+
     Attributes:
         text (str): The entity text
         label (str): The entity label

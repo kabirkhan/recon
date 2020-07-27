@@ -66,9 +66,10 @@ class Dataset:
         data: List[Example] = [],
         operations: List[OperationState] = None,
         example_store: ExampleStore = None,
+        version: str = "0.0.0",
         verbose: bool = False,
     ):
-        self.name = name
+        self._name = name
         self.data = data
         if not operations:
             operations = []
@@ -77,7 +78,16 @@ class Dataset:
         if example_store is None:
             example_store = ExampleStore(data)
         self.example_store = example_store
+        self._version = version
         self.verbose = verbose
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def version(self) -> str:
+        return self._version
 
     @property
     def commit_hash(self) -> str:
@@ -191,26 +201,36 @@ class Dataset:
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         path = ensure_path(path)
-        ds_op_state = None
-        if (path.parent / ".recon" / self.name).exists():
-            state = srsly.read_json(path.parent / ".recon" / self.name / "state.json")
-            ds_op_state = DatasetOperationsState(**state)
-            self.operations = ds_op_state.operations
+        state = None
+        if (path / ".recon" / self.name).exists():
+            state = srsly.read_json(path / ".recon" / self.name / "state.json")
+            state = DatasetOperationsState(**state)
+            self.operations = state.operations
 
-        data = loader_func(path)
+            example_store_path = path / ".recon" / self.name / "example_store.jsonl"
+            if example_store_path.exists():
+                self.example_store.from_disk(example_store_path)
+
+        if loader_func == read_json:
+            suffix = ".json"
+        else:
+            suffix = ".jsonl"
+
+        data = loader_func(path / f"{self.name}{suffix}")
         self.data = data
+
         for example in self.data:
             self.example_store.add(example)
 
-        if ds_op_state and self.commit_hash != ds_op_state.commit:
+        if state and self.commit_hash != state.commit:
             # Dataset changed, examples added
             self.operations.append(
                 OperationState(
-                    name="examples_added_external",
+                    name="recon.v1.examples_added_external",
                     status=OperationStatus.COMPLETED,
                     ts=datetime.now(),
-                    examples_added=max(len(self) - ds_op_state.size, 0),
-                    examples_removed=max(ds_op_state.size - len(self), 0),
+                    examples_added=max(len(self) - state.size, 0),
+                    examples_removed=max(state.size - len(self), 0),
                     examples_changed=0,
                     transformations=[],
                 )
@@ -236,17 +256,16 @@ class Dataset:
 
         return self
 
-    def to_disk(self, output_path: Path, force: bool = False, save_examples: bool = True) -> None:
+    def to_disk(self, output_dir: Path, force: bool = False, save_examples: bool = True) -> None:
         """Save Corpus to Disk
 
         Args:
-            output_path (Path): Output file path to save data to
+            output_dir (Path): Output file path to save data to
             force (bool): Force save to directory. Create parent directories
                 or overwrite existing data.
             save_examples (bool): Save the example store along with the state.
         """
-        output_path = ensure_path(output_path)
-        output_dir = output_path.parent
+        output_dir = ensure_path(output_dir)
         state_dir = output_dir / ".recon" / self.name
         if force:
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -254,15 +273,15 @@ class Dataset:
             if not state_dir.exists():
                 state_dir.mkdir(parents=True, exist_ok=True)
 
-        ds_op_state = DatasetOperationsState(
+        state = DatasetOperationsState(
             name=self.name, commit=self.commit_hash, size=len(self), operations=self.operations
         )
-        srsly.write_json(state_dir / "state.json", ds_op_state.dict())
+        srsly.write_json(state_dir / "state.json", state.dict())
 
         if save_examples:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
 
-        srsly.write_jsonl(output_path, [e.dict() for e in self.data])
+        srsly.write_jsonl(output_dir / (self.name + ".jsonl"), [e.dict() for e in self.data])
 
     def from_prodigy(self, prodigy_datasets: List[str]) -> "Dataset":
         """Need to have from_prodigy accept multiple datasets as a list of str so Prodigy
@@ -283,7 +302,7 @@ class Dataset:
             self.data += from_prodigy(prodigy_dataset)
         return self
 
-    def to_prodigy(self, prodigy_dataset: str = None):
+    def to_prodigy(self, prodigy_dataset: str = None) -> str:
         from recon.prodigy.util import to_prodigy
 
         if not prodigy_dataset:
@@ -291,3 +310,4 @@ class Dataset:
 
         print(f"Saving dataset to prodigy dataset: {prodigy_dataset}")
         to_prodigy(self.data, prodigy_dataset)
+        return prodigy_dataset

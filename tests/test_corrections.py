@@ -1,7 +1,8 @@
 import pytest
 from recon.corrections import corrections_from_dict, fix_annotations, rename_labels
+from recon.dataset import Dataset
 from recon.insights import get_label_disparities
-from recon.types import Example
+from recon.types import Example, Span, Token
 
 
 @pytest.fixture()
@@ -44,3 +45,75 @@ def test_fix_annotations(test_examples):
 
     disparities_fixed = get_label_disparities(fixed_examples, label1="SKILL", label2="JOB_ROLE")
     assert disparities_fixed == set()
+
+
+def test_split_sentences():
+    example = Example(
+        text="This is a first sentence with entity. This is an entity in the 2nd sentence.",
+        spans=[
+            Span(text="entity", start=30, end=36, label="ENTITY", token_start=6, token_end=7),
+            Span(text="entity", start=49, end=55, label="ENTITY", token_start=11, token_end=12),
+        ],
+        tokens=[
+            Token(text="This", start=0, end=4, id=0),
+            Token(text="is", start=5, end=7, id=1),
+            Token(text="a", start=8, end=9, id=2),
+            Token(text="first", start=10, end=15, id=3),
+            Token(text="sentence", start=16, end=24, id=4),
+            Token(text="with", start=25, end=29, id=5),
+            Token(text="entity", start=30, end=36, id=6),
+            Token(text=".", start=36, end=37, id=7),
+            Token(text="This", start=38, end=42, id=8),
+            Token(text="is", start=43, end=45, id=9),
+            Token(text="an", start=46, end=48, id=10),
+            Token(text="entity", start=49, end=55, id=11),
+            Token(text="in", start=56, end=58, id=12),
+            Token(text="the", start=59, end=62, id=13),
+            Token(text="2nd", start=63, end=66, id=14),
+            Token(text="sentence", start=67, end=75, id=15),
+            Token(text=".", start=75, end=76, id=16),
+        ],
+        meta={},
+        formatted=True,
+    )
+    test_ds = Dataset("test_dataset", data=[example])
+    assert len(test_ds) == 1
+
+    test_ds.apply_("recon.v1.split_sentences")
+
+    assert len(test_ds) == 2
+
+    assert test_ds.data[0] == Example(
+        text="This is a first sentence with entity.",
+        spans=[Span(text="entity", start=30, end=36, label="ENTITY", token_start=6, token_end=7)],
+        tokens=[
+            Token(text="This", start=0, end=4, id=0),
+            Token(text="is", start=5, end=7, id=1),
+            Token(text="a", start=8, end=9, id=2),
+            Token(text="first", start=10, end=15, id=3),
+            Token(text="sentence", start=16, end=24, id=4),
+            Token(text="with", start=25, end=29, id=5),
+            Token(text="entity", start=30, end=36, id=6),
+            Token(text=".", start=36, end=37, id=7),
+        ],
+        meta={},
+        formatted=True,
+    )
+
+    assert test_ds.data[1] == Example(
+        text="This is an entity in the 2nd sentence.",
+        spans=[Span(text="entity", start=11, end=17, label="ENTITY", token_start=3, token_end=4)],
+        tokens=[
+            Token(text="This", start=0, end=4, id=0),
+            Token(text="is", start=5, end=7, id=1),
+            Token(text="an", start=8, end=10, id=2),
+            Token(text="entity", start=11, end=17, id=3),
+            Token(text="in", start=18, end=20, id=4),
+            Token(text="the", start=21, end=24, id=5),
+            Token(text="2nd", start=25, end=28, id=6),
+            Token(text="sentence", start=29, end=37, id=7),
+            Token(text=".", start=37, end=38, id=8),
+        ],
+        meta={},
+        formatted=True,
+    )

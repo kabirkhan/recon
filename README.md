@@ -18,7 +18,6 @@
 <a href="https://pypi.org/project/reconner" target="_blank">
     <img src="https://img.shields.io/pypi/l/reconner?style=for-the-badge" alt="PyPi Package license">
 </a>
-
 </p>
 
 ---
