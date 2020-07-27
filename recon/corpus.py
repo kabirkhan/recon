@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 import srsly
 from spacy.util import ensure_path
@@ -7,7 +7,13 @@ from spacy.util import ensure_path
 from .dataset import Dataset
 from .loaders import read_json, read_jsonl
 from .store import ExampleStore
-from .types import CorpusApplyResult, Example, OperationResult, OperationState
+from .types import (
+    CorpusApplyResult,
+    CorpusMeta,
+    Example,
+    OperationResult,
+    OperationState,
+)
 
 
 class Corpus:
@@ -165,12 +171,14 @@ class Corpus:
         self._dev.pipe_(operations)
         self._test.pipe_(operations)
 
+    @classmethod
     def from_disk(
-        self,
+        cls,
         data_dir: Path,
-        train_file: str = "train.jsonl",
-        dev_file: str = "dev.jsonl",
-        test_file: str = "test.jsonl",
+        name: str = "corpus",
+        train_name: str = "train",
+        dev_name: str = "dev",
+        test_name: str = "test",
         loader_func: Callable = read_jsonl,
     ) -> "Corpus":
         """Load Corpus from disk given a directory with files
@@ -178,22 +186,32 @@ class Corpus:
 
         Args:
             data_dir (Path): directory to load from.
-            train_file (str, optional): Filename of train data under data_dir. Defaults to train.jsonl.
-            dev_file (str, optional): Filename of dev data under data_dir. Defaults to dev.jsonl.
-            test_file (str, optional): Filename of test data under data_dir. Defaults to test.jsonl.
+            train_name (str, optional): Name of train data under data_dir. Defaults to train.
+            dev_name (str, optional): Name of dev data under data_dir. Defaults to dev.
+            test_name (str, optional): Name of test data under data_dir. Defaults to test.
             loader_func (Callable, optional): Callable that reads a file and returns a List of examples.
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
-        data_dir = ensure_path(data_dir) / self.name
+        data_dir = ensure_path(data_dir)
 
-        train = Dataset("train").from_disk(data_dir / train_file)
-        dev = Dataset("dev").from_disk(data_dir / dev_file)
+        corpus_meta_path = data_dir / ".recon" / "meta.json"
+        if corpus_meta_path.exists():
+            corpus_meta = CorpusMeta.parse_file(corpus_meta_path)
+            name = corpus_meta.name
+
+        example_store_path = data_dir / ".recon" / "example_store.jsonl"
+        example_store = ExampleStore()
+        if example_store_path.exists():
+            example_store.from_disk(example_store_path)
+
+        train = Dataset("train", example_store=example_store).from_disk(data_dir)
+        dev = Dataset("dev", example_store=example_store).from_disk(data_dir)
 
         try:
-            test = Dataset("test").from_disk(data_dir / test_file)
-            corpus = self(self.name, train, dev, test=test)
+            test = Dataset("test", example_store=example_store).from_disk(data_dir)
+            corpus = cls(name, train, dev, test=test)
         except ValueError as e:
-            corpus = self(self.name, train, dev)
+            corpus = cls(name, train, dev)
         return corpus
 
     def to_disk(self, data_dir: Path, force: bool = False) -> None:
@@ -204,25 +222,30 @@ class Corpus:
             force (bool): Force save to directory. Create parent directories
                 or overwrite existing data.
         """
-        data_dir = ensure_path(data_dir) / self.name
+        data_dir = ensure_path(data_dir)
         state_dir = data_dir / ".recon"
+        corpus_meta_path = state_dir / "meta.json"
+
         if force:
             data_dir.mkdir(parents=True, exist_ok=True)
 
             if not state_dir.exists():
                 state_dir.mkdir(parents=True, exist_ok=True)
 
-        self._train.to_disk(data_dir / "train.jsonl", force=force, save_examples=False)
-        self._dev.to_disk(data_dir / "dev.jsonl", force=force, save_examples=False)
+        srsly.write_json(corpus_meta_path, CorpusMeta(name=self.name))
+        self._train.to_disk(data_dir, force=force, save_examples=False)
+        self._dev.to_disk(data_dir, force=force, save_examples=False)
         if self._test:
-            self._test.to_disk(data_dir / "test.jsonl", force=force, save_examples=False)
+            self._test.to_disk(data_dir, force=force, save_examples=False)
 
         self.example_store.to_disk(state_dir / "example_store.jsonl")
 
+    @classmethod
     def from_prodigy(
-        self,
-        prodigy_train_datasets: List[str] = None,
-        prodigy_dev_datasets: List[str] = None,
+        cls,
+        name: str,
+        prodigy_train_datasets: List[str],
+        prodigy_dev_datasets: List[str],
         prodigy_test_datasets: List[str] = None,
     ) -> "Corpus":
         """Load a Corpus from 3 separate datasets in Prodigy
@@ -238,18 +261,19 @@ class Corpus:
         train_ds = Dataset("train").from_prodigy(prodigy_train_datasets)
         dev_ds = Dataset("dev").from_prodigy(prodigy_dev_datasets)
         test_ds = (
-            Dataset("test").from_prodigy(prodigy_train_datasets) if prodigy_test_datasets else None
+            Dataset("test").from_prodigy(prodigy_test_datasets) if prodigy_test_datasets else None
         )
 
-        ds = self(self.name, train_ds, dev_ds, test_ds)
+        ds = cls(name, train_ds, dev_ds, test_ds)
         return ds
 
     def to_prodigy(
         self,
+        name: str = None,
         prodigy_train_dataset: str = None,
         prodigy_dev_dataset: str = None,
         prodigy_test_dataset: str = None,
-    ):
+    ) -> Tuple[str, str, str]:
         """Save a Corpus to 3 separate Prodigy datasets
 
         Args:
@@ -257,15 +281,19 @@ class Corpus:
             prodigy_dev_dataset (str, optional): Dev dataset name in Prodigy
             prodigy_test_dataset (str, optional): Test dataset name in Prodigy
         """
+        name = name if name else self.name
+
         if not prodigy_train_dataset:
-            prodigy_train_dataset = f"{self.name}_train_{self.train.commit_hash}"
+            prodigy_train_dataset = f"{name}_train_{self.train_ds.commit_hash}"
 
         if not prodigy_dev_dataset:
-            prodigy_dev_dataset = f"{self.name}_dev_{self.dev.commit_hash}"
+            prodigy_dev_dataset = f"{name}_dev_{self.dev_ds.commit_hash}"
 
         if not prodigy_test_dataset:
-            prodigy_test_dataset = f"{self.name}_test_{self.test.commit_hash}"
+            prodigy_test_dataset = f"{name}_test_{self.test_ds.commit_hash}"
 
         self.train_ds.to_prodigy(prodigy_train_dataset)
         self.dev_ds.to_prodigy(prodigy_dev_dataset)
         self.test_ds.to_prodigy(prodigy_test_dataset)
+
+        return (prodigy_train_dataset, prodigy_dev_dataset, prodigy_test_dataset)

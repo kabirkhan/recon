@@ -16,11 +16,11 @@ from .types import Correction, Example, Span, Token, TransformationCallbacks
 @operation("recon.v1.rename_labels")
 def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
     """Rename labels in a copy of List[Example] data
-    
+
     Args:
         example (Example): Input Example
         label_map (Dict[str, str]): One-to-one mapping of label names
-    
+
     Returns:
         Example: Copy of Example with renamed labels
     """
@@ -37,18 +37,18 @@ def fix_annotations(
     dryrun: bool = False,
 ) -> Example:
     """Fix annotations in a copy of List[Example] data.
-    
+
     This function will NOT add annotations to your data.
     It will only remove erroneous annotations and fix the
     labels for specific spans.
-    
+
     Args:
         example (Example): Input Example
         corrections (Dict[str, str]): Dictionary of corrections mapping entity text to a new label.
             If the value is set to None, the annotation will be removed
         case_sensitive (bool, optional): Consider case of text for each correction
         dryrun (bool, optional): Treat corrections as a dryrun and just print all changes to be made
-    
+
     Returns:
         Example: Example with fixed annotations
     """
@@ -96,7 +96,7 @@ def fix_annotations(
 
 def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
     """Create a list of Correction objects from a simpler config for
-    corrections using a Dict representation mapping keys to either the label to 
+    corrections using a Dict representation mapping keys to either the label to
     convert to or a tuple of (from_label, to_label) pairings or (List[from_labels], to_label)
     pairings if you want to convert as subset of labels at a time
 
@@ -139,11 +139,11 @@ def strip_annotations(
 ) -> Example:
     """Strip punctuation and spaces from start and end of annotations.
     These characters are almost always a mistake and will confuse a model
-    
+
     Args:
         example (Example): Input Example
         strip_chars (List[str], optional): Characters to strip.
-    
+
     Returns:
         Example: Example with stripped spans
     """
@@ -173,8 +173,8 @@ spacy_pre = SpacyPreProcessor(nlp)
 
 @operation("recon.v1.split_sentences", pre=[spacy_pre])
 def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {}) -> List[Example]:
-    """Split a single example into multiple examples by splitting the text into 
-    multiple sentences and resetting entity and token offsets based on offsets 
+    """Split a single example into multiple examples by splitting the text into
+    multiple sentences and resetting entity and token offsets based on offsets
     relative to sentence boundaries
 
     Args:
@@ -182,7 +182,7 @@ def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {})
         preprocessed_outputs (Dict[str, Any], optional): Outputs of preprocessors.
 
     Returns:
-        List[Example]: List of split examples. 
+        List[Example]: List of split examples.
             Could be list of 1 if the example is just one sentence.
     """
     doc = preprocessed_outputs["recon.v1.spacy"]
@@ -206,7 +206,7 @@ def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {})
     for sent in doc.sents:
         sent_doc = sent.as_doc()
         new_example = Example(
-            text=sent_doc.text,
+            text=sent.text,
             spans=[
                 Span(
                     text=e.text,

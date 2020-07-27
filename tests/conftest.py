@@ -52,7 +52,7 @@ def example_corpus() -> Corpus:
         Corpus: Example data
     """
     base_path = Path(__file__).parent.parent / "examples/data/skills"
-    return Corpus.from_disk(base_path)
+    return Corpus.from_disk(base_path, name="test_corpus")
 
 
 @pytest.fixture()
@@ -63,7 +63,7 @@ def example_corpus_processed() -> Corpus:
         Corpus: Example data
     """
     base_path = Path(__file__).parent.parent / "examples/data/skills"
-    corpus = Corpus.from_disk(base_path)
+    corpus = Corpus.from_disk(base_path, name="test_corpus")
     corpus.pipe_(
         [
             "recon.v1.fix_tokenization_and_spacing",

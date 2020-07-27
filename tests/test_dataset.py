@@ -90,23 +90,24 @@ def test_apply_(example_data):
 
 
 def test_dataset_to_from_disk(example_data, tmp_path):
+
     train_dataset = Dataset("train", example_data["train"])
     ner_stats_pre: NERStats = cast(NERStats, train_dataset.apply(get_ner_stats))
 
     assert len(train_dataset.operations) == 0
 
     with pytest.raises(FileNotFoundError):
-        train_dataset.to_disk(tmp_path / "train.jsonl")
+        train_dataset.to_disk(tmp_path)
 
-    train_dataset.to_disk(tmp_path / "train.jsonl", force=True)
-    train_dataset_loaded = Dataset("train").from_disk(tmp_path / "train.jsonl")
+    train_dataset.to_disk(tmp_path, force=True)
+    train_dataset_loaded = Dataset("train").from_disk(tmp_path)
     assert len(train_dataset_loaded.operations) == 0
     assert train_dataset_loaded.commit_hash == train_dataset.commit_hash
 
     train_dataset.apply_("recon.v1.upcase_labels")
 
-    train_dataset.to_disk(tmp_path / "train.jsonl", force=True)
-    train_dataset_loaded_2 = Dataset("train").from_disk(tmp_path / "train.jsonl")
+    train_dataset.to_disk(tmp_path, force=True)
+    train_dataset_loaded_2 = Dataset("train").from_disk(tmp_path)
 
     assert len(train_dataset_loaded_2.operations) == 1
     assert train_dataset_loaded_2.commit_hash == train_dataset.commit_hash

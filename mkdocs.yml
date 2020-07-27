@@ -5,8 +5,8 @@ site_url: https://microsoft.github.io/reconner/
 theme:
     name: 'material'
     palette:
-        primary: 'orange'
-        accent: 'deep-orange'
+        primary: 'blue'
+        accent: 'blue'
     logo: 'img/drone-white.svg'
     favicon: 'img/favicon.ico'
     custom_dir: docs/overrides
@@ -69,8 +69,10 @@ extra:
     social:
         - type: 'github'
           link: 'https://github.com/microsoft/reconner'
+          icon: 'img/drone-white.svg'
         - type: 'twitter'
           link: 'https://twitter.com/kabir_khan14'
+          icon: 'img/drone-white.svg'
 
 extra_css:
     - 'css/termynal.css'
@@ -80,4 +82,3 @@ extra_javascript:
     - 'js/termynal.js'
     - 'https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js'
     - 'js/custom.js'
-

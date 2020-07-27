@@ -34,10 +34,9 @@ def to_prodigy(
     else:
         db.add_dataset(prodigy_dataset)
 
-    examples = [e.dict() for e in examples]
     prodigy_examples = []
     for e in examples:
-        prodigy_examples.append(set_hashes(e))
+        prodigy_examples.append(set_hashes(e.dict()))
 
     db.add_examples(prodigy_examples, [prodigy_dataset])
 
@@ -48,6 +47,9 @@ def from_prodigy(prodigy_dataset: str) -> List[Example]:
     Args:
         prodigy_dataset (str): Name of prodigy dataset to load from
 
+    Raises:
+        ValueError: If trying to load examples from a dataset that doesn't exist in prodigy
+
     Returns:
         List[Example]: List of Recon examples
     """
@@ -56,5 +58,11 @@ def from_prodigy(prodigy_dataset: str) -> List[Example]:
 
     db = connect()
 
-    if db.get_dataset(prodigy_dataset):
-        return [Example(**e) for e in db.get_dataset(prodigy_dataset)]
+    examples = []
+    prodigy_examples = db.get_dataset(prodigy_dataset)
+    if not prodigy_examples:
+        raise ValueError(
+            f"Prodigy dataset with name {prodigy_dataset} does not exist. Available datasets are: \n {', '.join(db.datasets)}"
+        )
+    examples = [Example(**e) for e in prodigy_examples]
+    return examples
