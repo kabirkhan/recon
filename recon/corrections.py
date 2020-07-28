@@ -9,7 +9,6 @@ from spacy.tokens import Doc as SpacyDoc, Span as SpacySpan
 from wasabi import msg
 
 from .operations import operation
-from .preprocess import SpacyPreProcessor
 from .types import Correction, Example, Span, Token, TransformationCallbacks
 
 
@@ -133,9 +132,11 @@ def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
     return corrections
 
 
-@operation("recon.v1.strip_annotations", pre=[create_pre("recon.v1.spacy")])
+@operation("recon.v1.strip_annotations", pre=["recon.v1.spacy"])
 def strip_annotations(
-    example: Example, strip_chars: List[str] = [".", "!", "?", "-", ":", " "], preprocessed_outputs: Dict[str, Any] = {}
+    example: Example,
+    strip_chars: List[str] = [".", "!", "?", "-", ":", " "],
+    preprocessed_outputs: Dict[str, Any] = {},
 ) -> Example:
     """Strip punctuation and spaces from start and end of annotations.
     These characters are almost always a mistake and will confuse a model
@@ -150,7 +151,11 @@ def strip_annotations(
 
     doc = preprocessed_outputs["recon.v1.spacy"]
 
-    fix_tokens = any(example.tokens)
+    def fix_tokens(example: Example, span: Span) -> bool:
+        fix_tokens = example.tokens and any(example.tokens)
+        return bool(
+            fix_tokens and span.token_start and span.token_end and span.token_start < span.token_end
+        )
 
     for s in example.spans:
         for ch in strip_chars:
@@ -160,20 +165,18 @@ def strip_annotations(
                     s.text = s.text[1:]
                     s.start += 1
                     ch = s.text[0]
-                    if ch != " " and fix_tokens and s.token_start < s.token_end:
-                        s.token_start += 1
+                    s.token_start = s.token_start + 1 if ch != " " and fix_tokens(example, s) else None  # type: ignore
             elif s.text.endswith(ch):
                 ch = s.text[-1]
                 while ch in strip_chars:
                     s.text = s.text[:-1]
                     ch = s.text[-1]
                     s.end -= 1
-                    if ch != " " and fix_tokens and s.token_start < s.token_end:
-                        s.token_end -= 1
+                    s.token_end = s.token_end - 1 if ch != " " and fix_tokens(example, s) else None  # type: ignore
     return example
 
 
-@operation("recon.v1.split_sentences", pre=[create_pre("recon.v1.spacy")])
+@operation("recon.v1.split_sentences", pre=["recon.v1.spacy"])
 def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {}) -> List[Example]:
     """Split a single example into multiple examples by splitting the text into
     multiple sentences and resetting entity and token offsets based on offsets

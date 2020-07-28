@@ -6,7 +6,6 @@ from spacy.language import Language
 
 from .dataset import Dataset
 from .operations import op_iter, operation
-from .preprocess import SpacyPreProcessor
 from .registry import tokenizers
 from .types import (
     Example,
@@ -19,7 +18,7 @@ from .types import (
 )
 
 
-@operation("recon.v1.fix_tokenization_and_spacing", pre=[create_pre("recon.v1.spacy")])
+@operation("recon.v1.fix_tokenization_and_spacing", pre=["recon.v1.spacy"])
 def fix_tokenization_and_spacing(
     example: Example, *, preprocessed_outputs: Dict[str, Any] = {}
 ) -> Union[Example, None]:
@@ -131,7 +130,7 @@ def fix_tokenization_and_spacing(
     return example
 
 
-@operation("recon.v1.add_tokens", pre=[create_pre("recon.v1.spacy")])
+@operation("recon.v1.add_tokens", pre=["recon.v1.spacy"])
 def add_tokens(
     example: Example, *, use_spacy_token_ends: bool = False, preprocessed_outputs: Dict[str, Any]
 ) -> Union[Example, None]:

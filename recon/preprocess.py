@@ -44,7 +44,6 @@ class preprocessor:
 
 
 class PreProcessor(object):
-
     def __init__(self, name: str) -> None:
         super().__init__()
         self._name = name
@@ -87,18 +86,5 @@ class SpacyPreProcessor(PreProcessor):
         return docs
 
 
-def create_pre(name: str, **kwargs: Any):
-    """PreProcessor factory
-
-    Args:
-        name (str): name of preprocessor
-        kwargs (Any): Any kwargs needed to initialize pre
-
-    Returns:
-        PreProcessor: PreProcessor with name
-    """
-    if name == "recon.v1.spacy":
-        spacy_pre = SpacyPreProcessor(**kwargs)
-        if name not in registry.preprocessors:
-            spacy_pre.register()
-        return spacy_pre
+if "recon.v1.spacy" not in registry.preprocessors:
+    registry.preprocessors.register("recon.v1.spacy", SpacyPreProcessor())
