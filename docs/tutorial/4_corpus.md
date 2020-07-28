@@ -1,10 +1,10 @@
 # Tutorial - Using `Corpus.apply`
 
-In the previous step, we used the `stats.get_ner_stats` function to some stats on our train_data. Now, we want to be able to get these same stats across our train/dev/test split. 
+In the previous step, we used the `stats.get_ner_stats` function to some stats on our train_data. Now, we want to be able to get these same stats across our train/dev/test split.
 
 SO, ReconNER's `Corpus` class provides a useful method called [`apply`](../../api/corpus)
 that takes a `Callable` as a parameter that can run on a list of `Example`s (e.g. `stats.get_ner_stats`)
-and run that `Callable` over all the datasets as well as a concatenation of all the datasets so you get the full picture. 
+and run that `Callable` over all the datasets as well as a concatenation of all the datasets so you get the full picture.
 
 !!! tip
     You can pass arbitary `*args` and `**kwargs` to `Corpus.apply` and they will be passed along to the callable you provide as the required argument.
@@ -75,7 +75,7 @@ all
 
 ## Analyzing the results
 
-Now that we have a good understanding of the distribution of labels in across our train/dev/test split as well as the summation of all those numbers to the "all" data, we can start to see some issues. 
+Now that we have a good understanding of the distribution of labels in across our train/dev/test split as well as the summation of all those numbers to the "all" data, we can start to see some issues.
 
 
 ### 1. Not enough `JOB_ROLE` annotations
@@ -84,14 +84,14 @@ Now that we have a good understanding of the distribution of labels in across ou
 
 ### 2. Barely enough `PRODUCT` annotations
 
-We're also a little low (though not nearly as much) on our `PRODUCT` label. 
+We're also a little low (though not nearly as much) on our `PRODUCT` label.
 
 ### What to do from here
 
 We want our final model to be equally good at extracting these 3 labels of `SKILL`, `PRODUCT` and `JOB_ROLE` so we now know exactly where to invest more time in our annotations effort: getting more examples of `JOB_ROLE`.
 
 !!! note
-    This is a VERY small dataset sampled from a much larger NER dataset that's powering part of our work on the new [v3 Text Analytics Cognitive Service](https://azure.microsoft.com/en-us/services/cognitive-services/text-analytics/). So here's your glimpse into how we work with data at Microsoft. Until we fix the lack of annotations for the `JOB_ROLE` label we won't be launching it in production.
+    This is a VERY small dataset sampled from a much larger NER dataset that's powering part of our work on the new [v3 Text Analytics Cognitive Service](https://azure.kabirkhan.com/en-us/services/cognitive-services/text-analytics/). So here's your glimpse into how we work with data at kabirkhan. Until we fix the lack of annotations for the `JOB_ROLE` label we won't be launching it in production.
 
 
 ## Next Steps
@@ -101,4 +101,3 @@ We've only scratched the surface of ReconNER. It's great to have these global st
 We might have subsets of our data annotated by different people that had a slightly different understanding of the annotation requirements.
 
 In the next step of this tutorial we'll dive into the `insights` module of ReconNER to examine the quality of our existing annotations.
-

@@ -33,7 +33,7 @@ However, the goal of Recon is to provide insights across all of your annotated e
 Let's use the `read_jsonl` loader to load some annotated data created with Prodigy
 
 !!!tip
-    If you don't have any data available, you can use the data in the examples folder [here](https://github.com/microsoft/reconner/tree/master/examples/data/skills). We'll be using this data for the rest of the tutorial.
+    If you don't have any data available, you can use the data in the examples folder [here](https://github.com/kabirkhan/reconner/tree/master/examples/data/skills). We'll be using this data for the rest of the tutorial.
 
 ```python
 from recon.loaders import read_jsonl
@@ -49,4 +49,4 @@ Now we have some examples to work, we can start examining our data.
 
 ## Next Steps
 
-Once you have your data loaded, you can run other Recon functions on top of it to gain insights into the quality and completeness of your NER data as well as to start making corrections to the inconsistently annotated examples you almost certainly have (Don't worry, that's fine! Messy data is everywhere, even Microsoft)
+Once you have your data loaded, you can run other Recon functions on top of it to gain insights into the quality and completeness of your NER data as well as to start making corrections to the inconsistently annotated examples you almost certainly have (Don't worry, that's fine! Messy data is everywhere, even kabirkhan)

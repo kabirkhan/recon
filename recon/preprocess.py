@@ -87,4 +87,4 @@ class SpacyPreProcessor(PreProcessor):
 
 
 if "recon.v1.spacy" not in registry.preprocessors:
-    registry.preprocessors.register("recon.v1.spacy", SpacyPreProcessor())
+    registry.preprocessors.register("recon.v1.spacy")(SpacyPreProcessor())
