@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://microsoft.github.io/reconner"><img src="https://microsoft.github.io/reconner/img/recon.svg" alt="Recon"></a>
+  <a href="https://kabirkhan.github.io/reconner"><img src="https://kabirkhan.github.io/reconner/img/recon.svg" alt="Recon"></a>
 </p>
 <p align="center">
     <em>Recon NER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>
@@ -9,10 +9,10 @@
     <img src="https://img.shields.io/pypi/v/reconner?style=for-the-badge" alt="PyPi Package version">
 </a>
 <a href="https://dev.azure.com/kabirkhan1137/ReconNER/_build" target="_blank">
-    <img alt="Azure Pipelines Build badge" src="https://img.shields.io/azure-devops/build/kabirkhan1137/ReconNER/microsoft.reconner?style=for-the-badge">
+    <img alt="Azure Pipelines Build badge" src="https://img.shields.io/azure-devops/build/kabirkhan1137/ReconNER/kabirkhan.reconner?style=for-the-badge">
 </a>
-<a href="https://codecov.io/gh/microsoft/reconner" rel="nofollow">
-  <img alt="Codecov badge" src="https://img.shields.io/codecov/c/gh/microsoft/reconner?style=for-the-badge" style="max-width:100%;">
+<a href="https://codecov.io/gh/kabirkhan/reconner" rel="nofollow">
+  <img alt="Codecov badge" src="https://img.shields.io/codecov/c/gh/kabirkhan/reconner?style=for-the-badge" style="max-width:100%;">
 </a>
 
 <a href="https://pypi.org/project/reconner" target="_blank">
@@ -22,9 +22,9 @@
 
 ---
 
-**Documentation**: <a href="https://microsoft.github.io/reconner" target="_blank">https://microsoft.github.io/reconner</a>
+**Documentation**: <a href="https://kabirkhan.github.io/reconner" target="_blank">https://kabirkhan.github.io/reconner</a>
 
-**Source Code**: <a href="https://github.com/microsoft/reconner" target="_blank">https://github.com/microsoft/reconner</a>
+**Source Code**: <a href="https://github.com/kabirkhan/reconner" target="_blank">https://github.com/kabirkhan/reconner</a>
 
 ---
 
