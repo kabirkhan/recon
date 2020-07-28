@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List
 
 import catalogue
 import spacy
@@ -12,28 +12,66 @@ class registry:
     preprocessors = catalogue.create("recon", "preprocessors", entry_points=True)
 
 
-class PreProcessor(object):
-    name = "recon.v1.preprocess"
+class preprocessor:
+    def __init__(self, name: str):
+        """Decorate an operation that makes some changes to a dataset.
 
-    def __init__(self) -> None:
+        Args:
+            name (str): Operation name.
+        """
+        self.name = name
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Callable:
+        """Decorator for an operation.
+        The first arg is the function being decorated.
+        This function operates on a List[Example].
+
+        e.g. @preprocessor("recon.v1.some_name")
+
+        Or it should operate on a single example and
+        recon will take care of applying it to a full Dataset
+
+        Args:
+            args: First arg is function to decorate
+
+        Returns:
+            Callable: Original function
+        """
+        op: Callable = args[0]
+        registry.preprocessors.register(self.name)(op)
+
+        return op
+
+
+class PreProcessor(object):
+
+    def __init__(self, name: str) -> None:
         super().__init__()
+        self._name = name
         self._cache: Dict[Any, Any] = {}
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     def __call__(self, data: List[Example]) -> Iterable[Any]:
         raise NotImplementedError
 
+    def register(self) -> None:
+        registry.preprocessors.register(self.name)(self)
+
 
 class SpacyPreProcessor(PreProcessor):
-    name = "recon.v1.spacy"
-
-    def __init__(self, nlp: Language = None) -> None:
-        super().__init__()
+    def __init__(self, name: str = "recon.v1.spacy", nlp: Language = None) -> None:
+        super().__init__(name)
+        self._name = name
         self._nlp = nlp
 
     @property
     def nlp(self) -> Language:
         if self._nlp is None:
             self._nlp = spacy.blank("en")
+            self._nlp.add_pipe(self._nlp.create_pipe("sentencizer"))
         return self._nlp
 
     def __call__(self, data: List[Example]) -> Iterable[Any]:
@@ -47,3 +85,20 @@ class SpacyPreProcessor(PreProcessor):
             docs.insert(idx, self._cache[st])
 
         return docs
+
+
+def create_pre(name: str, **kwargs: Any):
+    """PreProcessor factory
+
+    Args:
+        name (str): name of preprocessor
+        kwargs (Any): Any kwargs needed to initialize pre
+
+    Returns:
+        PreProcessor: PreProcessor with name
+    """
+    if name == "recon.v1.spacy":
+        spacy_pre = SpacyPreProcessor(**kwargs)
+        if name not in registry.preprocessors:
+            spacy_pre.register()
+        return spacy_pre

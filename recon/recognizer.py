@@ -2,6 +2,7 @@ from typing import Dict, Iterable, Iterator, List, Set, Tuple
 
 import srsly
 from spacy.language import Language
+from spacy.scorer import Scorer
 from wasabi import Printer
 
 from .types import Example, Span, Token
@@ -95,8 +96,17 @@ class SpacyEntityRecognizer(EntityRecognizer):
                 tokens=[Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc],
             )
 
-    def evaluate(self, data: List[Example]) -> None:
-        msg = Printer()
+    def evaluate(self, data: List[Example], verbose: bool = True) -> Scorer:
+        """Evaluate spaCy recognizer performance on dataset
+
+        Args:
+            data (List[Example]): Examples to evaluate on
+            verbose (bool, optional): Print results or not. Defaults to True.
+
+        Returns:
+            Scorer: spaCy scorer object
+        """
+        msg = Printer(no_print=not verbose)
         formatted_data, _ = self._format_data(data)
         sc = self.nlp.evaluate(formatted_data, batch_size=64)
         msg.divider("Recognizer Results")
@@ -119,6 +129,14 @@ class SpacyEntityRecognizer(EntityRecognizer):
     def _format_data(
         self, data: List[Example]
     ) -> Tuple[List[Tuple[str, Dict[str, List[Tuple[int, int, str]]]]], Set[str]]:
+        """Format of list of recon examples into spaCy data
+
+        Args:
+            data (List[Example]): Input examples
+
+        Returns:
+            Tuple[List[Tuple[str, Dict[str, List[Tuple[int, int, str]]]]], Set[str]]: Data in the spaCy format
+        """
         result = []
         labels = set()
         for example in data:

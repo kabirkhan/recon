@@ -133,9 +133,9 @@ def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
     return corrections
 
 
-@operation("recon.v1.strip_annotations")
+@operation("recon.v1.strip_annotations", pre=[create_pre("recon.v1.spacy")])
 def strip_annotations(
-    example: Example, strip_chars: List[str] = [".", "!", "?", "-", ":", " "]
+    example: Example, strip_chars: List[str] = [".", "!", "?", "-", ":", " "], preprocessed_outputs: Dict[str, Any] = {}
 ) -> Example:
     """Strip punctuation and spaces from start and end of annotations.
     These characters are almost always a mistake and will confuse a model
@@ -148,30 +148,32 @@ def strip_annotations(
         Example: Example with stripped spans
     """
 
+    doc = preprocessed_outputs["recon.v1.spacy"]
+
+    fix_tokens = any(example.tokens)
+
     for s in example.spans:
         for ch in strip_chars:
             if s.text.startswith(ch):
                 ch = s.text[0]
-
                 while ch in strip_chars:
                     s.text = s.text[1:]
                     s.start += 1
                     ch = s.text[0]
+                    if ch != " " and fix_tokens and s.token_start < s.token_end:
+                        s.token_start += 1
             elif s.text.endswith(ch):
                 ch = s.text[-1]
                 while ch in strip_chars:
                     s.text = s.text[:-1]
                     ch = s.text[-1]
                     s.end -= 1
+                    if ch != " " and fix_tokens and s.token_start < s.token_end:
+                        s.token_end -= 1
     return example
 
 
-nlp = spacy.blank("en")
-nlp.add_pipe(nlp.create_pipe("sentencizer"))
-spacy_pre = SpacyPreProcessor(nlp)
-
-
-@operation("recon.v1.split_sentences", pre=[spacy_pre])
+@operation("recon.v1.split_sentences", pre=[create_pre("recon.v1.spacy")])
 def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {}) -> List[Example]:
     """Split a single example into multiple examples by splitting the text into
     multiple sentences and resetting entity and token offsets based on offsets

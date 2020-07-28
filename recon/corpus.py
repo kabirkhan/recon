@@ -273,6 +273,7 @@ class Corpus:
         prodigy_train_dataset: str = None,
         prodigy_dev_dataset: str = None,
         prodigy_test_dataset: str = None,
+        overwrite: bool = True,
     ) -> Tuple[str, str, str]:
         """Save a Corpus to 3 separate Prodigy datasets
 
@@ -292,8 +293,8 @@ class Corpus:
         if not prodigy_test_dataset:
             prodigy_test_dataset = f"{name}_test_{self.test_ds.commit_hash}"
 
-        self.train_ds.to_prodigy(prodigy_train_dataset)
-        self.dev_ds.to_prodigy(prodigy_dev_dataset)
-        self.test_ds.to_prodigy(prodigy_test_dataset)
+        self.train_ds.to_prodigy(prodigy_train_dataset, overwrite=overwrite)
+        self.dev_ds.to_prodigy(prodigy_dev_dataset, overwrite=overwrite)
+        self.test_ds.to_prodigy(prodigy_test_dataset, overwrite=overwrite)
 
         return (prodigy_train_dataset, prodigy_dev_dataset, prodigy_test_dataset)

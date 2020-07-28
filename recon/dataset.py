@@ -57,7 +57,6 @@ class Dataset:
     Then I can load that model from disk with all previous operations already tracked
     in self.operations. Then I can run 6..10, save to disk and train model.
     Now I have git-like "commits" for the data used in each model.
-
     """
 
     def __init__(
@@ -67,7 +66,7 @@ class Dataset:
         operations: List[OperationState] = None,
         example_store: ExampleStore = None,
         version: str = "0.0.0",
-        verbose: bool = False,
+        verbose: bool = True,
     ):
         self._name = name
         self.data = data
@@ -298,16 +297,18 @@ class Dataset:
         from recon.prodigy.util import from_prodigy
 
         print(f"Loading data from prodigy datasets: {', '.join(prodigy_datasets)}")
+        data = []
         for prodigy_dataset in prodigy_datasets:
-            self.data += from_prodigy(prodigy_dataset)
+            data += from_prodigy(prodigy_dataset)
+        self.data = data
         return self
 
-    def to_prodigy(self, prodigy_dataset: str = None) -> str:
+    def to_prodigy(self, prodigy_dataset: str = None, overwrite: bool = True) -> str:
         from recon.prodigy.util import to_prodigy
 
         if not prodigy_dataset:
             prodigy_dataset = f"{self.name}_{self.commit_hash}"
 
         print(f"Saving dataset to prodigy dataset: {prodigy_dataset}")
-        to_prodigy(self.data, prodigy_dataset)
+        to_prodigy(self.data, prodigy_dataset, overwrite_dataset=overwrite)
         return prodigy_dataset
