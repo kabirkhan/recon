@@ -18,7 +18,7 @@ def nlp():
 
 @pytest.fixture()
 def spacy_preprocessor(nlp):
-    return SpacyPreProcessor(nlp)
+    return SpacyPreProcessor(nlp=nlp)
 
 
 @pytest.fixture()

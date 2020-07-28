@@ -8,7 +8,7 @@ import catalogue
 import srsly
 from wasabi import Printer
 
-from .preprocess import PreProcessor
+from .preprocess import PreProcessor, registry as pre_registry
 from .types import (
     Example,
     OperationResult,
@@ -53,12 +53,12 @@ def op_iter(
 
 
 class operation:
-    def __init__(self, name: str, pre: List[PreProcessor] = []):
+    def __init__(self, name: str, pre: Union[List[str], List[PreProcessor]] = []):
         """Decorate an operation that makes some changes to a dataset.
 
         Args:
             name (str): Operation name.
-            pre (List[PreProcessor]): List of preprocessors to run
+            pre (Union[List[str], List[PreProcessor]]): List of preprocessors to run
         """
         self.name = name
         self.pre = pre
@@ -81,7 +81,17 @@ class operation:
             Callable: Original function
         """
         op: Callable = args[0]
-        registry.operations.register(self.name)(Operation(self.name, self.pre, op))
+
+        pre = []
+
+        for pre_name_or_op in self.pre:
+            preprocessor = pre_name_or_op
+            if isinstance(preprocessor, str):
+                preprocessor = pre_registry.preprocessors.get(pre_name_or_op)
+            assert isinstance(preprocessor, PreProcessor)
+            pre.append(preprocessor)
+
+        registry.operations.register(self.name)(Operation(self.name, pre, op))
 
         return op
 
@@ -114,9 +124,6 @@ class Operation:
         Returns:
             OperationResult: Container holding new data and the state of the Operation
         """
-        verbose = True
-        msg = Printer(no_print=verbose == False)
-
         initial_state = kwargs.pop("initial_state") if "initial_state" in kwargs else None
         verbose = kwargs.pop("verbose") if "verbose" in kwargs else None
         if not initial_state:

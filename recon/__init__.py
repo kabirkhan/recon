@@ -3,6 +3,7 @@
 __version__ = "0.5.3"
 
 from .corpus import Corpus
+from .preprocess import SpacyPreProcessor
 from .corrections import *
 from .insights import *
 from .loaders import read_json, read_jsonl

@@ -10,6 +10,7 @@ dist
 site
 .coverage
 htmlcov
+examples/3.0_prodigy.ipynb
 examples/cs_data*.ipynb
 examples/skills_data*.ipynb
 **/.ipynb_checkpoints

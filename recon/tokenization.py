@@ -18,20 +18,16 @@ from .types import (
     TransformationType,
 )
 
-tokenizer = tokenizers.get("default")
-nlp = tokenizer()
-spacy_pre = SpacyPreProcessor(nlp)
 
-
-@operation("recon.v1.fix_tokenization_and_spacing", pre=[spacy_pre])
+@operation("recon.v1.fix_tokenization_and_spacing", pre=[create_pre("recon.v1.spacy")])
 def fix_tokenization_and_spacing(
     example: Example, *, preprocessed_outputs: Dict[str, Any] = {}
 ) -> Union[Example, None]:
-    """Fix tokenization and spacing issues where there are annotation spans that 
+    """Fix tokenization and spacing issues where there are annotation spans that
     don't fall on a token boundary. This can happen if annotations are done at the
     character level, not the token level. Often, when scraping web text it's easy to
     get two words pushed together where one is an entity so this can fix a lot of issues.
-    
+
     Args:
         example (Example): Input Example
         preprocessed_outputs (Dict[str, Any]): Outputs of preprocessors
@@ -110,8 +106,8 @@ def fix_tokenization_and_spacing(
             new_text = f"{fe_text[:split_start]} {span.text}{fe_text[split_end:]}"
             example.text = new_text
         else:
-            # Something is super fucked up.
-            # print("SPAN CORRECTED OFF BY 1 unfixable", example.text, span)
+            # Something is super messed up.
+            print("SPAN CORRECTED OFF BY 1 unfixable", example.text, span)
             before = span.start
             after = span.end
             # tokenization_errors.append((example, span))
@@ -135,12 +131,12 @@ def fix_tokenization_and_spacing(
     return example
 
 
-@operation("recon.v1.add_tokens", pre=[spacy_pre])
+@operation("recon.v1.add_tokens", pre=[create_pre("recon.v1.spacy")])
 def add_tokens(
     example: Example, *, use_spacy_token_ends: bool = False, preprocessed_outputs: Dict[str, Any]
 ) -> Union[Example, None]:
     """Add tokens to each Example
-    
+
     Args:
         example (Example): Input Example
         preprocessed_outputs (Dict[str, Any]): Outputs of preprocessors

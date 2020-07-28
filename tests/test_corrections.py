@@ -47,6 +47,57 @@ def test_fix_annotations(test_examples):
     assert disparities_fixed == set()
 
 
+def test_strip_annotations():
+    example = Example(
+        text="This is an - entity more text and entity.",
+        spans=[
+            Span(text="- entity", start=11, end=19, label="ENTITY", token_start=3, token_end=5),
+            Span(text="entity.", start=34, end=41, label="ENTITY", token_start=8, token_end=10),
+        ],
+        tokens=[
+            Token(text="This", start=0, end=4, id=0),
+            Token(text="is", start=5, end=7, id=1),
+            Token(text="an", start=8, end=10, id=2),
+            Token(text="-", start=11, end=12, id=3),
+            Token(text="entity", start=13, end=19, id=4),
+            Token(text="more", start=20, end=24, id=5),
+            Token(text="text", start=25, end=29, id=6),
+            Token(text="and", start=30, end=33, id=7),
+            Token(text="entity", start=34, end=40, id=8),
+            Token(text=".", start=40, end=41, id=9),
+        ],
+        meta={},
+        formatted=True,
+    )
+
+    ds = Dataset("test_dataset", data=[example])
+
+    ds.apply_("recon.v1.strip_annotations")
+
+    assert len(ds) == 1
+    assert ds.data[0] == Example(
+        text="This is an - entity more text and entity.",
+        spans=[
+            Span(text="entity", start=13, end=19, label="ENTITY", token_start=4, token_end=5),
+            Span(text="entity", start=34, end=40, label="ENTITY", token_start=8, token_end=9),
+        ],
+        tokens=[
+            Token(text="This", start=0, end=4, id=0),
+            Token(text="is", start=5, end=7, id=1),
+            Token(text="an", start=8, end=10, id=2),
+            Token(text="-", start=11, end=12, id=3),
+            Token(text="entity", start=13, end=19, id=4),
+            Token(text="more", start=20, end=24, id=5),
+            Token(text="text", start=25, end=29, id=6),
+            Token(text="and", start=30, end=33, id=7),
+            Token(text="entity", start=34, end=40, id=8),
+            Token(text=".", start=40, end=41, id=9),
+        ],
+        meta={},
+        formatted=True,
+    )
+
+
 def test_split_sentences():
     example = Example(
         text="This is a first sentence with entity. This is an entity in the 2nd sentence.",
