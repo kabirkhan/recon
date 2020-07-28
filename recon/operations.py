@@ -53,7 +53,7 @@ def op_iter(
 
 
 class operation:
-    def __init__(self, name: str, pre: Union[List[str], List[PreProcessor]] = []):
+    def __init__(self, name: str, pre: List[Union[str, PreProcessor]] = []):
         """Decorate an operation that makes some changes to a dataset.
 
         Args:
@@ -82,7 +82,7 @@ class operation:
         """
         op: Callable = args[0]
 
-        pre = []
+        pre: List[PreProcessor] = []
 
         for pre_name_or_op in self.pre:
             preprocessor = pre_name_or_op

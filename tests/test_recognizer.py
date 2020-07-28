@@ -33,6 +33,5 @@ def test_spacy_recognizer(nlp, test_texts):
     assert len(examples[0].spans) == 3
     assert len(examples[1].spans) == 2
 
-
     scorer = recognizer.evaluate(examples, verbose=False)
     assert scorer.ents_f == 100
