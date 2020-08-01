@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any, Callable, Dict, Iterable, List
 
 import catalogue
@@ -5,7 +6,8 @@ import spacy
 from spacy.language import Language
 from spacy.tokens import Doc
 
-from .types import Example
+from .linker import BaseEntityLinker, EntityLinker
+from .types import Entity, Example
 
 
 class registry:
@@ -44,14 +46,19 @@ class preprocessor:
 
 
 class PreProcessor(object):
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, field: str) -> None:
         super().__init__()
         self._name = name
+        self._field = field
         self._cache: Dict[Any, Any] = {}
 
     @property
     def name(self) -> str:
         return self._name
+
+    @property
+    def field(self) -> str:
+        return self._field
 
     def __call__(self, data: List[Example]) -> Iterable[Any]:
         raise NotImplementedError
@@ -61,9 +68,8 @@ class PreProcessor(object):
 
 
 class SpacyPreProcessor(PreProcessor):
-    def __init__(self, name: str = "recon.v1.spacy", nlp: Language = None) -> None:
-        super().__init__(name)
-        self._name = name
+    def __init__(self, nlp: Language = None, name: str = "recon.v1.spacy", field: str = "doc") -> None:
+        super().__init__(name, field)
         self._nlp = nlp
 
     @property
@@ -84,6 +90,35 @@ class SpacyPreProcessor(PreProcessor):
             docs.insert(idx, self._cache[st])
 
         return docs
+
+
+class SpanAliasesPreProcessor(PreProcessor):
+
+    def __init__(self, entities: List[Entity], name: str = "recon.v1.span_aliases", field: str = "aliases", linker: BaseEntityLinker = EntityLinker()):
+        super().__init__(name, field)
+        self.entities = entities
+        self.ents_to_aliases = defaultdict(list)
+
+        for ent in self.entities:
+            if not ent.id:
+                ent.id = ent.name
+            self.ents_to_aliases[ent.id] = ent.aliases
+
+        self.linker = linker
+
+    def __call__(self, data: List[Example]) -> Iterable[Any]:
+        outputs = []
+
+        data = self.linker(data)
+        for example in data:
+            spans_to_aliases_map = defaultdict(list)
+            for span in example.spans:
+                if span.kb_id:
+                    aliases = self.ents_to_aliases[span.kb_id]
+                    spans_to_aliases_map[hash(span)] = aliases
+
+            outputs.append(spans_to_aliases_map)
+        return outputs
 
 
 if "recon.v1.spacy" not in registry.preprocessors:

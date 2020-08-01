@@ -132,7 +132,7 @@ def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
     return corrections
 
 
-@operation("recon.v1.strip_annotations", pre=["recon.v1.spacy"])
+@operation("recon.v1.strip_annotations", pre=["recon.v1.spacy"], handles_tokens=False)
 def strip_annotations(
     example: Example,
     strip_chars: List[str] = [".", "!", "?", "-", ":", " "],
@@ -165,14 +165,12 @@ def strip_annotations(
                     s.text = s.text[1:]
                     s.start += 1
                     ch = s.text[0]
-                    s.token_start = s.token_start + 1 if ch != " " and fix_tokens(example, s) else None  # type: ignore
             elif s.text.endswith(ch):
                 ch = s.text[-1]
                 while ch in strip_chars:
                     s.text = s.text[:-1]
                     ch = s.text[-1]
                     s.end -= 1
-                    s.token_end = s.token_end - 1 if ch != " " and fix_tokens(example, s) else None  # type: ignore
     return example
 
 

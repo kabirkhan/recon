@@ -1,4 +1,5 @@
 import functools
+import warnings
 from collections import Counter, defaultdict
 from copy import deepcopy
 from inspect import isclass
@@ -22,6 +23,7 @@ from .types import (
 
 class registry:
     operations = catalogue.create("recon", "operations", entry_points=True)
+    operation_factories = catalogue.create("recon", "operation_factories", entry_points=True)
 
 
 def op_iter(
@@ -47,13 +49,16 @@ def op_iter(
 
         for i, (example, output) in enumerate(zip(data, processor_outputs)):
             preprocessed_outputs[example][processor.name] = processor_outputs[i]
+            example.data.__setattr__(processor.field, processor_outputs[i])
 
     for example in data:
         yield hash(example), example.copy(deep=True), preprocessed_outputs[example]
 
 
 class operation:
-    def __init__(self, name: str, pre: List[Union[str, PreProcessor]] = []):
+    def __init__(
+        self, name: str, pre: List[Union[str, PreProcessor]] = [], handles_tokens: bool = True, factory: bool = False
+    ):
         """Decorate an operation that makes some changes to a dataset.
 
         Args:
@@ -62,6 +67,8 @@ class operation:
         """
         self.name = name
         self.pre = pre
+        self.handles_tokens = handles_tokens
+        self.factory = factory
 
     def __call__(self, *args: Any, **kwargs: Any) -> Callable:
         """Decorator for an operation.
@@ -91,7 +98,12 @@ class operation:
             assert isinstance(preprocessor, PreProcessor)
             pre.append(preprocessor)
 
-        registry.operations.register(self.name)(Operation(self.name, pre, op))
+        if self.factory:
+            def factory(name: str, pre: List[PreProcessor]) -> Operation:
+                return Operation(name, pre, op=op, handles_tokens = self.handles_tokens)
+            registry.operation_factories.register(self.name)(factory)
+        else:
+            registry.operations.register(self.name)(Operation(self.name, pre, op, self.handles_tokens))
 
         return op
 
@@ -100,7 +112,7 @@ class Operation:
     """Operation class that takes care of calling and reporting
     the results of an operation on a Dataset"""
 
-    def __init__(self, name: str, pre: List[PreProcessor], op: Callable):
+    def __init__(self, name: str, pre: List[PreProcessor], op: Callable, handles_tokens: bool):
         """Initialize an Operation instance
 
         Args:
@@ -111,6 +123,7 @@ class Operation:
         self.name = name
         self.pre = pre
         self.op = op
+        self.handles_tokens = handles_tokens
 
     def __call__(self, dataset: Any, *args: Any, **kwargs: Any) -> OperationResult:
         """Runs op on a dataset and records the results
@@ -155,6 +168,23 @@ class Operation:
                 )
             )
             dataset.example_store.add(new_example)
+
+        has_tokens = False
+        for e in dataset.data:
+            if e.tokens or any([(s.token_start or s.token_end) for s in e.spans]):
+                has_tokens = True
+                break
+
+        if has_tokens and not self.handles_tokens:
+            warnings.warn(
+                # fmt: off
+                "This dataset seems to have preset tokens. " +
+                f"Operation: {self.name} is not currently capable of handling tokens and you will "
+                "need to reset tokenization after this operation. " +
+                "Applying the `recon.v1.add_tokens` operation after this " +
+                "is complete will get you back to a clean state."
+                # fmt: on
+            )
 
         new_data = []
         for orig_example_hash, example, preprocessed_outputs in op_iter(
