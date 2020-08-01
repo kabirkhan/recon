@@ -2,12 +2,13 @@
 
 __version__ = "0.5.3"
 
+from .augmentation import *
 from .corpus import Corpus
-from .preprocess import SpacyPreProcessor
 from .corrections import *
 from .insights import *
 from .loaders import read_json, read_jsonl
 from .operations import operation
+from .preprocess import SpacyPreProcessor
 from .stats import get_ner_stats
 from .tokenization import add_tokens, fix_tokenization_and_spacing
 from .validation import filter_overlaps, upcase_labels

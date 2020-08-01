@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from types import SimpleNamespace
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
 from pydantic import BaseModel, Field, Schema, root_validator
@@ -16,6 +17,7 @@ class Span(BaseModel):
     label: str
     token_start: Optional[int]
     token_end: Optional[int]
+    kb_id: Optional[str]
 
     def __hash__(self) -> int:
         return cast(int, span_hash(self))
@@ -41,6 +43,10 @@ class Example(BaseModel):
     tokens: Optional[List[Token]]
     meta: Dict[str, Any] = {}
     formatted: bool = False
+    data: SimpleNamespace = SimpleNamespace() # Extra untyped data for each example
+
+    class Config():
+        arbitrary_types_allowed = True
 
     @root_validator(pre=True)
     def span_text_must_exist(cls, values: Dict[str, Any]) -> Dict[str, Any]:
@@ -66,6 +72,18 @@ class Example(BaseModel):
 
     def __hash__(self) -> int:
         return cast(int, tokenized_example_hash(self))
+
+    def dict(self, **kwargs: Any) -> Dict:
+        res = super().dict(**kwargs)
+        if 'data' in res:
+            del res['data']
+        return res
+
+
+class Entity(BaseModel):
+    id: Optional[str] = None
+    name: str
+    aliases: List[str]
 
 
 class TransformationType(str, Enum):
