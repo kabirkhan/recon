@@ -1,8 +1,7 @@
 from recon.dataset import Dataset
 from recon.operations import op_iter
-from recon.preprocess import SpacyPreProcessor
 from recon.tokenization import add_tokens
-from recon.types import Example, Span, Token
+from recon.types import Example, Span
 
 
 def test_fix_tokenization_and_spacing(spacy_preprocessor):

@@ -1,7 +1,6 @@
 import shutil
 from pathlib import Path
 
-import pytest
 from recon.corpus import Corpus
 from recon.dataset import Dataset
 from recon.stats import get_ner_stats

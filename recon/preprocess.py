@@ -1,10 +1,9 @@
 from collections import defaultdict
-from typing import Any, Callable, Dict, Iterable, Iterator, List
+from typing import Any, Callable, Dict, Iterable, List
 
 import catalogue
 import spacy
 from spacy.language import Language
-from spacy.tokens import Doc
 
 from .linker import BaseEntityLinker, EntityLinker
 from .types import Entity, Example

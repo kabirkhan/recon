@@ -2,8 +2,8 @@ from typing import cast
 
 import pytest
 from recon.stats import get_ner_stats
-from recon.types import Example, NERStats, Span, Token
-from recon.validation import filter_overlaps, upcase_labels
+from recon.types import Example, NERStats, Span
+from recon.validation import filter_overlaps
 
 
 @pytest.fixture()

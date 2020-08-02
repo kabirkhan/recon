@@ -3,7 +3,6 @@
 # -*- coding: utf-8 -*-
 import typer
 from pathlib import Path
-from typing import Callable
 
 from recon.corpus import Corpus
 from recon.stats import (
@@ -11,12 +10,7 @@ from recon.stats import (
     calculate_label_distribution_similarity,
     get_ner_stats,
 )
-from recon.types import Example, NERStats
 from wasabi import Printer
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import plotly.graph_objs as go
 
 from fastapi import FastAPI
 import uvicorn
@@ -46,7 +40,7 @@ def dashboard(data_dir: Path) -> None:
     corpus = Corpus.from_disk(data_dir)
     # msg.good("Done")
 
-    ner_stats = corpus.apply(get_ner_stats)
+    corpus.apply(get_ner_stats)
 
     # external_stylesheets = [
     #     "https://codepen.io/chriddyp/pen/bWLwgP.css",

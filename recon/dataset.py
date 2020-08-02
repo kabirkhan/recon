@@ -1,7 +1,6 @@
-import copy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Set, Tuple, Union, cast
+from typing import Any, Callable, Dict, List, Set, Union, cast
 
 import srsly
 from spacy.util import ensure_path
@@ -10,7 +9,6 @@ from wasabi import Printer
 from .hashing import dataset_hash
 from .loaders import read_json, read_jsonl
 from .operations import registry
-from .registry import loading_pipelines
 from .store import ExampleStore
 from .types import (
     DatasetOperationsState,

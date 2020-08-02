@@ -2,15 +2,12 @@
 the [Prodigy](https://prodi.gy) format.
 """
 
-import functools
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 import srsly
 
-from .operations import registry
-from .registry import loading_pipelines
-from .types import Example, OperationState, OperationStatus, Transformation
+from .types import Example
 
 
 def read_jsonl(path: Path) -> List[Example]:

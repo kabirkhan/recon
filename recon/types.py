@@ -3,9 +3,9 @@ from enum import Enum
 from types import SimpleNamespace
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
-from pydantic import BaseModel, Field, Schema, root_validator
+from pydantic import BaseModel, root_validator
 
-from .hashing import example_hash, span_hash, token_hash, tokenized_example_hash
+from .hashing import span_hash, token_hash, tokenized_example_hash
 
 
 class Span(BaseModel):
