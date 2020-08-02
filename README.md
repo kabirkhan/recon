@@ -8,7 +8,7 @@
 <a href="https://pypi.org/project/reconner" target="_blank">
     <img src="https://img.shields.io/pypi/v/reconner?style=for-the-badge" alt="PyPi Package version">
 </a>
-<a href="https://dev.azure.com/kabirkhan1137/ReconNER/_build" target="_blank">
+<a href="https://dev.azure.com/kabirkhan1137/ReconNER/_build?definitionId=4" target="_blank">
     <img alt="Azure Pipelines Build badge" src="https://img.shields.io/azure-devops/build/kabirkhan1137/ReconNER/kabirkhan.recon?style=for-the-badge">
 </a>
 <a href="https://codecov.io/gh/kabirkhan/recon" rel="nofollow">
