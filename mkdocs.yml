@@ -45,7 +45,6 @@ nav:
             - EntityRecognizer: 'api/recognizers/base.md'
             - SpacyEntityRecognizer: 'api/recognizers/spacy.md'
         - Types: 'api/types/example.md'
-    - Development - Contributing: 'contributing.md'
     - Release Notes: release-notes.md
 
 markdown_extensions:
