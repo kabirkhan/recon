@@ -27,6 +27,14 @@ a.internal-link::after {
     width: 100%
 }
 
+.md-typeset__table > table {
+    display: table
+}
+
+.md-typeset table:not([class]) {
+    display: table;
+}
+
 .md-typeset__table > table > thead {
     background-color: #546e7a
 }
