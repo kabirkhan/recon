@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 from recon.operations import operation
@@ -62,11 +62,14 @@ def substitute_spans(example: Example, span_subs: Dict[int, str]) -> Example:
     return example
 
 
-def augment_example(example: Example, span_f: Callable[[Span, Any], str], span_label: str = None, n_augs: int = 1, sub_prob: float = 0.5, **kwargs: Any) -> List[Example]:
-
-    print('=' * 100)
-    print(kwargs)
-    print('=' * 100)
+def augment_example(
+    example: Example,
+    span_f: Callable[[Span, Any], Optional[str]],
+    span_label: str = None,
+    n_augs: int = 1,
+    sub_prob: float = 0.5,
+    **kwargs: Any,
+) -> List[Example]:
 
     prev_example = example.copy(deep=True)
 
@@ -83,7 +86,7 @@ def augment_example(example: Example, span_f: Callable[[Span, Any], str], span_l
 
         span_subs = {}
         for span in spans_to_sub:
-            res = span_f(span, **kwargs)
+            res = span_f(span, **kwargs)  #  type: ignore
             if res:
                 span_subs[hash(span)] = res
 
@@ -119,18 +122,29 @@ def ent_label_sub(
     Returns:
         List[Example]: List of augmented examples including the original.
     """
-    def augmentation(span: Span, subs: List[str]) -> str:
-        return np.random.choice(subs)
+
+    def augmentation(span: Span, subs: List[str]) -> Optional[str]:
+        subs = [s for s in subs if s != span.text]
+        sub = None
+        if len(subs) > 0:
+            sub = np.random.choice(subs)
+        return sub
 
     return augment_example(example, augmentation, n_augs=n_augs, sub_prob=sub_prob, subs=subs)
 
 
 @operation("recon.v1.augment.kb_expansion", factory=True)
-def kb_expansion(example: Example, preprocessed_outputs: Dict[str, Any] = {}, n_augs: int = 1, sub_prob: float = 0.5):
+def kb_expansion(
+    example: Example,
+    preprocessed_outputs: Dict[str, Any] = {},
+    n_augs: int = 1,
+    sub_prob: float = 0.5,
+) -> List[Example]:
 
-    spans_to_aliases_map = preprocessed_outputs['recon.v1.span_aliases']
+    spans_to_aliases_map = preprocessed_outputs["recon.v1.span_aliases"]
 
-    def augmentation(span: Span, spans_to_aliases_map: Dict[int, List[str]]) -> Union[str, None]:
+    def augmentation(span: Span, spans_to_aliases_map: Dict[int, List[str]]) -> Optional[str]:
+        sub = None
         if hash(span) in spans_to_aliases_map:
             aliases = spans_to_aliases_map[hash(span)]
 
@@ -138,6 +152,14 @@ def kb_expansion(example: Example, preprocessed_outputs: Dict[str, Any] = {}, n_
                 rand_alias = np.random.choice(aliases)
                 index = aliases.index(rand_alias)
                 del spans_to_aliases_map[hash(span)][index]
-                return rand_alias
+                sub = rand_alias
 
-    return augment_example(example, augmentation, n_augs=n_augs, sub_prob=sub_prob, spans_to_aliases_map=spans_to_aliases_map)
+        return sub
+
+    return augment_example(
+        example,
+        augmentation,
+        n_augs=n_augs,
+        sub_prob=sub_prob,
+        spans_to_aliases_map=spans_to_aliases_map,
+    )

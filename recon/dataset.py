@@ -137,10 +137,8 @@ class Dataset:
                 operation = cast(Callable, operation)
 
         name = getattr(operation, "name", None)
-        if name is None or name not in registry.operations:
-            raise ValueError(
-                "This function is not an operation. Ensure your function is registered in the operations registry."
-            )
+        if not name:
+            raise ValueError("This function is not an operation since it does not have a name.")
 
         msg = Printer(no_print=self.verbose == False)
         msg.text(f"=> Applying operation '{name}' inplace")

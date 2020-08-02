@@ -43,9 +43,9 @@ class Example(BaseModel):
     tokens: Optional[List[Token]]
     meta: Dict[str, Any] = {}
     formatted: bool = False
-    data: SimpleNamespace = SimpleNamespace() # Extra untyped data for each example
+    data: SimpleNamespace = SimpleNamespace()  # Extra untyped data for each example
 
-    class Config():
+    class Config:
         arbitrary_types_allowed = True
 
     @root_validator(pre=True)
@@ -75,8 +75,8 @@ class Example(BaseModel):
 
     def dict(self, **kwargs: Any) -> Dict:
         res = super().dict(**kwargs)
-        if 'data' in res:
-            del res['data']
+        if "data" in res:
+            del res["data"]
         return res
 
 
