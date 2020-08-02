@@ -1,16 +1,11 @@
 # isort:skip_file
 # type: ignore
 
-from collections import Counter, defaultdict
 import copy
-import random
-from typing import Dict, Iterable, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
-import catalogue
 import prodigy
 from prodigy.components.db import connect
-from prodigy.components.loaders import get_stream
-from prodigy.components.preprocess import add_tokens
 from prodigy.recipes.ner import get_labels_from_ner
 from prodigy.util import (
     INPUT_HASH_ATTR,
@@ -21,11 +16,10 @@ from prodigy.util import (
     split_string,
 )
 import spacy
-import srsly
 from wasabi import msg
 from recon.constants import NONE
 from recon.dataset import Dataset
-from recon.operations import op_iter, operation, Operation
+from recon.operations import operation
 from recon.types import HardestExample, Example, Span
 from recon.validation import remove_overlapping_entities
 
@@ -51,7 +45,7 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
                     predicted_example = e.predicted
         if predicted_example:
             pthtml = []
-            predicted_example_task = predicted_example.dict()
+            predicted_example.dict()
 
             for token in predicted_example.tokens:
                 pthtml.append(f'<span class="recon-token">{token.text} </span>')

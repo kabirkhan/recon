@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Set, Union
+from typing import Dict, List, Union
 
 import srsly
 from spacy.util import ensure_path

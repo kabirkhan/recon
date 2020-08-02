@@ -1,12 +1,7 @@
-import copy
 from collections import defaultdict
-from typing import Any, Dict, List, Set, Tuple, Union
+from typing import Any, Dict, Union
 
-from spacy.language import Language
-
-from .dataset import Dataset
-from .operations import op_iter, operation
-from .registry import tokenizers
+from .operations import operation
 from .types import (
     Example,
     OperationState,
@@ -107,8 +102,8 @@ def fix_tokenization_and_spacing(
         else:
             # Something is super messed up.
             print("SPAN CORRECTED OFF BY 1 unfixable", example.text, span)
-            before = span.start
-            after = span.end
+            span.start
+            span.end
             # tokenization_errors.append((example, span))
 
             # if (before >= 0 and after < len(span.text) and span[before] not in token_starts and span[before] != ' ' and span[after] not in token_ends and span[after] != ' '):

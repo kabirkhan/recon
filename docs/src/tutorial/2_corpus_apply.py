@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import srsly
 import typer
 from recon.dataset import Dataset
 from recon.stats import get_ner_stats

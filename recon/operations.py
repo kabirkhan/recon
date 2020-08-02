@@ -1,15 +1,12 @@
-import functools
 import warnings
 from collections import Counter, defaultdict
-from copy import deepcopy
-from inspect import isclass
-from typing import Any, Callable, Dict, Iterator, List, Set, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Tuple, Union
 
 import catalogue
-import srsly
 from wasabi import Printer
 
-from .preprocess import PreProcessor, registry as pre_registry
+from .preprocess import PreProcessor
+from .preprocess import registry as pre_registry
 from .types import (
     Example,
     OperationResult,

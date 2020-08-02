@@ -1,13 +1,6 @@
-import copy
 from collections import defaultdict
-from pathlib import Path
-from typing import DefaultDict, Dict, Generator, List, Set, Union
+from typing import DefaultDict, Dict, List, Set
 
-import spacy
-import srsly
-from spacy.language import Language
-from spacy.scorer import Scorer
-from tqdm import tqdm, tqdm_notebook
 from wasabi import Printer
 
 from .constants import NONE
@@ -143,11 +136,11 @@ def top_prediction_errors(
         List[PredictionError]: List of Prediction Errors your model is making, sorted by the
             spans your model has the most trouble with.
     """
-    labels_ = labels or recognizer.labels
+    labels or recognizer.labels
     if n is not None:
         data = data[:n]
 
-    n_examples = len(data)
+    len(data)
     texts = (e.text for e in data)
     anns = (e.spans for e in data)
 

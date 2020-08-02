@@ -1,10 +1,10 @@
 import math
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Set, Union, cast
+from typing import Any, DefaultDict, Dict, List, Sequence, Union, cast
 
 import numpy as np
 import srsly
-from scipy.spatial.distance import jaccard, jensenshannon
+from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy as scipy_entropy
 
 from .constants import NONE

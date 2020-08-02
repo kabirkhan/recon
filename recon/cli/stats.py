@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, cast
+from typing import cast
 
 from recon.corpus import Corpus
 from recon.stats import (
@@ -7,7 +7,7 @@ from recon.stats import (
     calculate_label_distribution_similarity,
     get_ner_stats,
 )
-from recon.types import Example, NERStats
+from recon.types import NERStats
 from wasabi import Printer
 
 

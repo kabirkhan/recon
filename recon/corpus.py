@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union
 
 import srsly
 from spacy.util import ensure_path
 
 from .dataset import Dataset
-from .loaders import read_json, read_jsonl
+from .loaders import read_jsonl
 from .store import ExampleStore
 from .types import (
     CorpusApplyResult,
@@ -210,7 +210,7 @@ class Corpus:
         try:
             test = Dataset("test", example_store=example_store).from_disk(data_dir)
             corpus = cls(name, train, dev, test=test)
-        except ValueError as e:
+        except ValueError:
             corpus = cls(name, train, dev)
         return corpus
 

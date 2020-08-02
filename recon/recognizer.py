@@ -1,6 +1,5 @@
 from typing import Dict, Iterable, Iterator, List, Set, Tuple
 
-import srsly
 from spacy.language import Language
 from spacy.scorer import Scorer
 from wasabi import Printer

@@ -3,11 +3,10 @@ from typing import Dict, List
 
 import pytest
 from recon.corpus import Corpus
-from recon.dataset import Dataset
 from recon.loaders import read_jsonl
 from recon.preprocess import SpacyPreProcessor
 from recon.recognizer import SpacyEntityRecognizer
-from recon.types import Example, TransformationCallbacks
+from recon.types import Example
 from spacy.lang.en import English
 
 

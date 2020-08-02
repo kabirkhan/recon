@@ -1,15 +1,12 @@
 """Make corrections to your data."""
 
-import copy
-from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, cast
+from typing import Any, Dict, List, cast
 
-import spacy
-from spacy.tokens import Doc as SpacyDoc, Span as SpacySpan
+from spacy.tokens import Span as SpacySpan
 from wasabi import msg
 
 from .operations import operation
-from .types import Correction, Example, Span, Token, TransformationCallbacks
+from .types import Correction, Example, Span, Token
 
 
 @operation("recon.v1.rename_labels")
@@ -149,7 +146,7 @@ def strip_annotations(
         Example: Example with stripped spans
     """
 
-    doc = preprocessed_outputs["recon.v1.spacy"]
+    preprocessed_outputs["recon.v1.spacy"]
 
     def fix_tokens(example: Example, span: Span) -> bool:
         fix_tokens = example.tokens and any(example.tokens)

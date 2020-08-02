@@ -3,7 +3,7 @@ from typing import Iterable, Iterator
 
 from spacy.kb import KnowledgeBase
 
-from .types import Example, Span
+from .types import Example
 
 
 class BaseEntityLinker(ABC):

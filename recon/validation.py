@@ -1,11 +1,7 @@
-from collections import defaultdict
-from copy import deepcopy
-from typing import Any, Dict, List, Set, Tuple
-
-from spacy.language import Language
+from typing import List
 
 from .operations import operation
-from .types import Example, Span, TransformationCallbacks
+from .types import Example, Span
 
 
 @operation("recon.v1.upcase_labels")
