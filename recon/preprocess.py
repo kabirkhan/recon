@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Callable, Dict, Iterable, List
+from typing import Any, Callable, Dict, Iterable, Iterator, List
 
 import catalogue
 import spacy
@@ -60,7 +60,7 @@ class PreProcessor(object):
     def field(self) -> str:
         return self._field
 
-    def __call__(self, data: List[Example]) -> Iterable[Any]:
+    def __call__(self, data: Iterable[Example]) -> Iterable[Any]:
         raise NotImplementedError
 
     def register(self) -> None:
@@ -68,7 +68,9 @@ class PreProcessor(object):
 
 
 class SpacyPreProcessor(PreProcessor):
-    def __init__(self, nlp: Language = None, name: str = "recon.v1.spacy", field: str = "doc") -> None:
+    def __init__(
+        self, nlp: Language = None, name: str = "recon.v1.spacy", field: str = "doc"
+    ) -> None:
         super().__init__(name, field)
         self._nlp = nlp
 
@@ -79,7 +81,7 @@ class SpacyPreProcessor(PreProcessor):
             self._nlp.add_pipe(self._nlp.create_pipe("sentencizer"))
         return self._nlp
 
-    def __call__(self, data: List[Example]) -> Iterable[Any]:
+    def __call__(self, data: Iterable[Example]) -> Iterable[Any]:
         unseen_texts = (e.text for i, e in enumerate(data) if hash(e) not in self._cache)
         seen_texts = ((i, e.text) for i, e in enumerate(data) if hash(e) in self._cache)
 
@@ -93,8 +95,13 @@ class SpacyPreProcessor(PreProcessor):
 
 
 class SpanAliasesPreProcessor(PreProcessor):
-
-    def __init__(self, entities: List[Entity], name: str = "recon.v1.span_aliases", field: str = "aliases", linker: BaseEntityLinker = EntityLinker()):
+    def __init__(
+        self,
+        entities: List[Entity],
+        name: str = "recon.v1.span_aliases",
+        field: str = "aliases",
+        linker: BaseEntityLinker = EntityLinker(),
+    ):
         super().__init__(name, field)
         self.entities = entities
         self.ents_to_aliases = defaultdict(list)
@@ -106,7 +113,7 @@ class SpanAliasesPreProcessor(PreProcessor):
 
         self.linker = linker
 
-    def __call__(self, data: List[Example]) -> Iterable[Any]:
+    def __call__(self, data: Iterable[Example]) -> Iterable[Any]:
         outputs = []
 
         data = self.linker(data)

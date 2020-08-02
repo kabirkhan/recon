@@ -57,7 +57,11 @@ def op_iter(
 
 class operation:
     def __init__(
-        self, name: str, pre: List[Union[str, PreProcessor]] = [], handles_tokens: bool = True, factory: bool = False
+        self,
+        name: str,
+        pre: List[Union[str, PreProcessor]] = [],
+        handles_tokens: bool = True,
+        factory: bool = False,
     ):
         """Decorate an operation that makes some changes to a dataset.
 
@@ -99,11 +103,15 @@ class operation:
             pre.append(preprocessor)
 
         if self.factory:
-            def factory(name: str, pre: List[PreProcessor]) -> Operation:
-                return Operation(name, pre, op=op, handles_tokens = self.handles_tokens)
+
+            def factory(pre: List[PreProcessor]) -> Operation:
+                return Operation(self.name, pre, op=op, handles_tokens=self.handles_tokens)
+
             registry.operation_factories.register(self.name)(factory)
         else:
-            registry.operations.register(self.name)(Operation(self.name, pre, op, self.handles_tokens))
+            registry.operations.register(self.name)(
+                Operation(self.name, pre, op, self.handles_tokens)
+            )
 
         return op
 
@@ -223,3 +231,6 @@ class Operation:
         state_copy = state.copy(deep=True)
         state = OperationState(name=self.name)
         return OperationResult(data=new_data, state=state_copy)
+
+    def register(self) -> None:
+        registry.operations.register(self.name)(self)
