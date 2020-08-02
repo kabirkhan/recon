@@ -57,9 +57,9 @@ test = [
     "isort"
 ]
 doc = [
-    "mkdocs",
-    "mkdocs-material",
-    "markdown-include",
+    "mkdocs >=1.1.2,<2.0.0",
+    "mkdocs-material >=5.4.0,<6.0.0",
+    "markdown-include >=0.5.1,<0.6.0",
     "mkdocstrings"
 ]
 all = [
