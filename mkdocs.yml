@@ -7,6 +7,8 @@ theme:
     palette:
         primary: 'blue'
         accent: 'blue'
+    # icon:
+    #     repo: fontawesome/brands/github-alt
     logo: 'img/drone-white.svg'
     favicon: 'img/favicon.ico'
     custom_dir: docs/overrides
@@ -65,14 +67,12 @@ markdown_extensions:
 plugins:
   - mkdocstrings
 
-extra:
-    social:
-        - type: 'github'
-          link: 'https://github.com/kabirkhan/recon'
-          icon: 'img/drone-white.svg'
-        - type: 'twitter'
-          link: 'https://twitter.com/kabir_khan14'
-          icon: 'img/drone-white.svg'
+# extra:
+#     social:
+#         - icon: fontawesome/brands/github-alt
+#           link: 'https://github.com/kabirkhan/recon'
+#         - icon: 'fontawesome/brands/twitter'
+#           link: 'https://twitter.com/kabir_khan14'
 
 extra_css:
     - 'css/termynal.css'
