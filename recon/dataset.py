@@ -139,7 +139,7 @@ class Dataset:
             raise ValueError("This function is not an operation since it does not have a name.")
 
         msg = Printer(no_print=self.verbose == False)
-        msg.text(f"=> Applying operation '{name}' inplace")
+        msg.text(f"=> Applying operation '{name}' to dataset '{self.name}'")
         result: OperationResult = operation(self, *args, initial_state=initial_state, verbose=self.verbose, **kwargs)  # type: ignore
         msg.good(f"Completed operation '{name}'")
 
