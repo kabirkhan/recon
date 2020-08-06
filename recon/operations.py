@@ -3,6 +3,7 @@ from collections import Counter, defaultdict
 from typing import Any, Callable, Dict, Iterator, List, Tuple, Union
 
 import catalogue
+from tqdm import tqdm
 from wasabi import Printer
 
 from .preprocess import PreProcessor
@@ -40,13 +41,13 @@ def op_iter(
     msg = Printer(no_print=verbose == False, hide_animation=verbose == False)
     preprocessed_outputs: Dict[Example, Dict[str, Any]] = defaultdict(dict)
     for processor in pre:
-        with msg.loading(f"\t=> Running preprocessor {processor.name}..."):
-            processor_outputs = list(processor(data))
-            msg.good("Done")
-
-        for i, (example, output) in enumerate(zip(data, processor_outputs)):
-            preprocessed_outputs[example][processor.name] = processor_outputs[i]
-            example.data.__setattr__(processor.field, processor_outputs[i])
+        msg.info(f"\t=> Running preprocessor {processor.name}")
+        processor_outputs = processor(data)
+        for example, output in tqdm(
+            zip(data, processor_outputs), total=len(data), disable=(not verbose), leave=False
+        ):
+            preprocessed_outputs[example][processor.name] = output
+            example.data.__setattr__(processor.field, output)
 
     for example in data:
         yield hash(example), example.copy(deep=True), preprocessed_outputs[example]
@@ -192,31 +193,33 @@ class Operation:
             )
 
         new_data = []
-        for orig_example_hash, example, preprocessed_outputs in op_iter(
-            dataset.data, self.pre, verbose=verbose
-        ):
-            if preprocessed_outputs:
-                res = self.op(example, *args, preprocessed_outputs=preprocessed_outputs, **kwargs)
-            else:
-                res = self.op(example, *args, **kwargs)
 
-            if res is None:
-                remove_example(orig_example_hash)
-            elif isinstance(res, list):
-                old_example_present = False
-                for new_example in res:
-                    new_data.append(new_example)
-                    if hash(new_example) == orig_example_hash:
-                        old_example_present = True
-                    else:
-                        add_example(new_example)
-                if not old_example_present:
+        with tqdm(total=len(dataset), disable=(not verbose)) as pbar:
+            for orig_example_hash, example, preprocessed_outputs in op_iter(dataset.data, self.pre, verbose=verbose):
+                if preprocessed_outputs:
+                    res = self.op(example, *args, preprocessed_outputs=preprocessed_outputs, **kwargs)
+                else:
+                    res = self.op(example, *args, **kwargs)
+
+                if res is None:
                     remove_example(orig_example_hash)
-            else:
-                assert isinstance(res, Example)
-                new_data.append(res)
-                if hash(res) != orig_example_hash:
-                    change_example(orig_example_hash, res)
+                elif isinstance(res, list):
+                    old_example_present = False
+                    for new_example in res:
+                        new_data.append(new_example)
+                        if hash(new_example) == orig_example_hash:
+                            old_example_present = True
+                        else:
+                            add_example(new_example)
+                    if not old_example_present:
+                        remove_example(orig_example_hash)
+                else:
+                    assert isinstance(res, Example)
+                    new_data.append(res)
+                    if hash(res) != orig_example_hash:
+                        change_example(orig_example_hash, res)
+
+                pbar.update(1)
 
         transformation_counts = Counter([t.type for t in state.transformations])
 
