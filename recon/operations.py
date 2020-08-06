@@ -60,6 +60,7 @@ class operation:
         pre: List[Union[str, PreProcessor]] = [],
         handles_tokens: bool = True,
         factory: bool = False,
+        augmentation: bool = False
     ):
         """Decorate an operation that makes some changes to a dataset.
 
@@ -71,6 +72,7 @@ class operation:
         self.pre = pre
         self.handles_tokens = handles_tokens
         self.factory = factory
+        self.augmentation = augmentation
 
     def __call__(self, *args: Any, **kwargs: Any) -> Callable:
         """Decorator for an operation.
@@ -103,12 +105,12 @@ class operation:
         if self.factory:
 
             def factory(pre: List[PreProcessor]) -> Operation:
-                return Operation(self.name, pre, op=op, handles_tokens=self.handles_tokens)
+                return Operation(self.name, pre, op=op, handles_tokens=self.handles_tokens, augmentation=self.augmentation)
 
             registry.operation_factories.register(self.name)(factory)
         else:
             registry.operations.register(self.name)(
-                Operation(self.name, pre, op, self.handles_tokens)
+                Operation(self.name, pre, op, self.handles_tokens, augmentation=self.augmentation)
             )
 
         return op
@@ -118,7 +120,7 @@ class Operation:
     """Operation class that takes care of calling and reporting
     the results of an operation on a Dataset"""
 
-    def __init__(self, name: str, pre: List[PreProcessor], op: Callable, handles_tokens: bool):
+    def __init__(self, name: str, pre: List[PreProcessor], op: Callable, handles_tokens: bool, augmentation: bool):
         """Initialize an Operation instance
 
         Args:
@@ -130,6 +132,7 @@ class Operation:
         self.pre = pre
         self.op = op
         self.handles_tokens = handles_tokens
+        self.augmentation = augmentation
 
     def __call__(self, dataset: Any, *args: Any, **kwargs: Any) -> OperationResult:
         """Runs op on a dataset and records the results
@@ -143,8 +146,8 @@ class Operation:
         Returns:
             OperationResult: Container holding new data and the state of the Operation
         """
-        initial_state = kwargs.pop("initial_state") if "initial_state" in kwargs else None
-        verbose = kwargs.pop("verbose") if "verbose" in kwargs else None
+        verbose = kwargs.pop("verbose", False)
+        initial_state = kwargs.pop("initial_state", None)
         if not initial_state:
             initial_state = OperationState(name=self.name)
         state = initial_state.copy(deep=True)

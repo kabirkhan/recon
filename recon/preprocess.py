@@ -9,6 +9,9 @@ from .linker import BaseEntityLinker, EntityLinker
 from .types import Entity, Example
 
 
+from snorkel.preprocess import Preprocessor as SnorkelPreprocessor
+
+
 class registry:
     preprocessors = catalogue.create("recon", "preprocessors", entry_points=True)
 
@@ -44,16 +47,16 @@ class preprocessor:
         return op
 
 
-class PreProcessor(object):
+class PreProcessor(SnorkelPreprocessor):
     def __init__(self, name: str, field: str) -> None:
-        super().__init__()
-        self._name = name
+        super().__init__(name, field_names={"text": "text"}, mapped_field_names={field: field})
+        # self._name = name
         self._field = field
         self._cache: Dict[Any, Any] = {}
 
-    @property
-    def name(self) -> str:
-        return self._name
+    # @property
+    # def name(self) -> str:
+    #     return self._name
 
     @property
     def field(self) -> str:
