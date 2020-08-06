@@ -85,6 +85,36 @@ def test_apply_(example_data):
         assert t.type == TransformationType.EXAMPLE_CHANGED
 
 
+def test_rollback(example_data):
+    train_dataset = Dataset("train", example_data["train"])
+    ner_stats_pre: NERStats = cast(NERStats, train_dataset.apply(get_ner_stats))
+
+    assert len(train_dataset.operations) == 0
+
+    train_dataset.apply_("recon.v1.upcase_labels")
+
+    ner_stats_post: NERStats = cast(NERStats, train_dataset.apply(get_ner_stats))
+
+    pre_keys = sorted(ner_stats_pre.n_annotations_per_type.keys())
+    post_keys = sorted(ner_stats_post.n_annotations_per_type.keys())
+
+    assert pre_keys != post_keys
+
+    assert pre_keys == ["JOB_ROLE", "PRODUCT", "SKILL", "product", "skill"]
+    assert post_keys == ["JOB_ROLE", "PRODUCT", "SKILL"]
+
+    assert len(train_dataset.operations) == 1
+
+    train_dataset.rollback()
+
+    assert len(train_dataset.operations) == 0
+
+    ner_stats_rolled_back: NERStats = cast(NERStats, train_dataset.apply(get_ner_stats))
+    rolled_back_keys = sorted(ner_stats_rolled_back.n_annotations_per_type.keys())
+
+    assert pre_keys == rolled_back_keys
+
+
 def test_dataset_to_from_disk(example_data, tmp_path):
 
     train_dataset = Dataset("train", example_data["train"])

@@ -3,7 +3,7 @@ from enum import Enum
 from types import SimpleNamespace
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, Extra, root_validator
 
 from .hashing import span_hash, token_hash, tokenized_example_hash
 
@@ -43,10 +43,9 @@ class Example(BaseModel):
     tokens: Optional[List[Token]]
     meta: Dict[str, Any] = {}
     formatted: bool = False
-    data: SimpleNamespace = SimpleNamespace()  # Extra untyped data for each example
 
     class Config:
-        arbitrary_types_allowed = True
+        extra = Extra.allow
 
     @root_validator(pre=True)
     def span_text_must_exist(cls, values: Dict[str, Any]) -> Dict[str, Any]:
