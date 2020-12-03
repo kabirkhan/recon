@@ -234,6 +234,26 @@ class Dataset:
         for e in examples_to_remove:
             del self.example_store._map[e]
 
+    def search(self, search_query: str, case_sensitive: bool = True) -> List[Example]:
+        """Naive search method to quickly identify examples matching the provided substring
+
+        Args:
+            search_query (str): Substring to search each example for
+            case_sensitive (bool, optional): Consider case of search query and example text
+
+        Returns:
+            List[Example]: Matched examples
+        """        
+        search_query = search_query if case_sensitive else search_query.lower()
+        out_examples = []
+
+        for example in self.data:
+            example_text = example.text if case_sensitive else example.text.lower()
+            if search_query in example_text:
+                out_examples.append(example)
+
+        return out_examples
+
     def from_disk(self, path: Path, loader_func: Callable = read_jsonl) -> "Dataset":        
         """Load Dataset from disk given a path and a loader function that reads the data
         and returns an iterator of Examples
