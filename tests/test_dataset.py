@@ -115,6 +115,16 @@ def test_rollback(example_data):
     assert pre_keys == rolled_back_keys
 
 
+def test_dataset_search(example_data):
+    train_dataset = Dataset("train", example_data["train"])
+
+    assert len(train_dataset.search("kotlin")) == 0
+    assert len(train_dataset.search("Kotlin")) == 1
+    assert len(train_dataset.search("kotlin", case_sensitive = False)) == 1
+    assert len(train_dataset.search("Software")) == 2
+    assert len(train_dataset.search("Software", case_sensitive=False)) == 4
+
+
 def test_dataset_to_from_disk(example_data, tmp_path):
 
     train_dataset = Dataset("train", example_data["train"])
