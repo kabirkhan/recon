@@ -71,7 +71,7 @@ class Example(BaseModel):
     def __hash__(self) -> int:
         return cast(int, tokenized_example_hash(self))
 
-    def __eq__(self, other: "Example") -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Example):
             return self.dict() == other.dict()
         return False
