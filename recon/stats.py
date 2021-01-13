@@ -22,14 +22,14 @@ def get_ner_stats(
     data: List[Example], serialize: bool = False, return_examples: bool = False
 ) -> Union[NERStats, str, None]:
     """Compute statistics for NER data
-    
+
     Args:
         data (List[Example]): Data as a List of examples
         serialize (bool, optional): Serialize to a JSON string for printing.
         return_examples (bool, optional): Whether to return examples per type
-    
+
     Returns:
-        Union[NERStats, str, None]: 
+        Union[NERStats, str, None]:
             List of examples or string if serialize and no_print are both True
     """
     annotations_per_type: DefaultDict[str, Any] = defaultdict(int)
@@ -64,12 +64,12 @@ def get_ner_stats(
 
 
 def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
-    """Get list of counts for each type in n_annotations_per_type property 
+    """Get list of counts for each type in n_annotations_per_type property
     of an NERStats object sorted by type name
-    
+
     Args:
         ner_stats (NERStats): Dataset stats
-    
+
     Returns:
         List[int]: List of counts sorted by type name
     """
@@ -81,7 +81,7 @@ def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
 
 def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) -> float:
     """Calculate the similarity of the label distribution for 2 datasets.
-    
+
     e.g. This can help you understand how well your train set models your dev and test sets.
     Empircally you want a similarity over **0.8** when comparing your train set to each of your
     dev and test sets.
@@ -91,11 +91,11 @@ def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) 
 
         calculate_label_distribution_similarity(corpus.train, corpus.test)
         # 73.29 - This is bad, let's investigate our test set more
-    
+
     Args:
         x (List[Example]): Dataset
         y (List[Example]): Dataset to compare x to
-    
+
     Returns:
         float: Similarity of label distributions
     """
@@ -121,14 +121,14 @@ def get_entity_coverage(
     on the how many times certain text/label span combinations exist across your
     data so that you can focus your annotation efforts better rather than
     annotating examples your Model already understands well.
-    
+
     Args:
         data (List[Example]): List of examples
         sep (str, optional): Separator used in coverage map, only change if || exists in your text
             or label.
         case_sensitive (bool, optional): Consider case of text for each annotation
         return_examples (bool, optional): Return Examples that contain the entity label annotation.
-    
+
     Returns:
         List[EntityCoverage]: Sorted List of EntityCoverage objects containing the text, label, count, and
             an optional list of examples where that text/label annotation exists.
@@ -159,16 +159,16 @@ def calculate_entity_coverage_similarity(x: List[Example], y: List[Example]) -> 
     """Calculate how well dataset x covers the entities in dataset y.
     This function should be used to calculate how similar your train set
     annotations cover the annotations in your dev/test set
-    
+
     Args:
         x (List[Example]): Dataset to compare coverage to (usually corpus.train)
         y (List[Example]): Dataset to evaluate coverage for (usually corpus.dev or corpus.test)
-    
+
     Returns:
-        EntityCoverageStats: Stats with 
+        EntityCoverageStats: Stats with
             1. The base entity coverage (does entity in y exist in x)
-            2. Count coverage (sum of the EntityCoverage.count property for 
-            each EntityCoverage in y to get a more holisic coverage scaled by how 
+            2. Count coverage (sum of the EntityCoverage.count property for
+            each EntityCoverage in y to get a more holisic coverage scaled by how
             often entities occur in each dataset x and y)
     """
 
@@ -192,17 +192,18 @@ def calculate_entity_coverage_similarity(x: List[Example], y: List[Example]) -> 
         count_union += count
 
     return EntityCoverageStats(
-        entity=(n_intersection / n_union) * 100, count=(count_intersection / count_union) * 100,
+        entity=(n_intersection / n_union) * 100,
+        count=(count_intersection / count_union) * 100,
     )
 
 
 def get_probs_from_counts(seq: Sequence[int]) -> Sequence[float]:
     """Convert a sequence of counts to a sequence of probabilties
     by dividing each n by the sum of all n in seq
-    
+
     Args:
         seq (Sequence[int]): Sequence of counts
-    
+
     Returns:
         Sequence[float]: Sequence of probabilities
     """
@@ -213,14 +214,14 @@ def entropy(seq: Union[List[int], List[float]], total: int = None) -> float:
     """Calculate Shannon Entropy for a sequence of Floats or Integers.
     If Floats, check they are probabilities
     If Integers, divide each n in seq by total and calculate entropy
-    
+
     Args:
         seq (Union[List[int], List[float]]): Sequence to calculate entropy for
         total (int, optional): Total to divide by for List of int
-    
+
     Raises:
         ValueError: If seq is not valid
-    
+
     Returns:
         float: Entropy for sequence
     """
@@ -237,11 +238,11 @@ def entropy(seq: Union[List[int], List[float]], total: int = None) -> float:
 
 
 def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
-    """Use Entropy to calculate a metric for label balance based on an NERStats object 
-    
+    """Use Entropy to calculate a metric for label balance based on an NERStats object
+
     Args:
         ner_stats (NERStats): NERStats for a dataset.
-    
+
     Returns:
         float: Entropy for annotation counts of each label
     """
@@ -250,13 +251,15 @@ def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
     return entropy(classes, total)
 
 
-def calculate_entity_coverage_entropy(entity_coverage: List[EntityCoverage],) -> float:
+def calculate_entity_coverage_entropy(
+    entity_coverage: List[EntityCoverage],
+) -> float:
     """Use Entropy to calculate a metric for entity coverage.
-    
+
     Args:
-        entity_coverage (List[EntityCoverage]): List of EntityCoverage 
+        entity_coverage (List[EntityCoverage]): List of EntityCoverage
             from get_entity_coverage
-    
+
     Returns:
         float: Entropy for entity coverage counts
     """
@@ -266,11 +269,11 @@ def calculate_entity_coverage_entropy(entity_coverage: List[EntityCoverage],) ->
 
 def detect_outliers(seq: Sequence[Any], use_log: bool = False) -> Outliers:
     """Detect outliers in a numerical sequence.
-    
+
     Args:
         seq (Sequence[Any]): Sequence of ints or floats
         use_log (bool, optional): Use logarithm of seq.
-    
+
     Returns:
         Tuple[List[int], List[int]]: Tuple of low and high indices
     """

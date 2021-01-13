@@ -189,7 +189,7 @@ class Dataset:
 
     def rollback(self, n: int = 1) -> None:
         """Rollback the last n operations on a dataset.
-        
+
         e.g.
             ```
             ds = Dataset("name", data)

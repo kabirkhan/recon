@@ -7,10 +7,10 @@ from .types import Example, Span
 @operation("recon.v1.upcase_labels")
 def upcase_labels(example: Example) -> Example:
     """Convert all span labels to uppercase to normalize
-    
+
     Args:
         example (Example): Input Example
-    
+
     Returns:
         Example: Example with fixed labels
     """
@@ -22,10 +22,10 @@ def upcase_labels(example: Example) -> Example:
 @operation("recon.v1.filter_overlaps")
 def filter_overlaps(example: Example) -> Example:
     """Filter overlapping entity spans by picking the longest one.
-    
+
     Args:
         example (Example): Input Example
-    
+
     Returns:
         List[Example]: Example with fixed overlaps
     """
