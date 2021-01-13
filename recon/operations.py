@@ -47,7 +47,7 @@ def op_iter(
             zip(data, processor_outputs), total=len(data), disable=(not verbose), leave=False
         ):
             preprocessed_outputs[example][processor.name] = output
-            example.data.__setattr__(processor.field, output)
+            example.__setattr__(processor.field, output)
 
     for example in data:
         yield hash(example), example.copy(deep=True), preprocessed_outputs[example]
@@ -60,7 +60,7 @@ class operation:
         pre: List[Union[str, PreProcessor]] = [],
         handles_tokens: bool = True,
         factory: bool = False,
-        augmentation: bool = False
+        augmentation: bool = False,
     ):
         """Decorate an operation that makes some changes to a dataset.
 
@@ -105,7 +105,13 @@ class operation:
         if self.factory:
 
             def factory(pre: List[PreProcessor]) -> Operation:
-                return Operation(self.name, pre, op=op, handles_tokens=self.handles_tokens, augmentation=self.augmentation)
+                return Operation(
+                    self.name,
+                    pre,
+                    op=op,
+                    handles_tokens=self.handles_tokens,
+                    augmentation=self.augmentation,
+                )
 
             registry.operation_factories.register(self.name)(factory)
         else:
@@ -120,7 +126,14 @@ class Operation:
     """Operation class that takes care of calling and reporting
     the results of an operation on a Dataset"""
 
-    def __init__(self, name: str, pre: List[PreProcessor], op: Callable, handles_tokens: bool, augmentation: bool):
+    def __init__(
+        self,
+        name: str,
+        pre: List[PreProcessor],
+        op: Callable,
+        handles_tokens: bool,
+        augmentation: bool,
+    ):
         """Initialize an Operation instance
 
         Args:
@@ -198,9 +211,13 @@ class Operation:
         new_data = []
 
         with tqdm(total=len(dataset), disable=(not verbose)) as pbar:
-            for orig_example_hash, example, preprocessed_outputs in op_iter(dataset.data, self.pre, verbose=verbose):
+            for orig_example_hash, example, preprocessed_outputs in op_iter(
+                dataset.data, self.pre, verbose=verbose
+            ):
                 if preprocessed_outputs:
-                    res = self.op(example, *args, preprocessed_outputs=preprocessed_outputs, **kwargs)
+                    res = self.op(
+                        example, *args, preprocessed_outputs=preprocessed_outputs, **kwargs
+                    )
                 else:
                     res = self.op(example, *args, **kwargs)
 
