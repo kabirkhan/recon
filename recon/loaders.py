@@ -12,10 +12,10 @@ from .types import Example
 
 def read_jsonl(path: Path) -> List[Example]:
     """Read annotations in JSONL file format
-    
+
     Args:
         path (Path): Path to data
-    
+
     Returns:
         List[Example]: List of examples
     """
@@ -26,10 +26,10 @@ def read_jsonl(path: Path) -> List[Example]:
 
 def read_json(path: Path) -> List[Example]:
     """Read annotations in JSON file format
-    
+
     Args:
         path (Path): Path to data
-    
+
     Returns:
         List[Example]: List of examples
     """
@@ -40,10 +40,10 @@ def read_json(path: Path) -> List[Example]:
 
 def json_to_examples(data: List[Dict[str, Any]]) -> List[Example]:
     """Convert List of Dicts to List of typed Examples
-    
+
     Args:
         data (List[Dict[str, Any]]): Input List of Dicts to convert
-    
+
     Returns:
         List[Example]: List of typed Examples
     """
