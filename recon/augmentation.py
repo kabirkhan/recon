@@ -84,7 +84,7 @@ def augment_example(
 ) -> List[Example]:
 
     if spans is None:
-        spans = example.spans
+        spans = example.copy(deep=True).spans
 
     augmented_examples = {example}
 
