@@ -232,7 +232,7 @@ class Corpus:
             if not state_dir.exists():
                 state_dir.mkdir(parents=True, exist_ok=True)
 
-        srsly.write_json(corpus_meta_path, CorpusMeta(name=self.name))
+        srsly.write_json(corpus_meta_path, CorpusMeta(name=self.name).dict())
         self._train.to_disk(data_dir, force=force, save_examples=False)
         self._dev.to_disk(data_dir, force=force, save_examples=False)
         if self._test:
