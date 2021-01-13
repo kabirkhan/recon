@@ -120,7 +120,7 @@ def test_dataset_search(example_data):
 
     assert len(train_dataset.search("kotlin")) == 0
     assert len(train_dataset.search("Kotlin")) == 1
-    assert len(train_dataset.search("kotlin", case_sensitive = False)) == 1
+    assert len(train_dataset.search("kotlin", case_sensitive=False)) == 1
     assert len(train_dataset.search("Software")) == 2
     assert len(train_dataset.search("Software", case_sensitive=False)) == 4
 

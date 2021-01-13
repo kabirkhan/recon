@@ -1,6 +1,5 @@
 from datetime import datetime
 from enum import Enum
-from types import SimpleNamespace
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
 from pydantic import BaseModel, Extra, root_validator
