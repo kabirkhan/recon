@@ -27,7 +27,7 @@ class ExampleStore:
 
     def __contains__(self, example: Union[int, Example]) -> bool:
         """Check whether a string is in the store.
-        
+
         Args:
             example (Union[int, Example]): The example to check
 
@@ -39,7 +39,7 @@ class ExampleStore:
 
     def add(self, example: Example) -> None:
         """Add an Example to the store
-        
+
         Args:
             example (Example): example to add
         """
@@ -51,7 +51,7 @@ class ExampleStore:
 
         Args:
             path (Path): Path to file to load from
-        
+
         Returns:
             ExampleStore: Initialized ExampleStore
         """
@@ -68,7 +68,7 @@ class ExampleStore:
 
     def to_disk(self, path: Path) -> None:
         """Save store to disk
-        
+
         Args:
             path (Path): Path to save store to
         """

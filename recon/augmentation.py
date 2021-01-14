@@ -1,7 +1,5 @@
 from typing import Any, Callable, Dict, List, Optional
 
-import nltk
-from nltk.corpus import wordnet as wn
 import numpy as np
 from recon.operations import operation
 from recon.types import Example, Span
@@ -33,13 +31,13 @@ def substitute_spans(example: Example, span_subs: Dict[Span, str]) -> Example:
 
     new_example_text = example.text
     new_example_spans = []
-    
+
     prev_example_spans = {hash(span) for span in example.spans}
     spans = sorted(set(list(span_subs.keys()) + example.spans), key=lambda s: s.start)
-        
+
     for span in spans:
         should_add_span = hash(span) in prev_example_spans
-        
+
         prev_end = span.end
         new_text = span.text
 
@@ -57,7 +55,7 @@ def substitute_spans(example: Example, span_subs: Dict[Span, str]) -> Example:
             span.text = new_text
             span.start = new_start
             span.end = new_end
-            
+
             span_sub_start_counter += new_end - prev_end
         else:
             span.start += span_sub_start_counter
@@ -65,14 +63,15 @@ def substitute_spans(example: Example, span_subs: Dict[Span, str]) -> Example:
             span_sub_start_counter = span.end - prev_end
 
         span.text = new_text
-        
+
         if should_add_span:
             new_example_spans.append(span)
-        
+
     example.text = new_example_text
     example.spans = new_example_spans
 
     return example
+
 
 def augment_example(
     example: Example,
@@ -85,7 +84,7 @@ def augment_example(
 ) -> List[Example]:
 
     if spans is None:
-        spans = example.spans
+        spans = example.copy(deep=True).spans
 
     augmented_examples = {example}
 
@@ -100,13 +99,13 @@ def augment_example(
         for span in spans_to_sub:
             res = span_f(span, **kwargs)  #  type: ignore
             if res:
-                span_subs[hash(span)] = res
+                span_subs[span] = res
 
         if not any(span_subs.values()) or len(augmented_examples) > n_augs:
             break
 
         example = substitute_spans(example, span_subs)
-        if hash(example) not in augmented_example_hashes:
+        if example not in augmented_examples:
             augmented_examples.add(example)
 
     return list(augmented_examples)
@@ -176,16 +175,16 @@ def kb_expansion(
     )
 
 
-def get_synonym(word, pos=None):
-    """Get synonym for word given its part-of-speech (pos)."""
-    synsets = wn.synsets(word, pos=pos)
-    # Return None if wordnet has no synsets (synonym sets) for this word and pos.
-    if synsets:
-        print(synsets[0])
-        words = [lemma.name() for lemma in synsets[0].lemmas()]
-        if words[0].lower() != word.lower():  # Skip if synonym is same as word.
-            # Multi word synonyms in wordnet use '_' as a separator e.g. reckon_with. Replace it with space.
-            return words[0].replace("_", " ")
+# def get_synonym(word, pos=None):
+#     """Get synonym for word given its part-of-speech (pos)."""
+#     synsets = wn.synsets(word, pos=pos)
+#     # Return None if wordnet has no synsets (synonym sets) for this word and pos.
+#     if synsets:
+#         print(synsets[0])
+#         words = [lemma.name() for lemma in synsets[0].lemmas()]
+#         if words[0].lower() != word.lower():  # Skip if synonym is same as word.
+#             # Multi word synonyms in wordnet use '_' as a separator e.g. reckon_with. Replace it with space.
+#             return words[0].replace("_", " ")
 
 
 # @operation("recon.v1.augment.replace_pos_with_synonym", pre=[spacy_pre])
@@ -196,7 +195,7 @@ def get_synonym(word, pos=None):
 #         "NOUN": "n",
 #         "ADJ": "a"
 #     }
-    
+
 #     if pos not in pos_map:
 #         raise ValueError(f"Argument `pos` of {pos} not in {''.join(pos_map.keys())}")
 
@@ -209,7 +208,7 @@ def get_synonym(word, pos=None):
 #     spans = [Span(text=token.text, start=token.idx, end=token.idx + len(token.text), label="") for token in tokens]
 
 #     def augmentation(span: Span, synonym_f: Callable[[str], str] = synonym_f) -> Optional[str]:
-#         return synonym_f(span.text) 
+#         return synonym_f(span.text)
 
 #     return augment_example(
 #         example,
@@ -219,10 +218,10 @@ def get_synonym(word, pos=None):
 #         sub_prob=sub_prob,
 #         spans_to_aliases_map=spans_to_aliases_map,
 #     )
-    
+
 #     for i in range(n_augs):
 #         example = example.copy(deep=True)
-        
+
 #         if pos_idxs:
 #             # Pick random verb idx to replace.
 #             idx = np.random.choice(pos_idxs)
@@ -230,8 +229,8 @@ def get_synonym(word, pos=None):
 #             synonym = get_synonyms(token.text, pos="v")
 #             synonym = "enjoy"
 #             print(synonym)
-            
-            
+
+
 #             # If there's a valid verb synonym, replace it. Otherwise, return None.
 #             if synonym:
 #                 curr_span = Span(text=token.text, start=token.idx, end=token.idx + len(token.text), label="")
@@ -239,5 +238,5 @@ def get_synonym(word, pos=None):
 #                 example = substitute_spans(example, span_subs)
 #                 if example not in augmented_examples:
 #                     augmented_examples.add(example)
-                    
+
 #     return list(augmented_examples)

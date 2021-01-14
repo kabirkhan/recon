@@ -1,6 +1,5 @@
 from datetime import datetime
 from enum import Enum
-from types import SimpleNamespace
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
 from pydantic import BaseModel, Extra, root_validator
@@ -72,10 +71,17 @@ class Example(BaseModel):
     def __hash__(self) -> int:
         return cast(int, tokenized_example_hash(self))
 
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Example):
+            return self.dict() == other.dict()
+        return False
+
     def dict(self, **kwargs: Any) -> Dict:
         res = super().dict(**kwargs)
-        if "data" in res:
-            del res["data"]
+        keys = list(res.keys())
+        for k in keys:
+            if k not in self.schema()["properties"].keys():
+                del res[k]
         return res
 
 
