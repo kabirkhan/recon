@@ -3,8 +3,7 @@ from enum import Enum
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
 from pydantic import BaseModel, Extra, root_validator
-
-from .hashing import span_hash, token_hash, tokenized_example_hash
+from recon.hashing import span_hash, token_hash, tokenized_example_hash
 
 
 class Span(BaseModel):

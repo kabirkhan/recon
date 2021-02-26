@@ -1,10 +1,9 @@
 from typing import Dict, Iterable, Iterator, List, Set, Tuple
 
+from recon.types import Example, Span, Token
 from spacy.language import Language
 from spacy.scorer import Scorer
 from wasabi import Printer
-
-from .types import Example, Span, Token
 
 
 class EntityRecognizer:

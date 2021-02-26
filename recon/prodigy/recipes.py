@@ -8,18 +8,15 @@ import prodigy
 from prodigy.components.db import connect
 from prodigy.recipes.ner import get_labels_from_ner
 from prodigy.util import (
-    INPUT_HASH_ATTR,
-    TASK_HASH_ATTR,
     get_labels,
     log,
-    set_hashes,
     split_string,
 )
 import spacy
 from wasabi import msg
 from recon.constants import NONE
 from recon.dataset import Dataset
-from recon.operations import operation
+from recon.operations.core import operation
 from recon.types import HardestExample, Example, Span
 from recon.validation import remove_overlapping_entities
 

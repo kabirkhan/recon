@@ -2,18 +2,17 @@ from pathlib import Path
 from typing import Any, Callable, List, Tuple, Union
 
 import srsly
-from spacy.util import ensure_path
-
-from .dataset import Dataset
-from .loaders import read_jsonl
-from .store import ExampleStore
-from .types import (
+from recon.dataset import Dataset
+from recon.loaders import read_jsonl
+from recon.store import ExampleStore
+from recon.types import (
     CorpusApplyResult,
     CorpusMeta,
     Example,
     OperationResult,
     OperationState,
 )
+from spacy.util import ensure_path
 
 
 class Corpus:

@@ -2,26 +2,25 @@ import warnings
 from collections import Counter, defaultdict
 from typing import Any, Callable, Dict, Iterator, List, Tuple, Union
 
-import catalogue
-from tqdm import tqdm
-from wasabi import Printer
-
-from .preprocess import PreProcessor
-from .preprocess import registry as pre_registry
-from .types import (
+from pydantic.error_wrappers import ErrorWrapper
+from recon.operations import registry as op_registry
+from recon.operations.utils import (
+    get_received_operation_data,
+    get_required_operation_params,
+    request_body_to_args,
+)
+from recon.preprocess import PreProcessor
+from recon.preprocess import registry as pre_registry
+from recon.types import (
     Example,
     OperationResult,
     OperationState,
     OperationStatus,
     Transformation,
-    TransformationCallbacks,
     TransformationType,
 )
-
-
-class registry:
-    operations = catalogue.create("recon", "operations", entry_points=True)
-    operation_factories = catalogue.create("recon", "operation_factories", entry_points=True)
+from tqdm import tqdm
+from wasabi import Printer
 
 
 def op_iter(
@@ -113,9 +112,9 @@ class operation:
                     augmentation=self.augmentation,
                 )
 
-            registry.operation_factories.register(self.name)(factory)
+            op_registry.operation_factories.register(self.name)(factory)
         else:
-            registry.operations.register(self.name)(
+            op_registry.operations.register(self.name)(
                 Operation(self.name, pre, op, self.handles_tokens, augmentation=self.augmentation)
             )
 
@@ -168,6 +167,9 @@ class Operation:
         if state.status == OperationStatus.NOT_STARTED:
             state.status = OperationStatus.IN_PROGRESS
 
+        state.args = args
+        state.kwargs = kwargs
+
         def add_example(new_example: Example) -> None:
             state.transformations.append(
                 Transformation(example=hash(new_example), type=TransformationType.EXAMPLE_ADDED)
@@ -208,6 +210,28 @@ class Operation:
                 # fmt: on
             )
 
+        required_params = get_required_operation_params(self.op)
+        received_data = get_received_operation_data(required_params, state)
+
+        values: Dict[str, Any] = {}
+        errors: List[ErrorWrapper] = []
+
+        if received_data:
+            values, errors = request_body_to_args(list(required_params.values()), received_data)
+            print("VALUES: ", values)
+
+        if errors:
+            error_msg = (
+                f"Validation error while trying to call operation: {self.name} "
+                + "with provided args and kwargs values. "
+            )
+            for err in errors:
+                error_msg += str(err.exc)
+                print(values)
+            raise ValueError(error_msg)
+
+        state.args = ()
+        state.kwargs = values
         new_data = []
 
         with tqdm(total=len(dataset), disable=(not verbose)) as pbar:
@@ -215,11 +239,9 @@ class Operation:
                 dataset.data, self.pre, verbose=verbose
             ):
                 if preprocessed_outputs:
-                    res = self.op(
-                        example, *args, preprocessed_outputs=preprocessed_outputs, **kwargs
-                    )
+                    res = self.op(example, preprocessed_outputs=preprocessed_outputs, **values)
                 else:
-                    res = self.op(example, *args, **kwargs)
+                    res = self.op(example, **values)
 
                 if res is None:
                     remove_example(orig_example_hash)
@@ -253,4 +275,4 @@ class Operation:
         return OperationResult(data=new_data, state=state_copy)
 
     def register(self) -> None:
-        registry.operations.register(self.name)(self)
+        op_registry.operations.register(self.name)(self)

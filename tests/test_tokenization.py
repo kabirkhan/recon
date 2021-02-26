@@ -1,5 +1,5 @@
 from recon.dataset import Dataset
-from recon.operations import op_iter
+from recon.operations.core import op_iter
 from recon.tokenization import add_tokens
 from recon.types import Example, Span
 

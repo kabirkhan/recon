@@ -6,8 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import srsly
-
-from .types import Example
+from recon.types import Example
 
 
 def read_jsonl(path: Path) -> List[Example]:

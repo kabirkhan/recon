@@ -3,14 +3,11 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Set, Union, cast
 
 import srsly
-from spacy.util import ensure_path
-from wasabi import Printer
-
-from .hashing import dataset_hash
-from .loaders import read_json, read_jsonl
-from .operations import registry
-from .store import ExampleStore
-from .types import (
+from recon.hashing import dataset_hash
+from recon.loaders import read_json, read_jsonl
+from recon.operations import registry
+from recon.store import ExampleStore
+from recon.types import (
     DatasetOperationsState,
     Example,
     OperationResult,
@@ -18,6 +15,8 @@ from .types import (
     OperationStatus,
     TransformationType,
 )
+from spacy.util import ensure_path
+from wasabi import Printer
 
 
 class Dataset:
@@ -317,6 +316,7 @@ class Dataset:
 
         for op_name, state in operations_to_run.items():
             op = registry.operations.get(op_name)
+
             self.apply_(op, *state.args, initial_state=state, **state.kwargs)  # type: ignore
 
         return self
@@ -360,7 +360,7 @@ class Dataset:
         Returns:
             Dataset: Initialized dataset with Prodigy data
         """
-        from recon.prodigy.util import from_prodigy
+        from recon.prodigy.utils import from_prodigy
 
         print(f"Loading data from prodigy datasets: {', '.join(prodigy_datasets)}")
         data = []
@@ -370,7 +370,7 @@ class Dataset:
         return self
 
     def to_prodigy(self, prodigy_dataset: str = None, overwrite: bool = True) -> str:
-        from recon.prodigy.util import to_prodigy
+        from recon.prodigy.utils import to_prodigy
 
         if not prodigy_dataset:
             prodigy_dataset = f"{self.name}_{self.commit_hash}"

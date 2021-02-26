@@ -1,16 +1,8 @@
 from collections import defaultdict
 from typing import Any, Dict, Union
 
-from .operations import operation
-from .types import (
-    Example,
-    OperationState,
-    Span,
-    Token,
-    Transformation,
-    TransformationCallbacks,
-    TransformationType,
-)
+from recon.operations.core import operation
+from recon.types import Example, Token
 
 
 @operation("recon.v1.fix_tokenization_and_spacing", pre=["recon.v1.spacy"])

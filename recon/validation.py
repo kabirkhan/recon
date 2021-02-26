@@ -1,7 +1,7 @@
 from typing import List
 
-from .operations import operation
-from .types import Example, Span
+from recon.operations.core import operation
+from recon.types import Example, Span
 
 
 @operation("recon.v1.upcase_labels")

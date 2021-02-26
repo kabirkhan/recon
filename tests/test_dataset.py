@@ -1,10 +1,11 @@
 from typing import cast
 
 import pytest
+from recon.corrections import corrections_from_dict
 from recon.dataset import Dataset
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
-from recon.types import NERStats, OperationStatus, TransformationType
+from recon.types import Correction, NERStats, OperationStatus, TransformationType
 
 
 def test_dataset_initialize(example_data):
@@ -141,11 +142,17 @@ def test_dataset_to_from_disk(example_data, tmp_path):
     assert train_dataset_loaded.commit_hash == train_dataset.commit_hash
 
     train_dataset.apply_("recon.v1.upcase_labels")
+    corrections = corrections_from_dict(
+        {"software development engineer": "JOB_ROLE", "model": None}
+    )
+    assert len(corrections) == 2
+    print("CORRECTIONS: ", corrections)
+    train_dataset.apply_("recon.v1.fix_annotations", corrections)
 
     train_dataset.to_disk(tmp_path, force=True)
     train_dataset_loaded_2 = Dataset("train").from_disk(tmp_path)
 
-    assert len(train_dataset_loaded_2.operations) == 1
+    assert len(train_dataset_loaded_2.operations) == 2
     assert train_dataset_loaded_2.commit_hash == train_dataset.commit_hash
     assert train_dataset_loaded_2.commit_hash != train_dataset_loaded.commit_hash
 
@@ -157,3 +164,12 @@ def test_dataset_to_from_disk(example_data, tmp_path):
 
     for t in op.transformations:
         assert t.type == TransformationType.EXAMPLE_CHANGED
+
+    op2 = train_dataset_loaded_2.operations[1]
+
+    assert op2.kwargs["corrections"] == [
+        Correction(
+            annotation="software development engineer", from_labels=["ANY"], to_label="JOB_ROLE"
+        ).dict(),
+        Correction(annotation="model", from_labels=["ANY"], to_label=None).dict(),
+    ]

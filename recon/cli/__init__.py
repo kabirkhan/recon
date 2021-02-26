@@ -1,6 +1,5 @@
 import typer
-
-from .stats import stats
+from recon.cli.stats import stats
 
 app = typer.Typer(no_args_is_help=True)
 
