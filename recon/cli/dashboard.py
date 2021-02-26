@@ -6,8 +6,6 @@ from pathlib import Path
 
 from recon.corpus import Corpus
 from recon.stats import (
-    calculate_label_balance_entropy,
-    calculate_label_distribution_similarity,
     get_ner_stats,
 )
 from wasabi import Printer

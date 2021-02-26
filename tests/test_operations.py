@@ -1,6 +1,7 @@
 import pytest
 from recon.dataset import Dataset
-from recon.operations import Operation, operation, registry
+from recon.operations import registry
+from recon.operations.core import Operation, operation
 from recon.types import Example, Span
 
 

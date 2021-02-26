@@ -4,18 +4,10 @@ from typing import Any, DefaultDict, Dict, List, Sequence, Union, cast
 
 import numpy as np
 import srsly
+from recon.constants import NONE
+from recon.types import EntityCoverage, EntityCoverageStats, Example, NERStats, Outliers
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy as scipy_entropy
-
-from .constants import NONE
-from .types import (
-    EntityCoverage,
-    EntityCoverageStats,
-    Example,
-    NERStats,
-    Outliers,
-    Span,
-)
 
 
 def get_ner_stats(

@@ -2,11 +2,10 @@
 
 from typing import Any, Dict, List, cast
 
+from recon.operations.core import operation
+from recon.types import Correction, Example, Span, Token
 from spacy.tokens import Span as SpacySpan
 from wasabi import msg
-
-from .operations import operation
-from .types import Correction, Example, Span, Token
 
 
 @operation("recon.v1.rename_labels")
@@ -62,7 +61,7 @@ def fix_annotations(
 
         if t in corrections_map:
             c = corrections_map[t]
-            if c.to_label is None and s.label in c.from_labels:
+            if c.to_label is None and (s.label in c.from_labels or "ANY" in c.from_labels):
                 if dryrun:
                     prints.append(f"Deleting span: {s.text}")
                 else:

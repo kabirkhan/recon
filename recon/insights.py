@@ -1,19 +1,16 @@
 from collections import defaultdict
 from typing import DefaultDict, Dict, List, Set
 
-from wasabi import Printer
-
-from .constants import NONE
-from .recognizer import EntityRecognizer
-from .types import (
-    AnnotationCount,
+from recon.constants import NONE
+from recon.recognizer import EntityRecognizer
+from recon.types import (
     Example,
     HardestExample,
     LabelDisparity,
     PredictionError,
     PredictionErrorExamplePair,
-    Span,
 )
+from wasabi import Printer
 
 
 def get_ents_by_label(

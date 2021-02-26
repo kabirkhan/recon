@@ -3,11 +3,10 @@ from typing import Any, Callable, Dict, Iterable, List
 
 import catalogue
 import spacy
+from recon.linker import BaseEntityLinker, EntityLinker
+from recon.types import Entity, Example
 from snorkel.preprocess import Preprocessor as SnorkelPreprocessor
 from spacy.language import Language
-
-from .linker import BaseEntityLinker, EntityLinker
-from .types import Entity, Example
 
 
 class registry:
