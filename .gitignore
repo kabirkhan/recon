@@ -16,6 +16,7 @@ examples/cs_data*.ipynb
 examples/skills_data*.ipynb
 examples/models/*
 examples/data/wnut17
+examples/test*
 *.bin
 **/.ipynb_checkpoints
 **/.pytest_cache
