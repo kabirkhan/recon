@@ -1,11 +1,12 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Set, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
 
 import srsly
 from recon.hashing import dataset_hash
 from recon.loaders import read_json, read_jsonl
 from recon.operations import registry
+from recon.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import (
     DatasetOperationsState,
@@ -89,6 +90,13 @@ class Dataset:
     @property
     def commit_hash(self) -> str:
         return cast(str, dataset_hash(self, as_int=False))
+    
+    def __str__(self) -> Optional[Dict[str, Any]]:
+        stats = get_ner_stats(self.data, serialize=True)
+        return (
+            f'Dataset: {self.name}\n'
+            f'Stats: {stats}'
+        )
 
     def __hash__(self) -> int:
         return cast(int, dataset_hash(self))
