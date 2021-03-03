@@ -12,7 +12,7 @@ def test_base_recognizer(test_texts):
 
 
 def test_spacy_recognizer(nlp, test_texts):
-    ruler = nlp.create_pipe("entity_ruler")
+    ruler = nlp.add_pipe("entity_ruler", name="entity_ruler")
     ruler.add_patterns(
         [
             {"label": "SKILL", "pattern": "Machine learning"},
@@ -21,8 +21,6 @@ def test_spacy_recognizer(nlp, test_texts):
             {"label": "JOB_ROLE", "pattern": "Software Engineer"},
         ]
     )
-
-    nlp.add_pipe(ruler)
 
     recognizer = SpacyEntityRecognizer(nlp)
     assert recognizer.labels == ["JOB_ROLE", "SKILL"]
@@ -33,5 +31,5 @@ def test_spacy_recognizer(nlp, test_texts):
     assert len(examples[0].spans) == 3
     assert len(examples[1].spans) == 2
 
-    scorer = recognizer.evaluate(examples, verbose=False)
-    assert scorer.ents_f == 100
+    scores = recognizer.evaluate(examples, verbose=False)
+    assert scores.ents_f == 1.0

@@ -16,7 +16,7 @@ def get_ner_stats(
     """Compute statistics for NER data
 
     Args:
-        data (List[Example]): Data as a List of examples
+        data (Iterator[Example]): Data as a List of examples
         serialize (bool, optional): Serialize to a JSON string for printing.
         return_examples (bool, optional): Whether to return examples per type
 
@@ -27,7 +27,11 @@ def get_ner_stats(
     annotations_per_type: DefaultDict[str, Any] = defaultdict(int)
     examples: DefaultDict[str, Any] = defaultdict(list)
     n_examples_no_entities = 0
+
+    length = 0
+
     for e in data:
+        length += 1
         if not e.spans:
             n_examples_no_entities += 1
             examples[NONE].append(e)
@@ -41,7 +45,7 @@ def get_ner_stats(
     }
 
     stats = NERStats(
-        n_examples=len(data),
+        n_examples=length,
         n_examples_no_entities=n_examples_no_entities,
         n_annotations=sum(annotations_per_type.values()),
         n_annotations_per_type=sorted_anns_by_count,

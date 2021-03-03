@@ -1,8 +1,11 @@
-from typing import Dict, Iterable, Iterator, List, Set, Tuple
+import tempfile
+from pathlib import Path
+from typing import Iterable, Iterator, List, Set
 
-from recon.types import Example, Span, Token
+from recon.loaders import to_spacy
+from recon.types import Example, Scores, Span, Token
 from spacy.language import Language
-from spacy.scorer import Scorer
+from spacy.training import Corpus as SpacyCorpus
 from wasabi import Printer
 
 
@@ -37,6 +40,39 @@ class EntityRecognizer:
             Iterator[Example]: Iterator of Examples
         """
         raise NotImplementedError
+
+    def _evaluate(self, examples: List[Example]) -> Scores:
+        raise NotImplementedError
+
+    def evaluate(self, examples: List[Example], verbose: bool = True) -> Scores:
+        """Evaluate recognizer performance on dataset and print metrics
+
+        Args:
+            data (List[Example]): Examples to evaluate on
+            verbose (bool, optional): Print results or not. Defaults to True.
+
+        Returns:
+            Scorer: spaCy scorer object
+        """
+        sc = self._evaluate(examples)
+
+        msg = Printer(no_print=not verbose)
+        msg.divider("Recognizer Results")
+        result = [
+            ("Precision", f"{sc.ents_p:.3f}"),
+            ("Recall", f"{sc.ents_r:.3f}"),
+            ("F-Score", f"{sc.ents_f:.3f}"),
+        ]
+        msg.table(result)
+
+        table_data = []
+        for label, scores in sorted(sc.ents_per_type.items(), key=lambda tup: tup[0]):
+            table_data.append(
+                (label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}")
+            )
+        header = ("Label", "Precision", "Recall", "F-Score")
+        formatted = msg.table(table_data, header=header, divider=True)
+        return sc
 
 
 class SpacyEntityRecognizer(EntityRecognizer):
@@ -94,7 +130,7 @@ class SpacyEntityRecognizer(EntityRecognizer):
                 tokens=[Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc],
             )
 
-    def evaluate(self, data: List[Example], verbose: bool = True) -> Scorer:
+    def _evaluate(self, data: List[Example]) -> Scores:
         """Evaluate spaCy recognizer performance on dataset
 
         Args:
@@ -104,41 +140,12 @@ class SpacyEntityRecognizer(EntityRecognizer):
         Returns:
             Scorer: spaCy scorer object
         """
-        msg = Printer(no_print=not verbose)
-        formatted_data, _ = self._format_data(data)
-        sc = self.nlp.evaluate(formatted_data, batch_size=64)
-        msg.divider("Recognizer Results")
-        result = [
-            ("Precision", f"{sc.ents_p:.3f}"),
-            ("Recall", f"{sc.ents_r:.3f}"),
-            ("F-Score", f"{sc.ents_f:.3f}"),
-        ]
-        msg.table(result)
 
-        table_data = []
-        for label, scores in sorted(sc.ents_per_type.items(), key=lambda tup: tup[0]):
-            table_data.append(
-                (label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}")
-            )
-        header = ("Label", "Precision", "Recall", "F-Score")
-        formatted = msg.table(table_data, header=header, divider=True)
-        return sc
-
-    def _format_data(
-        self, data: List[Example]
-    ) -> Tuple[List[Tuple[str, Dict[str, List[Tuple[int, int, str]]]]], Set[str]]:
-        """Format of list of recon examples into spaCy data
-
-        Args:
-            data (List[Example]): Input examples
-
-        Returns:
-            Tuple[List[Tuple[str, Dict[str, List[Tuple[int, int, str]]]]], Set[str]]: Data in the spaCy format
-        """
-        result = []
-        labels = set()
-        for example in data:
-            ents = [(s.start, s.end, s.label) for s in example.spans]
-            labels.update([ent[2] for ent in ents])
-            result.append((example.text, {"entities": ents}))
-        return result, labels
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            data_path = Path(tmp_dir) / "data.spacy"
+            to_spacy(data_path, data)
+            corpus = SpacyCorpus(data_path, gold_preproc=False)
+            dev_dataset = list(corpus(self.nlp))
+            sc = self.nlp.evaluate(dev_dataset)
+            scores = Scores(**sc)
+        return scores
