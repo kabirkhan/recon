@@ -2,7 +2,7 @@
   <a href="https://kabirkhan.github.io/recon"><img src="https://kabirkhan.github.io/recon/img/recon.svg" alt="Recon"></a>
 </p>
 <p align="center">
-    <em>Recon NER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>
+    <em>Recon NER, Debug and correct annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>
 </p>
 <p align="center">
 <a href="https://pypi.org/project/reconner" target="_blank">
