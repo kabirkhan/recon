@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -146,7 +147,6 @@ def test_dataset_to_from_disk(example_data, tmp_path):
         {"software development engineer": "JOB_ROLE", "model": None}
     )
     assert len(corrections) == 2
-    print("CORRECTIONS: ", corrections)
     train_dataset.apply_("recon.v1.fix_annotations", corrections)
 
     train_dataset.to_disk(tmp_path, force=True)
@@ -173,3 +173,14 @@ def test_dataset_to_from_disk(example_data, tmp_path):
         ).dict(),
         Correction(annotation="model", from_labels=["ANY"], to_label=None).dict(),
     ]
+
+
+def test_dataset_to_from_spacy(example_data, tmp_path):
+    train_dataset = Dataset("train", example_data["train"])
+    ner_stats_pre: NERStats = cast(NERStats, train_dataset.apply(get_ner_stats))
+
+    train_dataset.to_spacy(tmp_path)
+    train_dataset_loaded = Dataset("train").from_spacy(Path(tmp_path) / "train.spacy")
+
+    ner_stats_post: NERStats = cast(NERStats, train_dataset_loaded.apply(get_ner_stats))
+    assert ner_stats_pre == ner_stats_post

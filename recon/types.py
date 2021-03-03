@@ -290,3 +290,11 @@ class Correction(BaseModel):
     annotation: str
     from_labels: List[str]
     to_label: Optional[str] = None
+
+
+class Scores(BaseModel):
+    ents_p: float
+    ents_r: float
+    ents_f: float
+    ents_per_type: Dict[str, Any]
+    speed: float

@@ -28,12 +28,10 @@ classifiers = [
     "License :: OSI Approved :: MIT License"
     ]
 requires = [
-    "pydantic == 1.5",
-    "spacy >= 2.3.0, <3.0.0",
+    "spacy >= 3.0.0, <3.1.0",
     "scipy",
     "snorkel == 0.9.6",
-    "typer >= 0.0.8",
-    "tqdm"
+    "typer >= 0.0.8"
 ]
 description-file = "README.md"
 requires-python = ">=3.6"
