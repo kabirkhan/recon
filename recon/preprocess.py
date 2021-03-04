@@ -77,7 +77,7 @@ class SpacyPreProcessor(PreProcessor):
     def nlp(self) -> Language:
         if self._nlp is None:
             self._nlp = spacy.blank("en")
-            self._nlp.add_pipe(self._nlp.create_pipe("sentencizer"))
+            self._nlp.add_pipe("sentencizer")
         return self._nlp
 
     def __call__(self, data: Iterable[Example]) -> Iterable[Any]:

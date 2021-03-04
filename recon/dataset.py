@@ -4,8 +4,9 @@ from typing import Any, Callable, Dict, List, Set, Union, cast
 
 import srsly
 from recon.hashing import dataset_hash
-from recon.loaders import read_json, read_jsonl
+from recon.loaders import from_spacy, read_json, read_jsonl, to_spacy
 from recon.operations import registry
+from recon.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import (
     DatasetOperationsState,
@@ -89,6 +90,10 @@ class Dataset:
     @property
     def commit_hash(self) -> str:
         return cast(str, dataset_hash(self, as_int=False))
+
+    def __str__(self) -> str:
+        stats = get_ner_stats(self.data, serialize=True)
+        return f"Dataset: {self.name}\n" f"Stats: {stats}"
 
     def __hash__(self) -> int:
         return cast(int, dataset_hash(self))
@@ -370,6 +375,15 @@ class Dataset:
         return self
 
     def to_prodigy(self, prodigy_dataset: str = None, overwrite: bool = True) -> str:
+        """Save examples to prodigy dataset
+
+        Args:
+            prodigy_dataset (str, optional): Prodigy dataset name to save to.
+            overwrite (bool, optional): Overwrite dataset name if it exists.
+
+        Returns:
+            str: Prodigy dataset name
+        """
         from recon.prodigy.utils import to_prodigy
 
         if not prodigy_dataset:
@@ -378,3 +392,27 @@ class Dataset:
         print(f"Saving dataset to prodigy dataset: {prodigy_dataset}")
         to_prodigy(self.data, prodigy_dataset, overwrite_dataset=overwrite)
         return prodigy_dataset
+
+    def from_spacy(self, path: Path) -> "Dataset":
+        """Load Dataset from a file in the .spacy format
+
+        Args:
+            path (Path): path to load from
+
+        Returns:
+            Dataset: Initialized dataset with Prodigy data
+        """
+        data = from_spacy(path)
+        self.data = list(data)
+        return self
+
+    def to_spacy(self, output_dir: Path) -> None:
+        """Save data to .spacy file
+
+        Saves file as {output_dir}/{self.name}.spacy
+
+        Args:
+            output_dir (Path): Output file path to save data to
+        """
+        output_dir = ensure_path(output_dir)
+        to_spacy(output_dir / (self.name + ".spacy"), self.data)

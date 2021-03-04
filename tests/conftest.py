@@ -82,7 +82,7 @@ def recognizer(nlp, example_corpus):
         for span in e.spans:
             patterns.append({"label": span.label, "pattern": span.text.lower()})
 
-    nlp.add_pipe(nlp.create_pipe("entity_ruler", {"patterns": patterns}))
-
+    ruler = nlp.add_pipe("entity_ruler", name="entity_ruler")
+    ruler.add_patterns(patterns)
     recognizer = SpacyEntityRecognizer(nlp)
     return recognizer
