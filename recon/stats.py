@@ -4,7 +4,7 @@ from typing import Any, DefaultDict, Dict, List, Sequence, Union, cast
 
 import numpy as np
 import srsly
-from recon.constants import NONE
+from recon.constants import NOT_LABELED
 from recon.types import EntityCoverage, EntityCoverageStats, Example, NERStats, Outliers
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy as scipy_entropy
@@ -34,7 +34,7 @@ def get_ner_stats(
         length += 1
         if not e.spans:
             n_examples_no_entities += 1
-            examples[NONE].append(e)
+            examples[NOT_LABELED].append(e)
         else:
             for s in e.spans:
                 annotations_per_type[s.label] += 1
@@ -70,7 +70,7 @@ def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
         List[int]: List of counts sorted by type name
     """
     annotations_per_type = ner_stats.n_annotations_per_type
-    annotations_per_type[NONE] = ner_stats.n_examples_no_entities
+    annotations_per_type[NOT_LABELED] = ner_stats.n_examples_no_entities
 
     return [t[1] for t in sorted(annotations_per_type.items(), key=lambda p: p[0])]
 

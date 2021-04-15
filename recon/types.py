@@ -3,7 +3,16 @@ from enum import Enum
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
 
 from pydantic import BaseModel, Extra, root_validator
-from recon.hashing import span_hash, token_hash, tokenized_example_hash
+from recon.hashing import (
+    prediction_error_hash,
+    span_hash,
+    token_hash,
+    tokenized_example_hash,
+)
+from spacy import displacy
+from spacy.tokens import Doc
+from spacy.util import get_words_and_spaces
+from spacy.vocab import Vocab
 
 
 class Span(BaseModel):
@@ -82,6 +91,31 @@ class Example(BaseModel):
             if k not in self.schema()["properties"].keys():
                 del res[k]
         return res
+
+    @property
+    def doc(self) -> Doc:
+        """Return spaCy Doc representation of Example
+
+        Returns:
+            Doc: Output spaCy Doc with ents set from example spans
+        """
+        if not self.tokens:
+            raise ValueError("Tokens are not set. Try running the recon.v1.add_tokens operation.")
+        tokens = [token.text for token in self.tokens]
+        words, spaces = get_words_and_spaces(tokens, self.text)
+        doc = Doc(Vocab(), words=words, spaces=spaces)
+        doc.ents = [doc.char_span(s.start, s.end, label=s.label) for s in self.spans]
+        return doc
+
+    def show(self, jupyter: Optional[bool] = None, options: Dict[str, Any] = {}) -> None:
+        """Visualize example using spaCy displacy entity renderer
+
+        Args:
+            jupyter (Optional[bool], optional): Run for Jupyter Interactive Environment.
+            options (Dict[str, Any]): DisplaCy options to pass through to filter ent types and set colors
+                See: https://spacy.io/usage/visualizers#ent
+        """
+        displacy.render(self.doc, style="ent", jupyter=jupyter, options=options)
 
 
 class Entity(BaseModel):
@@ -213,6 +247,9 @@ class PredictionError(BaseModel):
     count: int
     examples: Optional[List[PredictionErrorExamplePair]] = []
 
+    def __hash__(self) -> int:
+        return cast(int, prediction_error_hash(self))
+
 
 class HardestExample(BaseModel):
     """Container for how hard an Example is for an EntityRecognizer to predict
@@ -221,6 +258,7 @@ class HardestExample(BaseModel):
 
     example: Example
     count: int
+    difficulty: Optional[float]
     prediction_errors: Optional[List[PredictionError]]
 
 

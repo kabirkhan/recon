@@ -1,7 +1,7 @@
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, Set
+from typing import DefaultDict, Dict, List, Set, Tuple
 
-from recon.constants import NONE
+from recon.constants import NOT_LABELED
 from recon.recognizer import EntityRecognizer
 from recon.types import (
     Example,
@@ -10,6 +10,7 @@ from recon.types import (
     PredictionError,
     PredictionErrorExamplePair,
 )
+from spacy.scorer import PRFScore
 from wasabi import Printer
 
 
@@ -142,7 +143,9 @@ def top_prediction_errors(
     anns = (e.spans for e in data)
 
     errors = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))  # type: ignore
-    error_examples: DefaultDict[str, List[PredictionErrorExamplePair]] = defaultdict(list)
+    error_examples: DefaultDict[
+        Tuple[str, str, str], List[PredictionErrorExamplePair]
+    ] = defaultdict(list)
     n_errors = 0
 
     for orig_example, pred_example, ann in zip(data, recognizer.predict(texts), anns):
@@ -173,14 +176,12 @@ def top_prediction_errors(
                     text = pred_example.text[start:end]
                     false_label = fp[2]
                     errors[label][text][false_label] += 1
-                    error_examples[f"{text}||{label}||{false_label}"].append(
-                        pred_error_example_pair
-                    )
+                    error_examples[(text, label, false_label)].append(pred_error_example_pair)
                 else:
                     start, end, false_label = fp
                     text = pred_example.text[start:end]
-                    errors[NONE][text][false_label] += 1
-                    error_examples[f"{text}||{NONE}||{false_label}"].append(pred_error_example_pair)
+                    errors[NOT_LABELED][text][false_label] += 1
+                    error_examples[(text, NOT_LABELED, false_label)].append(pred_error_example_pair)
                 n_errors += 1
                 seen.add((start, end))
 
@@ -189,22 +190,22 @@ def top_prediction_errors(
                 start, end, label = fn
                 if (start, end) not in seen:
                     text = pred_example.text[start:end]
-                    errors[label][text][NONE] += 1
-                    error_examples[f"{text}||{label}||{NONE}"].append(pred_error_example_pair)
+                    errors[label][text][NOT_LABELED] += 1
+                    error_examples[(text, label, NOT_LABELED)].append(pred_error_example_pair)
                     n_errors += 1
 
-    ranked_errors_map: Dict[str, PredictionError] = {}
+    ranked_errors_map: Dict[Tuple[str, str, str], PredictionError] = {}
 
     for label, errors_per_label in errors.items():
         for error_text, error_labels in errors_per_label.items():
             for error_label, count in error_labels.items():
-                pe_hash = f"{error_text}||{label}||{error_label}"
+                pe_hash = (error_text, label, error_label)
                 ranked_errors_map[pe_hash] = PredictionError(
                     text=error_text,
                     true_label=label,
                     pred_label=error_label,
                     count=count,
-                    examples=error_examples[f"{error_text}||{label}||{error_label}"],
+                    examples=error_examples[pe_hash],
                 )
 
     ranked_errors: List[PredictionError] = sorted(
@@ -234,14 +235,16 @@ def top_prediction_errors(
 def get_hardest_examples(
     pred_errors: List[PredictionError],
     return_pred_errors: bool = True,
-    remove_pred_error_examples: bool = True,
+    return_pred_error_examples: bool = False,
+    normalize: bool = True,
 ) -> List[HardestExample]:
     """Get hardest examples from list of PredictionError types
 
     Args:
         pred_errors (List[PredictionError]): list of PredictionError
         return_pred_errors (bool, optional): Whether to return prediction errors. Defaults to True.
-        remove_pred_error_examples (bool, optional): Whether to remove examples from returned PredictionError. Defaults to True.
+        return_pred_error_examples (bool, optional): Whether to return examples from returned PredictionError. Defaults to False.
+        normalize (bool, optional): Whether to normalize the "difficulty" of the example based on it's length.
 
     Raises:
         ValueError: Each PredictionError must have a List of examples
@@ -277,7 +280,7 @@ def get_hardest_examples(
         example = examples_text_map[example_text]  # type: ignore
 
         prediction_errors: List[PredictionError] = []
-        if remove_pred_error_examples and example_pred_errors:
+        if example_pred_errors and not return_pred_error_examples:
             prediction_errors = [
                 PredictionError(
                     text=pe.text,
@@ -291,21 +294,37 @@ def get_hardest_examples(
         else:
             prediction_errors = example_pred_errors
 
-        prediction_error_hashes: Set[str] = set()
-        deduped_prediction_errors: List[PredictionError] = []
+        deduped_prediction_errors: List[PredictionError] = list(set(prediction_errors))
 
-        for pe in prediction_errors:
-            pe_hash = f"{pe.text}||{pe.true_label}||{pe.pred_label}"
-            if pe_hash not in prediction_error_hashes:
-                deduped_prediction_errors.append(pe)
-
-        record = HardestExample(example=example, count=len(deduped_prediction_errors))
+        he = HardestExample(example=example, count=len(deduped_prediction_errors))
         if return_pred_errors:
-            record.prediction_errors = deduped_prediction_errors
-        hardest_examples.append(record)
+            he.prediction_errors = deduped_prediction_errors
 
-    sorted_hardest_examples = sorted(hardest_examples, key=lambda he: he.count, reverse=True)
+        scorer = score_he(he)
+        he.difficulty = scorer.fscore
+        hardest_examples.append(he)
+
+    sorted_hardest_examples = sorted(
+        hardest_examples, key=lambda he: he.difficulty if he.difficulty else 1.0, reverse=True
+    )
     return sorted_hardest_examples
+
+
+def score_he(he: HardestExample) -> PRFScore:
+    predicted = None
+
+    for e in he.prediction_errors[0].examples:  # type: ignore
+        if e.original == he.example:
+            predicted = e.predicted
+            break
+
+    scorer = PRFScore()
+    scorer.score_set(
+        set([(s.start, s.end, s.label) for s in predicted.spans]),  # type: ignore
+        set([(s.start, s.end, s.label) for s in he.example.spans]),
+    )
+
+    return scorer
 
 
 def get_annotation_labels(
