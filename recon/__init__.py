@@ -1,6 +1,6 @@
 """ReconNER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data."""
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 from recon.augmentation import *
 from recon.corpus import Corpus
@@ -16,5 +16,6 @@ from recon.validation import filter_overlaps, upcase_labels
 try:
     # This needs to be imported in order for the entry points to be loaded
     from recon.prodigy import recipes as prodigy_recipes  # noqa: F401
-except ImportError:
+except ImportError as e:
+    print("Error", e)
     pass

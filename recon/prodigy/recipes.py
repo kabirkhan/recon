@@ -1,12 +1,10 @@
 # isort:skip_file
 # type: ignore
 
-import copy
 from typing import Dict, List, Optional, Union
 
 import prodigy
 from prodigy.components.db import connect
-from prodigy.recipes.ner import get_labels_from_ner
 from prodigy.util import (
     get_labels,
     log,
@@ -14,11 +12,9 @@ from prodigy.util import (
 )
 import spacy
 from wasabi import msg
-from recon.constants import NONE
 from recon.dataset import Dataset
 from recon.operations.core import operation
 from recon.types import HardestExample, Example, Span
-from recon.validation import remove_overlapping_entities
 
 
 def make_span_hash(span: Union[Span, Dict[str, object]]) -> str:
@@ -40,69 +36,28 @@ def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]
             for e in pe.examples:
                 if e.predicted.text == he.example.text:
                     predicted_example = e.predicted
-        if predicted_example:
-            pthtml = []
-            predicted_example.dict()
+            if predicted_example:
+                pred_spans = []
+                for span in predicted_example.spans:
+                    if span.label != "NOT_LABELED":
+                        span_ = span.copy(deep=True)
+                        span_.label = f"{span.label}:PREDICTED"
+                        pred_spans.append(span_.dict())
 
-            for token in predicted_example.tokens:
-                pthtml.append(f'<span class="recon-token">{token.text} </span>')
-
-            pred_spans = predicted_example.spans
-            pred_span_hashes = [make_span_hash(span) for span in predicted_example.spans]
-
-            for gold_span_hash, gold_span in gold_span_hashes.items():
-                if gold_span_hash not in pred_span_hashes:
-                    gold_span_miss = copy.deepcopy(gold_span)
-                    gold_span_miss.label = NONE
-                    pred_spans.append(gold_span_miss)
-
-            pred_spans = remove_overlapping_entities(
-                sorted([span.dict() for span in pred_spans], key=lambda s: s["start"])
-            )
-
-            i = len(pred_spans) - 1
-            while i >= 0:
-                span = pred_spans[i]
-                span_hash = make_span_hash(span)
-                if span_hash in gold_span_hashes:
-                    labelColorClass = "recon-pred-success-mark"
-                elif span["label"] == NONE:
-                    labelColorClass = "recon-pred-missing-mark"
-                else:
-                    labelColorClass = "recon-pred-error-mark"
-
-                if not span["token_end"]:
-                    print(span)
-
-                pthtml = (
-                    pthtml[: span["token_end"]]
-                    + [
-                        f'<span class="recon-pred-label">{span["label"]}<span class="c0178">x</span></span></span>'
-                    ]
-                    + pthtml[span["token_end"] :]
-                )
-                pthtml = (
-                    pthtml[: span["token_start"]]
-                    + [f'<span class="recon-pred {labelColorClass}">']
-                    + pthtml[span["token_start"] :]
-                )
-                i -= 1
-
-            task[
-                "html"
-            ] = f"""
-            <h2 class='recon-title'>Recon Prediction Errors</h2>
-            <h5 class='recon-subtitle'>
-                The following text shows the errors your model made on this example inline.
-                Correct the annotations above based on how well your model performed on this example.
-                If your labeling is correct you might need to add more training examples in this domain.    
-            </h5>
-            <div class='recon-container'>
-                {''.join(pthtml)}
-            </div>
-            """
-        task["prediction_errors"] = [pe.dict() for pe in he.prediction_errors]
-        yield task
+                print("PREDICTED SPANS", pred_spans)
+                task["spans"] = sorted(task["spans"] + pred_spans, key=lambda s: s["start"])
+                task[
+                    "html"
+                ] = f"""
+                <h2 class='recon-title'>Recon Prediction Errors</h2>
+                <h5 class='recon-subtitle'>
+                    The following text shows the errors your model made on this example inline.
+                    Correct the annotations above based on how well your model performed on this example.
+                    If your labeling is correct you might need to add more training examples in this domain.    
+                </h5>
+                """
+            task["prediction_errors"] = [pe.dict() for pe in he.prediction_errors]
+            yield task
 
 
 @prodigy.recipe(
@@ -152,17 +107,14 @@ def ner_correct(
         nlp = spacy.load(spacy_model)
     labels = label  # comma-separated list or path to text file
     if not labels:
-        labels = get_labels_from_ner(nlp)
+        labels = nlp.get_pipe("ner").labels
         if not labels:
             msg.fail("No --label argument set and no labels found in model", exits=1)
         msg.text(f"Using {len(labels)} labels from model: {', '.join(labels)}")
 
     log(f"RECIPE: Annotating with {len(labels)} labels", labels)
-    labels = labels.split(",")
 
     stream = get_stream_from_hardest_examples(nlp, hardest_examples)
-    # stream = add_tokens(nlp, stream)  # add "tokens" key to the tasks
-    # stream = set_hashes(stream)
 
     table_template = """
     <style>
@@ -195,17 +147,29 @@ def ner_correct(
     </table>
     """
 
+    def before_db(examples):
+        for eg in examples:
+            new_spans = []
+            for span in eg["spans"]:
+                if not span["label"].endswith(":PREDICTED"):
+                    new_spans.append(span)
+            eg["spans"] = new_spans
+        return examples
+
     return {
         "view_id": "blocks",
         "dataset": dataset,
         "stream": stream,
         "exclude": exclude,
+        "before_db": before_db,
         "config": {
             "lang": nlp.lang,
             "labels": labels,
             "exclude_by": "input",
+            "force_stream_order": True,
+            "overlapping_spans": True,
             "blocks": [
-                {"view_id": "ner_manual"},
+                {"view_id": "spans_manual", "overlapping_spans": True},
                 {"view_id": "html"},
                 {"view_id": "html", "field_rows": 3, "html_template": table_template},
             ],

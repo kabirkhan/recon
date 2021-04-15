@@ -85,6 +85,20 @@ def dataset_hash(dataset: Any, as_int: bool = True) -> Union[str, int]:
     return _hash(hash_data, as_int=as_int)
 
 
+def prediction_error_hash(prediction_error: Any, as_int: bool = True) -> Union[str, int]:
+    """Hash of PredictionError
+
+    Args:
+        prediction_error (PredictionError): PredictionError to hash
+        as_int (bool, optional): Encode hash as int
+
+    Returns:
+        Union[str, int]: PredictionError hash
+    """
+    hash_data = (prediction_error.text, prediction_error.true_label, prediction_error.pred_label)
+    return _hash(hash_data, as_int=as_int)
+
+
 def _hash(
     tpl: Tuple, hash_function: Callable = hashlib.sha1, as_int: bool = True
 ) -> Union[str, int]:
