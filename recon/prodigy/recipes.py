@@ -1,10 +1,12 @@
 # isort:skip_file
 # type: ignore
 
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import prodigy
 from prodigy.components.db import connect
+from prodigy.components.loaders import get_stream
+from prodigy.components.preprocess import add_tokens
 from prodigy.util import (
     get_labels,
     log,
@@ -13,139 +15,72 @@ from prodigy.util import (
 import spacy
 from wasabi import msg
 from recon.dataset import Dataset
+from recon.insights import get_hardest_examples
 from recon.operations.core import operation
-from recon.types import HardestExample, Example, Span
-
-
-def make_span_hash(span: Union[Span, Dict[str, object]]) -> str:
-    if isinstance(span, Span):
-        h = f"{span.text}|||{span.start}|||{span.end}|||{span.label}"
-    else:
-        h = f'{span["text"]}|||{span["start"]}|||{span["end"]}|||{span["label"]}'
-    return h
-
-
-def get_stream_from_hardest_examples(nlp, hardest_examples: List[HardestExample]):
-    for he in hardest_examples:
-        task = he.example.dict()
-        gold_span_hashes = {make_span_hash(span): span for span in he.example.spans}
-        predicted_example = None
-        assert he.prediction_errors is not None
-        for pe in he.prediction_errors:
-            assert pe.examples is not None
-            for e in pe.examples:
-                if e.predicted.text == he.example.text:
-                    predicted_example = e.predicted
-            if predicted_example:
-                pred_spans = []
-                for span in predicted_example.spans:
-                    if span.label != "NOT_LABELED":
-                        span_ = span.copy(deep=True)
-                        span_.label = f"{span.label}:PREDICTED"
-                        pred_spans.append(span_.dict())
-
-                print("PREDICTED SPANS", pred_spans)
-                task["spans"] = sorted(task["spans"] + pred_spans, key=lambda s: s["start"])
-                task[
-                    "html"
-                ] = f"""
-                <h2 class='recon-title'>Recon Prediction Errors</h2>
-                <h5 class='recon-subtitle'>
-                    The following text shows the errors your model made on this example inline.
-                    Correct the annotations above based on how well your model performed on this example.
-                    If your labeling is correct you might need to add more training examples in this domain.    
-                </h5>
-                """
-            task["prediction_errors"] = [pe.dict() for pe in he.prediction_errors]
-            yield task
+from recon.recognizer import SpacyEntityRecognizer
+from recon.types import Example, HardestExampleV2
 
 
 @prodigy.recipe(
     "recon.ner_correct",
+    # fmt: off
     dataset=("Dataset to save annotations to", "positional", None, str),
-    spacy_model=(
-        "Base model or blank:lang (e.g. blank:en) for blank model",
-        "positional",
-        None,
-        str,
-    ),
-    hardest_examples=(
-        "Data to annotate (file path or '-' to read from standard input)",
-        "positional",
-        None,
-        str,
-    ),
-    label=(
-        "Comma-separated label(s) to annotate or text file with one label per line",
-        "option",
-        "l",
-        get_labels,
-    ),
-    exclude=(
-        "Comma-separated list of dataset IDs whose annotations to exclude",
-        "option",
-        "e",
-        split_string,
-    ),
+    spacy_model=("Loadable spaCy model for tokenization or blank:lang (e.g. blank:en)", "positional", None, str),
+    source=("Data to annotate (file path or '-' to read from standard input)", "positional", None, str),
+    loader=("Loader (guessed from file extension if not set)", "option", "lo", str),
+    label=("Comma-separated label(s) to annotate or text file with one label per line", "option", "l", get_labels),
+    exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
+    # fmt: on
 )
 def ner_correct(
     dataset: str,
     spacy_model: str,
-    hardest_examples: List[HardestExample],
+    source: Union[str, Iterable[dict]],
+    loader: Optional[str] = None,
     label: Optional[List[str]] = None,
+    patterns: Optional[str] = None,
     exclude: Optional[List[str]] = None,
-):
-    """
-    Stream a List of `recon.types.HardestExample` instances to prodigy
-    for review/correction. Uses the Prodigy blocks interface to display
-    prediction error information along with ner view
-    """
-    log("RECIPE: Starting recipe recon.ner_correct", locals())
-    if spacy_model.startswith("blank:"):
-        nlp = spacy.blank(spacy_model.replace("blank:", ""))
-    else:
-        nlp = spacy.load(spacy_model)
+    highlight_chars: bool = False,
+) -> Dict[str, Any]:
+
+    log("RECIPE: Starting recipe ner.manual", locals())
+    nlp = spacy.load(spacy_model)
     labels = label  # comma-separated list or path to text file
     if not labels:
-        labels = nlp.get_pipe("ner").labels
+        labels = nlp.pipe_labels.get("ner", [])
         if not labels:
             msg.fail("No --label argument set and no labels found in model", exits=1)
         msg.text(f"Using {len(labels)} labels from model: {', '.join(labels)}")
-
     log(f"RECIPE: Annotating with {len(labels)} labels", labels)
+    stream = get_stream(source, loader=loader, rehash=True, dedup=True, input_key="text")
+    if patterns is not None:
+        pattern_matcher = PatternMatcher(nlp, combine_matches=True, all_examples=True)
+        pattern_matcher = pattern_matcher.from_disk(patterns)
+        stream = (eg for _, eg in pattern_matcher(stream))
+    # Add "tokens" key to the tasks, either with words or characters
+    stream = add_tokens(nlp, stream, use_chars=highlight_chars)
+    stream = [Example(**eg) for eg in stream]
 
-    stream = get_stream_from_hardest_examples(nlp, hardest_examples)
+    rec = SpacyEntityRecognizer(nlp)
+    hes = get_hardest_examples(rec, stream)
 
-    table_template = """
-    <style>
-        .table-title {
-            margin-top: -120px;
-        }
-        table {
-            border-collapse: collapse;
-        }
-        table, td, th {
-            border: 1px solid gray;
-            vertical-align: top;
-            margin-top: -50px;
-        }
-    </style>
-    <h5 class='recon-subtitle table-title'>All prediction errors for this example.</h2>
-    <table>
-        <tr>
-            <th>Text</th>
-            <th>True Label</th>
-            <th>Pred Label</th>
-        </tr>
-        {{#prediction_errors}}
-        <tr>
-            <td>{{text}}</td>
-            <td>{{true_label}}</td>
-            <td>{{pred_label}}</td>
-        </tr>
-        {{/prediction_errors}}
-    </table>
-    """
+    def stream_from_hardest_examples(hes: List[HardestExampleV2]):
+
+        for he in hes:
+
+            combined = he.reference.copy(deep=True)
+            pred_spans = []
+            for s in he.prediction.spans:
+                span = s.copy(deep=True)
+                span.label = f"{s.label}:PREDICTED"
+                pred_spans.append(span)
+
+            combined.spans = sorted(combined.spans + pred_spans, key=lambda s: s.start)
+
+            task = combined.dict()
+            yield task
+
+    stream = stream_from_hardest_examples(hes)
 
     def before_db(examples):
         for eg in examples:
@@ -170,55 +105,20 @@ def ner_correct(
             "overlapping_spans": True,
             "blocks": [
                 {"view_id": "spans_manual", "overlapping_spans": True},
-                {"view_id": "html"},
-                {"view_id": "html", "field_rows": 3, "html_template": table_template},
             ],
-            "global_css": f"""
-            .prodigy-container {{
-                max-width: {'900px' if len(labels) > 8 else '600px'}
+            "javascript": f"""
+
+            const disablePredInteraction = event => {{
+                let xpath = "//span[contains(text(),':PREDICTED')]";
+                let matchingElement = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                let length = matchingElement.snapshotLength;
+
+                for (var i = 0; i < length; i++) {{
+                    matchingElement.snapshotItem(i).parentElement.parentElement.onclick = function(e) {{ console.log('PRED SPAN CLIECKED'); e.stopImmediatePropagation(); }}
+                }}
             }}
-            .recon-title {{
-                text-align: left;
-                margin-top: -80px;
-            }}
-            .recon-subtitle {{
-                text-align: left;
-                margin-top: -80px;
-                white-space: normal;
-            }}
-            .recon-container {{
-                text-align: left;
-                line-height: 2;
-                margin-top: -80px;
-                white-space: pre-line;
-            }}
-            .recon-pred {{
-                color: inherit;
-                margin: 0 0.15em;
-                display: inline;
-                padding: 0.25em 0.4em;
-                font-weight: bold;
-                line-height: 1;
-                -webkit-box-decoration-break: clone;
-            }}
-            .recon-pred-success-mark {{
-                background: #00cc66;
-            }}
-            .recon-pred-error-mark {{
-                background: #fc7683;
-            }}
-            .recon-pred-missing-mark {{
-                background: #84b4c4;
-            }}
-            .recon-pred-label {{
-                color: #583fcf;
-                font-size: 0.675em;
-                font-weight: bold;
-                font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
-                margin-left: 8px;
-                text-transform: uppercase;
-                vertical-align: middle;
-            }}
+
+            document.addEventListener('prodigyanswer', disablePredInteraction)
             """,
         },
     }
