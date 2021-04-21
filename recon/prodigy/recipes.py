@@ -38,9 +38,7 @@ def ner_correct(
     source: Union[str, Iterable[dict]],
     loader: Optional[str] = None,
     label: Optional[List[str]] = None,
-    patterns: Optional[str] = None,
     exclude: Optional[List[str]] = None,
-    highlight_chars: bool = False,
 ) -> Dict[str, Any]:
 
     log("RECIPE: Starting recipe ner.manual", locals())
@@ -53,12 +51,8 @@ def ner_correct(
         msg.text(f"Using {len(labels)} labels from model: {', '.join(labels)}")
     log(f"RECIPE: Annotating with {len(labels)} labels", labels)
     stream = get_stream(source, loader=loader, rehash=True, dedup=True, input_key="text")
-    if patterns is not None:
-        pattern_matcher = PatternMatcher(nlp, combine_matches=True, all_examples=True)
-        pattern_matcher = pattern_matcher.from_disk(patterns)
-        stream = (eg for _, eg in pattern_matcher(stream))
     # Add "tokens" key to the tasks, either with words or characters
-    stream = add_tokens(nlp, stream, use_chars=highlight_chars)
+    stream = add_tokens(nlp, stream)
     stream = [Example(**eg) for eg in stream]
 
     rec = SpacyEntityRecognizer(nlp)
