@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import DefaultDict, Dict, List, Set, Tuple
-import numpy as np
 
+import numpy as np
 from recon.constants import NOT_LABELED
 from recon.recognizer import EntityRecognizer
 from recon.types import (
@@ -234,7 +234,10 @@ def top_prediction_errors(
 
 
 def get_hardest_examples(
-    recognizer: EntityRecognizer, examples: List[Example], score_count: bool = True, normalize_scores: bool = True
+    recognizer: EntityRecognizer,
+    examples: List[Example],
+    score_count: bool = True,
+    normalize_scores: bool = True,
 ) -> List[HardestExampleV2]:
     """Get hardest examples for a recognizer to predict on and sort by difficulty with the goal
     of quickly identifying the biggest holes in a model / annotated data.
