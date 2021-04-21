@@ -262,6 +262,13 @@ class HardestExample(BaseModel):
     prediction_errors: Optional[List[PredictionError]]
 
 
+class HardestExampleV2(BaseModel):
+    reference: Example
+    prediction: Example
+    count: int
+    score: float
+
+
 class LabelDisparity(BaseModel):
     """Container for the number of disparities in a Dataset
     where some text is tagged as label1 in some places and label2 in others

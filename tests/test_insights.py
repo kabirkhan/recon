@@ -27,8 +27,10 @@ def test_top_prediction_errors(recognizer, example_corpus):
 
 
 def test_get_hardest_examples(recognizer, example_corpus):
-    pred_errors = top_prediction_errors(recognizer, example_corpus.test)
-    hardest_examples = get_hardest_examples(pred_errors, return_pred_error_examples=True)
+    hardest_examples = get_hardest_examples(recognizer, example_corpus.test)
 
-    assert len(hardest_examples) == 42
-    assert hardest_examples[0].example.text.startswith("Julia's co-founders")
+    hardest_examples_no_count = get_hardest_examples(recognizer, example_corpus.test, score_count=False)
+
+    assert len(hardest_examples) == len(example_corpus.test)
+    assert hardest_examples[0].reference.text.startswith("Some of the free Apache Tomcat")
+    assert hardest_examples_no_count[0].reference.text.startswith("Visual Basic was")
