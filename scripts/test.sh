@@ -7,4 +7,4 @@ set -x
 pytest --cov=recon --cov-report=term-missing -o console_output_style=progress ${@}
 bash ./scripts/lint.sh
 # Include tests for files
-bash ./scripts/test-files.sh
+#bash ./scripts/test-files.sh
