@@ -1,6 +1,6 @@
 """ReconNER, Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data."""
 
-__version__ = "0.8.2"
+__version__ = "0.9.0"
 
 from recon.augmentation import *
 from recon.corpus import Corpus
