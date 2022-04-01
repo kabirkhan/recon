@@ -37,9 +37,7 @@ def test_fix_annotations(test_examples):
 
     fixed_examples = []
     for e in test_examples:
-        corrections = corrections_from_dict(
-            {"software development engineer": "JOB_ROLE", "model": None}
-        )
+        corrections = corrections_from_dict({"software development engineer": "JOB_ROLE", "model": None})
         example = fix_annotations(e.copy(deep=True), corrections)
         fixed_examples.append(example)
 

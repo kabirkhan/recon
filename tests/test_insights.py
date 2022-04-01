@@ -29,9 +29,7 @@ def test_top_prediction_errors(recognizer, example_corpus):
 def test_get_hardest_examples(recognizer, example_corpus):
     hardest_examples = get_hardest_examples(recognizer, example_corpus.test)
 
-    hardest_examples_no_count = get_hardest_examples(
-        recognizer, example_corpus.test, score_count=False
-    )
+    hardest_examples_no_count = get_hardest_examples(recognizer, example_corpus.test, score_count=False)
 
     assert len(hardest_examples) == len(example_corpus.test)
     assert hardest_examples[0].reference.text.startswith("Some of the free Apache Tomcat")

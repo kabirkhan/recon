@@ -107,9 +107,7 @@ class Dataset:
                 return e
         raise KeyError(f"Example with hash {example_hash} does not exist")
 
-    def apply(
-        self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
-    ) -> Any:
+    def apply(self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any) -> Any:
         """Apply a function to the dataset
 
         Args:
@@ -213,9 +211,7 @@ class Dataset:
         if n < 1:
             raise ValueError("Cannot rollback dataset: n must be 1 or higher.")
         elif n > len(self.operations):
-            raise ValueError(
-                "Cannot rollback dataset: n is larger than the total number of dataset operations."
-            )
+            raise ValueError("Cannot rollback dataset: n is larger than the total number of dataset operations.")
 
         store = self.example_store
 

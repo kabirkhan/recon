@@ -86,9 +86,7 @@ def from_spacy(path: Path, nlp: Language = None, lang_code: str = "en") -> Itera
         )
 
 
-def to_spacy(
-    path: Path, data: Iterable[Example], nlp: Language = None, lang_code: str = "en"
-) -> DocBin:
+def to_spacy(path: Path, data: Iterable[Example], nlp: Language = None, lang_code: str = "en") -> DocBin:
     """Save a batch of examples to disk in the .spacy DocBin format
 
     Args:
