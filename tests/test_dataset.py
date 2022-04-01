@@ -143,9 +143,7 @@ def test_dataset_to_from_disk(example_data, tmp_path):
     assert train_dataset_loaded.commit_hash == train_dataset.commit_hash
 
     train_dataset.apply_("recon.v1.upcase_labels")
-    corrections = corrections_from_dict(
-        {"software development engineer": "JOB_ROLE", "model": None}
-    )
+    corrections = corrections_from_dict({"software development engineer": "JOB_ROLE", "model": None})
     assert len(corrections) == 2
     train_dataset.apply_("recon.v1.fix_annotations", corrections)
 
@@ -168,9 +166,7 @@ def test_dataset_to_from_disk(example_data, tmp_path):
     op2 = train_dataset_loaded_2.operations[1]
 
     assert op2.kwargs["corrections"] == [
-        Correction(
-            annotation="software development engineer", from_labels=["ANY"], to_label="JOB_ROLE"
-        ).dict(),
+        Correction(annotation="software development engineer", from_labels=["ANY"], to_label="JOB_ROLE").dict(),
         Correction(annotation="model", from_labels=["ANY"], to_label=None).dict(),
     ]
 

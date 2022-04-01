@@ -122,9 +122,7 @@ def create_response_field(
     try:
         return response_field(field_info=field_info)
     except RuntimeError:
-        raise ValueError(
-            f"Invalid args for response field! Hint: check that {type_} is a valid pydantic field type"
-        )
+        raise ValueError(f"Invalid args for response field! Hint: check that {type_} is a valid pydantic field type")
 
 
 def get_param_field(
@@ -247,17 +245,13 @@ def get_required_operation_params(op: Callable) -> Dict[str, ModelField]:
             # already handled by the internals of the operation
             continue
 
-        param_field = get_param_field(
-            param=param, default_field_info=FieldInfo, param_name=param_name
-        )
+        param_field = get_param_field(param=param, default_field_info=FieldInfo, param_name=param_name)
         required_params[param_name] = param_field
 
     return required_params
 
 
-def get_received_operation_data(
-    required_params: Dict[str, ModelField], state: OperationState
-) -> Dict[str, Any]:
+def get_received_operation_data(required_params: Dict[str, ModelField], state: OperationState) -> Dict[str, Any]:
     """Resolve serialized args and kwargs data of an operation to their Pydantic types
 
     Args:
