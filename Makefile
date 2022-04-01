@@ -20,7 +20,7 @@ lint:
 	$(isort) --check-only --df
 	$(black) --check --diff
 
-.PHONY test
+.PHONY: test
 test:
 	pytest ./tests --cov=recon --cov-report=term-missing -o console_output_style=progress
 

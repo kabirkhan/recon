@@ -29,7 +29,7 @@ jobs:
       #   run: make mypy
   
   test:
-    name: test py${{ matrix.python }} on linux
+    name: test py${{ matrix.python }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
