@@ -5,7 +5,6 @@ import catalogue
 import spacy
 from recon.linker import BaseEntityLinker, EntityLinker
 from recon.types import Entity, Example
-from snorkel.preprocess import Preprocessor as SnorkelPreprocessor
 from spacy.language import Language
 
 
@@ -44,16 +43,15 @@ class preprocessor:
         return op
 
 
-class PreProcessor(SnorkelPreprocessor):
+class PreProcessor:
     def __init__(self, name: str, field: str) -> None:
-        super().__init__(name, field_names={"text": "text"}, mapped_field_names={field: field})
-        # self._name = name
+        self._name = name
         self._field = field
         self._cache: Dict[Any, Any] = {}
 
-    # @property
-    # def name(self) -> str:
-    #     return self._name
+    @property
+    def name(self) -> str:
+        return self._name
 
     @property
     def field(self) -> str:
