@@ -1,6 +1,6 @@
 # Loading your data
 
-Recon NER expects your data to be in the most basic [Prodigy Annotation Format](https://prodi.gy/docs/api-interfaces#ner).
+Recon NER expects your data to be in the [Prodigy Annotation Format](https://prodi.gy/docs/api-interfaces#ner).
 
 A single example in this format looks like:
 
@@ -12,7 +12,7 @@ A single example in this format looks like:
 ```
 
 Recon does require that you have the tokens property set and will try to resolve any tokenization errors in your
-data for you as well as add tokens if they don't already exist. If your have already been tokenized (which is true if you used the ner_manual Prodigy recipe), Recon will skip the tokenization step.
+data for you as well as add tokens if they don't already exist. If your data has already been tokenized (which is true if you used the ner_manual Prodigy recipe), Recon will skip the tokenization step.
 
 Recon expects your data to be in a collection in a JSONL or JSON file.
 
