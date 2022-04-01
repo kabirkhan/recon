@@ -1,13 +1,17 @@
 [build-system]
-requires = ["flit_core >=2,<3"]
-build-backend = "flit_core.buildapi"
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
 
-[tool.flit.metadata]
-dist-name = "reconner"
-module = "recon"
-author = "Kabir Khan"
-author-email = "kabirkhan1137@outlook.com"
-home-page = "https://github.com/kabirkhan/recon"
+[tool.poetry]
+name = "reconner"
+version = "0.9.0"
+description = "Recon NER, Debug and correct annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data."
+packages = [
+    { include = "recon" }
+]
+authors = ["Kabir Khan <kabirkhan1137@outlook.com>"]
+homepage = "https://kabirkhan.github.io"
+repository = "https://github.com/kabirkhan/recon"
 classifiers = [
     "Intended Audience :: Information Technology",
     "Intended Audience :: System Administrators",
@@ -26,36 +30,26 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "License :: OSI Approved :: MIT License"
-    ]
-requires = [
-    "spacy >= 3.0.0, <3.1.0",
-    "scipy",
-    "snorkel == 0.9.6",
-    "typer >= 0.0.8"
 ]
-description-file = "README.md"
-requires-python = ">=3.6"
 
-[tool.flit.metadata.urls]
-Documentation = "https://kabirkhan.github.io/recon"
+[tool.poetry.dependencies]
+python = ">= 3.7"
+spacy = ">= 3.2.0, <3.4.0"
 
-[tool.flit.metadata.requires-extra]
-dev = [
-    "jupyterlab >= 1.2.0, <1.3",
-    "ipywidgets",
-    "autoflake >=1.3.1,<2.0.0",
-    "flake8 >=3.8.3,<4.0.0"
-]
-test = [
-    "pytest == 5.3.0",
-    "pytest-cov",
-    "coverage",
-    "pytest-xdist",
-    "pytest-sugar",
-    "mypy",
-    "black",
-    "isort"
-]
+[tool.poetry.dev-dependencies]
+jupyterlab = ">= 1.2.0, <1.3"
+ipywidgets = "*"
+autoflake = "*"
+flake8 = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-xdist = "*"
+pytest-sugar = "*"
+mypy = "*"
+black = "*"
+isort = "*"
+
+[tool.poetry.extras]
 doc = [
     "mkdocs >=1.1.2,<2.0.0",
     "mkdocs-material >=5.4.0,<6.0.0",
@@ -67,16 +61,16 @@ all = [
     "click-completion"
 ]
 
-[tool.flit.scripts]
+[tool.poetry.scripts]
 recon = "recon.cli:app"
 
-[tool.flit.entrypoints."prodigy_recipes"]
+[tool.poetry.plugins."prodigy_recipes"]
 "recon.ner_correct" = "recon:prodigy_recipes.ner_correct"
 "recon.ner_merge" = "recon:prodigy_recipes.ner_merge"
 
 [tool.black]
 line-length = 100
-target-version = ['py36']
+target-version = ['py39']
 include = '\.pyi?$'
 exclude = '''
 /(

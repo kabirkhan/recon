@@ -66,6 +66,4 @@ In the next step step of this tutorial we'll introduce the core containers Recon
 
 1. [`Dataset`](/api/dataset) - A `Dataset` has a name and holds a list of examples. Its also responsible for tracking any mutations done to its internal data throught Recon operations. (More on this [later](link_to_operations))
 
-and
-
 2. [`Corpus`](/api/corpus). A `Corpus` is a wrapper around a set of datasets that represent a typical train/eval or train/dev/test split. Using a `Corpus` allows you to gain insights on how well your train set represents your dev/test sets.
