@@ -1,7 +1,7 @@
 
 .DEFAULT_GOAL := all
-isort = isort pydantic tests
-black = black -S -l 120 --target-version py38 pydantic tests
+isort = poetry run isort recon tests
+black = poetry run black -S -l 120 --target-version py39 recon tests
 
 
 .PHONY: install
@@ -16,12 +16,12 @@ format:
 
 .PHONY: lint
 lint:
-	flake8 pydantic/ tests/
+	poetry run flake8 recon/ tests/
 	$(isort) --check-only --df
 	$(black) --check --diff
 
 .PHONY: test
 test:
-	pytest ./tests --cov=recon --cov-report=term-missing -o console_output_style=progress
+	poetry run pytest ./tests --cov=recon --cov-report=term-missing -o console_output_style=progress
 
 
