@@ -58,5 +58,27 @@ jobs:
       - name: test
         run: |
           make test
-
+  
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
       
+      - name: set up python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      
+      - name: Build
+        run: |
+          poetry build
+      
+      - name: Publish
+        run: |
+          poetry publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
