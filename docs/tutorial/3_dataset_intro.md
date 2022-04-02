@@ -1,4 +1,4 @@
-In Recon, a [`Dataset`](/api/dataset) has a few responsibilities.
+In Recon, the [`Dataset`](/api/dataset) has a few responsibilities.
 
 * Store exampels
 * Store state of **every** mutation made to it using recon operations
