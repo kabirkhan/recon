@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths: [docs]
+    tags:
+      - 'v*'
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write 
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+      
+      - name: set up python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      
+      - name: Install
+        run: |
+          make install
+
+      - name: Build Docs
+        run: |
+          make build-docs
+
+      - name: Deploy Docs
+        run: |
+          make deploy-docs
