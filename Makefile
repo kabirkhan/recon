@@ -27,4 +27,11 @@ lint:
 test:
 	poetry run pytest ./tests --cov=recon --cov-report=term-missing -o console_output_style=progress
 
+.PHONY: build-docs
+build-docs:
+	poetry run python -m mkdocs build
+	cp ./docs/index.md ./README.md
 
+.PHONY: deploy-docs
+deploy-docs:
+	poetry run python -m mkdocs gh-deploy
