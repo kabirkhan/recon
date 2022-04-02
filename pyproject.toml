@@ -26,14 +26,14 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "License :: OSI Approved :: MIT License"
 ]
 
 [tool.poetry.dependencies]
-python = ">= 3.9, < 3.11"
+python = ">= 3.8 , < 3.11"
 numpy = ">= 1.22.0, < 1.23.0"
 spacy = ">= 3.2.0, < 3.4.0"
 scipy = ">= 1.8.0, < 1.9"
