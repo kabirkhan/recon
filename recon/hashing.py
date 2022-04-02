@@ -1,5 +1,6 @@
-import xxhash
 from typing import Any, Callable, Tuple, Union
+
+import xxhash
 
 
 def token_hash(token: Any, as_int: bool = True) -> Union[str, int]:
@@ -119,4 +120,4 @@ def _hash(tpl: Tuple, hash_function: Callable = xxhash.xxh64, as_int: bool = Tru
         else:
             e_bytes = bytes(e)
         m.update(e_bytes)
-    return  m.intdigest() if as_int else m.hexdigest() 
+    return m.intdigest() if as_int else m.hexdigest()
