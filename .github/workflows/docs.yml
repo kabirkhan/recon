@@ -1,4 +1,4 @@
-name: Update Dos
+name: Update Documentation
 
 on:
   push:
