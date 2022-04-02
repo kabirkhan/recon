@@ -1510,8 +1510,8 @@ doc = []
 
 [metadata]
 lock-version = "1.1"
-python-versions = ">= 3.8, < 3.11"
-content-hash = "2521f7139b46967e0407293ba323dbd83ea053f489dea9fab812202f3d4040e0"
+python-versions = ">= 3.8 , < 3.11"
+content-hash = "f04bda1993953ce1bdacb5ccedf908379ca2e6a2a71abe7f8078292d809e11c4"
 
 [metadata.files]
 appnope = [
