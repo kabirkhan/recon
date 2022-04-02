@@ -1,4 +1,4 @@
-import hashlib
+import xxhash
 from typing import Any, Callable, Tuple, Union
 
 
@@ -97,7 +97,7 @@ def prediction_error_hash(prediction_error: Any, as_int: bool = True) -> Union[s
     return _hash(hash_data, as_int=as_int)
 
 
-def _hash(tpl: Tuple, hash_function: Callable = hashlib.sha1, as_int: bool = True) -> Union[str, int]:
+def _hash(tpl: Tuple, hash_function: Callable = xxhash.xxh64, as_int: bool = True) -> Union[str, int]:
     """Deterministic hash function. The main use here is
     providing a `commit_hash` for a Dataset to compare across
     saves/loads and ensure that operations are re-run if the hash
@@ -120,9 +120,4 @@ def _hash(tpl: Tuple, hash_function: Callable = hashlib.sha1, as_int: bool = Tru
             e_bytes = bytes(e)
         m.update(e_bytes)
 
-    hd = m.hexdigest()
-
-    if as_int:
-        return int(hd, 16)
-    else:
-        return hd
+    return  m.intdigest() if as_int else m.hexdigest() 
