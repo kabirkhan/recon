@@ -15,7 +15,7 @@ def test_dataset_initialize(example_data):
     assert dataset.name == "train"
     assert dataset.data == []
     assert dataset.example_store._map == {}
-    assert dataset.commit_hash == "94efdd6f628eda9c1ae893467c9652808443ef3e"
+    assert dataset.commit_hash == "d18f9b6611eb8e16"
     assert dataset.operations == []
 
     store = ExampleStore()
@@ -23,7 +23,7 @@ def test_dataset_initialize(example_data):
     assert dataset2.name == "dev"
     assert dataset2.data == example_data["dev"]
     assert dataset2.example_store == store
-    assert dataset2.commit_hash == "dd05e54668c166d075bc4406bfee590e4c89a292"
+    assert dataset2.commit_hash == "6253c7cdc08bcbca"
     assert dataset2.operations == []
 
 
@@ -37,7 +37,7 @@ def test_dataset_commit_hash(example_data):
     train_dataset.data.append(example_data["train"][-1])
 
     assert train_dataset.commit_hash != train_commit
-    assert hash(train_dataset) == 1186038092183970443
+    assert hash(train_dataset) == 2389582605943205983
 
 
 def test_len(example_data):
