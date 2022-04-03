@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
 This might not be that interesting (it doesn't save you a ton of code) but `Dataset.apply` can accept either a function or a name for a registered Recon operation. All functions are registered in a Recon registry.
 
-All functions packaged with recon have "recon.vN..." as  a prefix.
+All functions packaged with recon have "recon.vN..." as a prefix.
 
 So the above example can be converted to:
 
@@ -95,8 +95,8 @@ if __name__ == "__main__":
     typer.run(main)
 ```
 
-This means you don't have to import the get_ner_stats function. For a full list of operations see
-the [operations API guide](/api/operations)
+This means you don't have to import the get_ner_stats function. It also means you can easily write custom operations beyond what is built in to Recon. For a full list of built in operations see
+the [operations API guide](/api/operations). 
 
 All of these examples should return the exact same response. See for yourself:
 

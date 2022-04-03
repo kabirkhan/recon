@@ -4,10 +4,8 @@ on:
   push:
     branches:
       - main
-    paths: 
+    paths:
       - docs
-    tags:
-      - 'v*'
 
 jobs:
   deploy-docs:
