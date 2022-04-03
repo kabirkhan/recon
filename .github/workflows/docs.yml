@@ -2,8 +2,10 @@ name: Update Documentation
 
 on:
   push:
-    paths:
-      - docs
+    branches:
+      - main
+    # paths:
+    #   - docs
 
 jobs:
   deploy-docs:
