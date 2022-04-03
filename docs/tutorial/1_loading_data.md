@@ -2,7 +2,7 @@
 
 Recon NER expects your data to be in the [Prodigy Annotation Format](https://prodi.gy/docs/api-interfaces#ner).
 
-A single example in this format looks like:
+A single example in this format looks like
 
 ```JSON
 {
