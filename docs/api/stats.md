@@ -1,1 +1,1 @@
-::: recon.stats
+::: recon.operations.stats
