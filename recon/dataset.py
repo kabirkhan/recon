@@ -6,7 +6,7 @@ import srsly
 from recon.hashing import dataset_hash
 from recon.loaders import from_spacy, read_json, read_jsonl, to_spacy
 from recon.operations import registry
-from recon.stats import get_ner_stats
+from recon.operations.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import (
     DatasetOperationsState,
@@ -64,32 +64,40 @@ class Dataset:
         data: List[Example] = [],
         operations: List[OperationState] = None,
         example_store: ExampleStore = None,
-        version: str = "0.0.0",
         verbose: bool = True,
     ):
         self._name = name
-        self.data = data
+        self._data = data
         if not operations:
             operations = []
-        self.operations = operations
+        self._operations = operations
 
         if example_store is None:
             example_store = ExampleStore(data)
-        self.example_store = example_store
-        self._version = version
-        self.verbose = verbose
+        self._example_store = example_store
+        self._verbose = verbose
 
     @property
     def name(self) -> str:
         return self._name
 
     @property
-    def version(self) -> str:
-        return self._version
+    def commit_hash(self) -> str:
+        """String representation of internal hash
+        that can be used to mark a checkpoint in a dataset."""
+        return cast(str, dataset_hash(self, as_int=False))
 
     @property
-    def commit_hash(self) -> str:
-        return cast(str, dataset_hash(self, as_int=False))
+    def data(self) -> List[Example]:
+        return self._data
+
+    @property
+    def operations(self) -> List[OperationState]:
+        return self._operations
+
+    @property
+    def example_store(self) -> ExampleStore:
+        return self._example_store
 
     def __str__(self) -> str:
         stats = get_ner_stats(self.data, serialize=True)
@@ -141,12 +149,12 @@ class Dataset:
         if not name:
             raise ValueError("This function is not an operation since it does not have a name.")
 
-        msg = Printer(no_print=self.verbose == False)
+        msg = Printer(no_print=self._verbose == False)
         msg.text(f"=> Applying operation '{name}' to dataset '{self.name}'")
-        result: OperationResult = operation(self, *args, initial_state=initial_state, verbose=self.verbose, **kwargs)  # type: ignore
+        result: OperationResult = operation(self, *args, initial_state=initial_state, verbose=self._verbose, **kwargs)  # type: ignore
         msg.good(f"Completed operation '{name}'")
 
-        self.operations.append(result.state)
+        self._operations.append(result.state)
         dataset_changed = any(
             (
                 result.state.examples_added,
@@ -155,7 +163,7 @@ class Dataset:
             )
         )
         if dataset_changed:
-            self.data = result.data
+            self._data = result.data
 
     def pipe_(self, operations: List[Union[str, OperationState]]) -> None:
         """Run a sequence of operations on dataset data.
@@ -166,7 +174,7 @@ class Dataset:
             operations (List[Union[str, OperationState]]): List of operations
         """
 
-        msg = Printer(no_print=self.verbose == False)
+        msg = Printer(no_print=self._verbose == False)
         msg.text(f"Applying pipeline of operations inplace to the dataset: {self.name}")
 
         for op in operations:
@@ -231,10 +239,10 @@ class Dataset:
         old_data = [e for e in self.data if hash(e) not in examples_to_remove]
         old_data += examples_to_add
 
-        self.data = old_data
-        self.operations = self.operations[:-1]
+        self._data = old_data
+        self._operations = self.operations[:-1]
         for e in examples_to_remove:
-            del self.example_store._map[e]  # type: ignore
+            del self._example_store._map[e]  # type: ignore
 
     def search(self, search_query: str, case_sensitive: bool = True) -> List[Example]:
         """Naive search method to quickly identify examples matching the provided substring
@@ -256,6 +264,15 @@ class Dataset:
 
         return out_examples
 
+    def set_example_store(self, example_store: ExampleStore) -> None:
+        """Overwrite the the internal ExampleStore. You probably don't want to call this.
+        Used by the Corpus to ensure the ExampleStore of each dataset is complete.
+
+        Args:
+            example_store (ExampleStore): ExampleStore to overwrite with
+        """
+        self._example_store = example_store
+
     def from_disk(self, path: Path, loader_func: Callable = read_jsonl) -> "Dataset":
         """Load Dataset from disk given a path and a loader function that reads the data
         and returns an iterator of Examples
@@ -270,11 +287,11 @@ class Dataset:
         if (path / ".recon" / self.name).exists():
             state = srsly.read_json(path / ".recon" / self.name / "state.json")
             state = DatasetOperationsState(**state)
-            self.operations = state.operations
+            self._operations = state.operations
 
             example_store_path = path / ".recon" / self.name / "example_store.jsonl"
             if example_store_path.exists():
-                self.example_store.from_disk(example_store_path)
+                self._example_store.from_disk(example_store_path)
 
         if loader_func == read_json:
             suffix = ".json"
@@ -282,14 +299,14 @@ class Dataset:
             suffix = ".jsonl"
 
         data = loader_func(path / f"{self.name}{suffix}")
-        self.data = data
+        self._data = data
 
-        for example in self.data:
-            self.example_store.add(example)
+        for example in self._data:
+            self._example_store.add(example)
 
         if state and self.commit_hash != state.commit:
             # Dataset changed, examples added
-            self.operations.append(
+            self._operations.append(
                 OperationState(
                     name="recon.v1.examples_added_external",
                     status=OperationStatus.COMPLETED,
@@ -301,13 +318,13 @@ class Dataset:
                 )
             )
 
-            for op in self.operations:
-                op.status = OperationStatus.NOT_STARTED
+            for op in self._operations:
+                op._status = OperationStatus.NOT_STARTED
 
         seen: Set[str] = set()
         operations_to_run: Dict[str, OperationState] = {}
 
-        for op in self.operations:
+        for op in self._operations:
             if (
                 op.name not in operations_to_run
                 and op.name in registry.operations
@@ -317,27 +334,29 @@ class Dataset:
 
         for op_name, state in operations_to_run.items():
             op = registry.operations.get(op_name)
-
             self.apply_(op, *state.args, initial_state=state, **state.kwargs)  # type: ignore
 
         return self
 
-    def to_disk(self, output_dir: Path, force: bool = False, save_examples: bool = True) -> None:
+    def to_disk(self, output_dir: Path, overwrite: bool = False, save_examples: bool = True) -> None:
         """Save Corpus to Disk
 
         Args:
             output_dir (Path): Output file path to save data to
-            force (bool): Force save to directory. Create parent directories
+            overwrite (bool): Force save to directory. Create parent directories
                 or overwrite existing data.
             save_examples (bool): Save the example store along with the state.
         """
         output_dir = ensure_path(output_dir)
         state_dir = output_dir / ".recon" / self.name
-        if force:
-            output_dir.mkdir(parents=True, exist_ok=True)
+        if not overwrite and output_dir.exists():
+            raise ValueError(
+                "Output directory is not empty. Set overwrite=True in Dataset.to_disk to clear the directory before saving."
+            )
 
-            if not state_dir.exists():
-                state_dir.mkdir(parents=True, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        if not state_dir.exists():
+            state_dir.mkdir(parents=True, exist_ok=True)
 
         state = DatasetOperationsState(
             name=self.name, commit=self.commit_hash, size=len(self), operations=self.operations
@@ -367,7 +386,7 @@ class Dataset:
         data = []
         for prodigy_dataset in prodigy_datasets:
             data += from_prodigy(prodigy_dataset)
-        self.data = data
+        self._data = data
         return self
 
     def to_prodigy(self, prodigy_dataset: str = None, overwrite: bool = True) -> str:
@@ -399,7 +418,7 @@ class Dataset:
             Dataset: Initialized dataset with Prodigy data
         """
         data = from_spacy(path)
-        self.data = list(data)
+        self._data = list(data)
         return self
 
     def to_spacy(self, output_dir: Path) -> None:

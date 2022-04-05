@@ -2,7 +2,7 @@ from pathlib import Path
 
 import typer
 from recon.loaders import read_jsonl
-from recon.stats import get_ner_stats
+from recon import get_ner_stats
 
 
 def main(data_file: Path):

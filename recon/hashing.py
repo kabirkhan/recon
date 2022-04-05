@@ -1,9 +1,13 @@
-from typing import Any, Callable, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Tuple, Union
 
 import xxhash
 
+if TYPE_CHECKING:
+    from recon.dataset import Dataset
+    from recon.types import Example, PredictionError, Span, Token
 
-def token_hash(token: Any, as_int: bool = True) -> Union[str, int]:
+
+def token_hash(token: "Token", as_int: bool = True) -> Union[str, int]:
     """Hash of Token type
 
     Args:
@@ -16,7 +20,7 @@ def token_hash(token: Any, as_int: bool = True) -> Union[str, int]:
     return _hash((token.text, token.start, token.end, token.id), as_int=as_int)
 
 
-def span_hash(span: Any, as_int: bool = True) -> Union[str, int]:
+def span_hash(span: "Span", as_int: bool = True) -> Union[str, int]:
     """Hash of Span type
 
     Args:
@@ -37,7 +41,7 @@ def span_hash(span: Any, as_int: bool = True) -> Union[str, int]:
     return _hash(hash_data, as_int=as_int)
 
 
-def example_hash(example: Any, as_int: bool = True) -> Union[str, int]:
+def example_hash(example: "Example", as_int: bool = True) -> Union[str, int]:
     """Hash of Example type
 
     Args:
@@ -51,7 +55,7 @@ def example_hash(example: Any, as_int: bool = True) -> Union[str, int]:
     return _hash(hash_data, as_int=as_int)
 
 
-def tokenized_example_hash(example: Any, as_int: bool = True) -> Union[str, int]:
+def tokenized_example_hash(example: "Example", as_int: bool = True) -> Union[str, int]:
     """Hash of Example type including token data
 
     Args:
@@ -70,7 +74,7 @@ def tokenized_example_hash(example: Any, as_int: bool = True) -> Union[str, int]
     return _hash(hash_data, as_int=as_int)
 
 
-def dataset_hash(dataset: Any, as_int: bool = True) -> Union[str, int]:
+def dataset_hash(dataset: "Dataset", as_int: bool = True) -> Union[str, int]:
     """Hash of Dataset
 
     Args:
@@ -84,7 +88,7 @@ def dataset_hash(dataset: Any, as_int: bool = True) -> Union[str, int]:
     return _hash(hash_data, as_int=as_int)
 
 
-def prediction_error_hash(prediction_error: Any, as_int: bool = True) -> Union[str, int]:
+def prediction_error_hash(prediction_error: "PredictionError", as_int: bool = True) -> Union[str, int]:
     """Hash of PredictionError
 
     Args:

@@ -1,7 +1,11 @@
 import pytest
-from recon.corrections import corrections_from_dict, fix_annotations, rename_labels
 from recon.dataset import Dataset
 from recon.insights import get_label_disparities
+from recon.operations.corrections import (
+    corrections_from_dict,
+    fix_annotations,
+    rename_labels,
+)
 from recon.types import Example, Span, Token
 
 

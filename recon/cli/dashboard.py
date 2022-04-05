@@ -5,7 +5,7 @@ import typer
 from pathlib import Path
 
 from recon.corpus import Corpus
-from recon.stats import (
+from recon.operations.stats import (
     get_ner_stats,
 )
 from wasabi import Printer

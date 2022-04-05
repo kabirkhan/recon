@@ -1,9 +1,9 @@
 from typing import cast
 
 import pytest
-from recon.stats import get_ner_stats
+from recon.operations.stats import get_ner_stats
+from recon.operations.validation import filter_overlaps
 from recon.types import Example, NERStats, Span
-from recon.validation import filter_overlaps
 
 
 @pytest.fixture()

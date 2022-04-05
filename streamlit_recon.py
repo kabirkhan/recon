@@ -13,7 +13,7 @@ import typer
 from wasabi import Printer
 from recon import Corpus
 from recon.constants import NONE
-from recon.corrections import rename_labels
+from recon.operations.corrections import rename_labels
 from recon.insights import (
     get_ents_by_label,
     get_hardest_examples,
@@ -22,7 +22,7 @@ from recon.insights import (
     top_prediction_errors,
 )
 from recon.recognizer import SpacyEntityRecognizer
-from recon.stats import get_entity_coverage, get_ner_stats
+from recon.operations.stats import get_entity_coverage, get_ner_stats
 from recon.types import Example, HardestExample, PredictionError
 
 

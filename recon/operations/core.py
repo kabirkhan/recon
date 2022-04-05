@@ -89,7 +89,6 @@ class operation:
             Callable: Original function
         """
         op: Callable = args[0]
-
         pre: List[PreProcessor] = []
 
         for pre_name_or_op in self.pre:
@@ -214,7 +213,6 @@ class Operation:
 
         if received_data:
             values, errors = request_body_to_args(list(required_params.values()), received_data)
-            print("VALUES: ", values)
 
         if errors:
             error_msg = (

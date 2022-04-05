@@ -2,9 +2,9 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from recon.corrections import corrections_from_dict
 from recon.dataset import Dataset
-from recon.stats import get_ner_stats
+from recon.operations.corrections import corrections_from_dict
+from recon.operations.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import Correction, NERStats, OperationStatus, TransformationType
 
@@ -134,10 +134,10 @@ def test_dataset_to_from_disk(example_data, tmp_path):
 
     assert len(train_dataset.operations) == 0
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(ValueError):
         train_dataset.to_disk(tmp_path)
 
-    train_dataset.to_disk(tmp_path, force=True)
+    train_dataset.to_disk(tmp_path, overwrite=True)
     train_dataset_loaded = Dataset("train").from_disk(tmp_path)
     assert len(train_dataset_loaded.operations) == 0
     assert train_dataset_loaded.commit_hash == train_dataset.commit_hash
@@ -147,7 +147,7 @@ def test_dataset_to_from_disk(example_data, tmp_path):
     assert len(corrections) == 2
     train_dataset.apply_("recon.v1.fix_annotations", corrections)
 
-    train_dataset.to_disk(tmp_path, force=True)
+    train_dataset.to_disk(tmp_path, overwrite=True)
     train_dataset_loaded_2 = Dataset("train").from_disk(tmp_path)
 
     assert len(train_dataset_loaded_2.operations) == 2

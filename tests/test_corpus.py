@@ -3,7 +3,7 @@ from pathlib import Path
 
 from recon.corpus import Corpus
 from recon.dataset import Dataset
-from recon.stats import get_ner_stats
+from recon.operations.stats import get_ner_stats
 
 
 def test_corpus_initialize(example_data):
@@ -43,7 +43,7 @@ def test_corpus_disk(example_data):
 
     save_dir = Path(__file__).parent.parent / "examples/data/skills/to_disk_test"
 
-    corpus.to_disk(save_dir, force=True)
+    corpus.to_disk(save_dir, overwrite=True)
     corpus_loaded = Corpus.from_disk(save_dir)
     assert corpus.train == example_data["train"]
     assert corpus.dev == example_data["dev"]

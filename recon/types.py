@@ -29,6 +29,10 @@ class Span(BaseModel):
     def __hash__(self) -> int:
         return cast(int, span_hash(self))
 
+    @property
+    def hash(self) -> str:
+        return cast(str, span_hash(self, as_int=False))
+
 
 class Token(BaseModel):
     """Token with offsets into Example Text"""
@@ -40,6 +44,10 @@ class Token(BaseModel):
 
     def __hash__(self) -> int:
         return cast(int, token_hash(self))
+
+    @property
+    def hash(self) -> str:
+        return cast(str, token_hash(self, as_int=False))
 
 
 class Example(BaseModel):
@@ -91,6 +99,10 @@ class Example(BaseModel):
             if k not in self.schema()["properties"].keys():
                 del res[k]
         return res
+
+    @property
+    def hash(self) -> str:
+        return cast(str, tokenized_example_hash(self, as_int=False))
 
     @property
     def doc(self) -> Doc:
@@ -249,6 +261,10 @@ class PredictionError(BaseModel):
 
     def __hash__(self) -> int:
         return cast(int, prediction_error_hash(self))
+
+    @property
+    def hash(self) -> str:
+        return cast(str, prediction_error_hash(self, as_int=False))
 
 
 class HardestExample(BaseModel):

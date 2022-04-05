@@ -42,13 +42,13 @@ class Corpus:
             if test:
                 examples += test.data
             example_store = ExampleStore(examples)
-        self.example_store = example_store
+        self._example_store = example_store
 
         if test is None:
             test = Dataset("test")
 
         for ds in (train, dev, test):
-            ds.example_store = example_store
+            ds.set_example_store(example_store)
 
         self._train = train
         self._dev = dev
@@ -125,6 +125,10 @@ class Corpus:
             List[Example]: All Examples in Corpus
         """
         return self.train + self.dev + self.test
+
+    @property
+    def example_store(self) -> ExampleStore:
+        return self._example_store
 
     def apply(self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any) -> CorpusApplyResult:
         """Apply a function to all datasets
@@ -209,30 +213,32 @@ class Corpus:
             corpus = cls(name, train, dev)
         return corpus
 
-    def to_disk(self, data_dir: Path, force: bool = False) -> None:
+    def to_disk(self, output_dir: Path, overwrite: bool = False) -> None:
         """Save Corpus to Disk
 
         Args:
-            data_dir (Path): Directory to save data to
-            force (bool): Force save to directory. Create parent directories
-                or overwrite existing data.
+            output_dir (Path): Directory to save data to
+            overwrite (bool): Force save to directory. Create parent directories
+                and/or overwrite existing data.
         """
-        data_dir = ensure_path(data_dir)
-        state_dir = data_dir / ".recon"
+        data_dir = ensure_path(output_dir)
+        state_dir = output_dir / ".recon"
         corpus_meta_path = state_dir / "meta.json"
 
-        if force:
-            data_dir.mkdir(parents=True, exist_ok=True)
+        if not overwrite and output_dir.exists():
+            raise ValueError(
+                "Output directory is not empty. Set overwrite=True in Corpus.to_disk to clear the directory before saving."
+            )
 
-            if not state_dir.exists():
-                state_dir.mkdir(parents=True, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        if not state_dir.exists():
+            state_dir.mkdir(parents=True, exist_ok=True)
 
         srsly.write_json(corpus_meta_path, CorpusMeta(name=self.name).dict())
-        self._train.to_disk(data_dir, force=force, save_examples=False)
-        self._dev.to_disk(data_dir, force=force, save_examples=False)
+        self._train.to_disk(data_dir, overwrite=overwrite, save_examples=False)
+        self._dev.to_disk(data_dir, overwrite=overwrite, save_examples=False)
         if self._test:
-            self._test.to_disk(data_dir, force=force, save_examples=False)
-
+            self._test.to_disk(data_dir, overwrite=overwrite, save_examples=False)
         self.example_store.to_disk(state_dir / "example_store.jsonl")
 
     @classmethod
