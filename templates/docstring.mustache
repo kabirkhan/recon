@@ -1,0 +1,44 @@
+{{! Custom mkautodoc Docstring Template }}
+{{summaryPlaceholder}}
+
+{{extendedSummaryPlaceholder}}
+
+{{#parametersExist}}
+### Parameters
+--------------
+{{#args}}
+**{{var}}**: ({{typePlaceholder}}), required.
+    {{descriptionPlaceholder}}
+{{/args}}
+{{#kwargs}}
+**{{var}}**: ({{typePlaceholder}}, optional), Defaults to {{&default}}.
+    {{descriptionPlaceholder}}
+{{/kwargs}}
+{{/parametersExist}}
+
+{{#exceptionsExist}}
+### Raises
+-----------
+{{#exceptions}}
+{{type}}: 
+    {{descriptionPlaceholder}}
+{{/exceptions}}
+{{/exceptionsExist}}
+
+{{#returnsExist}}
+### Returns
+-----------
+{{#returns}}
+({{typePlaceholder}}): 
+    {{descriptionPlaceholder}}
+{{/returns}}
+{{/returnsExist}}
+
+{{#yieldsExist}}
+### yields
+----------
+{{#yields}}
+({{typePlaceholder}}): 
+    {{descriptionPlaceholder}}
+{{/yields}}
+{{/yieldsExist}}

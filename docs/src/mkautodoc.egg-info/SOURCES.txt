@@ -1,0 +1,7 @@
+setup.py
+mkautodoc/__init__.py
+mkautodoc/extension.py
+mkautodoc.egg-info/PKG-INFO
+mkautodoc.egg-info/SOURCES.txt
+mkautodoc.egg-info/dependency_links.txt
+mkautodoc.egg-info/top_level.txt

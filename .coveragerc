@@ -1,0 +1,6 @@
+[run]
+
+source =
+    reconner
+    
+parallel = True
