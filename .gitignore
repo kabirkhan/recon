@@ -10,3 +10,4 @@ dist
 site
 .coverage
 htmlcov
+**/.ipynb_checkpoints

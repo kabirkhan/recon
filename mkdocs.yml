@@ -10,7 +10,7 @@ theme:
     icon:
         repo: 'fontawesome/brands/github-alt'
     logo: 'img/drone-white.svg'
-    favicon: 'img/favicon.ico'
+    favicon: 'img/recon.svg'
     custom_dir: docs/overrides
 
 repo_name: 'kabirkhan/recon'
