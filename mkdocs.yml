@@ -5,11 +5,11 @@ site_url: https://kabirkhan.github.io/recon/
 theme:
     name: 'material'
     palette:
-        primary: 'blue'
-        accent: 'blue'
+        primary: 'white'
+        accent: 'purple'
     icon:
         repo: 'fontawesome/brands/github-alt'
-    logo: 'img/drone-white.svg'
+    logo: 'img/recon.svg'
     favicon: 'img/recon.svg'
     custom_dir: docs/overrides
 

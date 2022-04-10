@@ -35,3 +35,7 @@ build-docs:
 .PHONY: deploy-docs
 deploy-docs:
 	poetry run python -m mkdocs gh-deploy
+
+.PHONY: docs-live
+docs-live:
+	poetry run mkdocs serve --dev-addr 0.0.0.0:8009
