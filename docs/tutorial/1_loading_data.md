@@ -33,7 +33,7 @@ However, the goal of Recon is to provide insights across all of your annotated e
 Let's use the `read_jsonl` loader to load some annotated data created with Prodigy
 
 !!!tip
-    If you don't have any data available, you can use the data in the examples folder [here](https://github.com/kabirkhan/reconner/tree/master/examples/data/skills). We'll be using this data for the rest of the tutorial.
+    If you don't have any data available, you can use the data in the examples folder [here](https://github.com/kabirkhan/recon/tree/master/examples/data/skills). We'll be using this data for the rest of the tutorial.
 
 ```python
 from recon.loaders import read_jsonl
