@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://kabirkhan.github.io/recon"><img src="https://kabirkhan.github.io/recon/img/recon_ner.svg" alt="Recon"></a>
+  <a href="https://kabirkhan.github.io/recon"><img src="https://raw.githubusercontent.com/kabirkhan/recon/main/docs/img/recon-ner.svg" alt="Recon"></a>
 </p>
 <p align="center">
     <em>Recon NER, Debug and correct annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.</em>

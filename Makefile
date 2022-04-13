@@ -33,7 +33,7 @@ build-docs:
 	cp ./docs/index.md ./README.md
 
 .PHONY: deploy-docs
-deploy-docs:
+deploy-docs: build-docs
 	poetry run python -m mkdocs gh-deploy
 
 .PHONY: docs-live
