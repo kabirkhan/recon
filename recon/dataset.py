@@ -1,16 +1,17 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Set, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
 
 import srsly
 from recon.hashing import dataset_hash
 from recon.loaders import from_spacy, read_json, read_jsonl, to_spacy
 from recon.operations import registry
-from recon.operations.stats import get_ner_stats
+from recon.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import (
     DatasetOperationsState,
     Example,
+    NERStats,
     OperationResult,
     OperationState,
     OperationStatus,
@@ -76,6 +77,7 @@ class Dataset:
             example_store = ExampleStore(data)
         self._example_store = example_store
         self._verbose = verbose
+        self._stats: Optional[NERStats] = None
 
     @property
     def name(self) -> str:
@@ -98,10 +100,13 @@ class Dataset:
     @property
     def example_store(self) -> ExampleStore:
         return self._example_store
-
-    def __str__(self) -> str:
-        stats = get_ner_stats(self.data, serialize=True)
-        return f"Dataset: {self.name}\n" f"Stats: {stats}"
+    
+    @property
+    def stats(self) -> NERStats:
+        return get_ner_stats(self.data)
+    
+    def summary(self) -> str:
+        print(f"Dataset\nName: {self.name}\nStats: {self.stats}")
 
     def __hash__(self) -> int:
         return cast(int, dataset_hash(self))

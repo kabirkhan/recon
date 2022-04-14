@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import cast
 
 from recon.corpus import Corpus
-from recon.operations.stats import (
+from recon.stats import (
     calculate_label_distribution_similarity,
     get_ner_stats,
 )

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from recon.corpus import Corpus
 from recon.dataset import Dataset
-from recon.operations.stats import get_ner_stats
+from recon.stats import get_ner_stats
 
 
 def test_corpus_initialize(example_data):

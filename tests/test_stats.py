@@ -1,4 +1,4 @@
-from recon.operations.stats import (
+from recon.stats import (
     calculate_entity_coverage_entropy,
     calculate_entity_coverage_similarity,
     calculate_label_balance_entropy,

@@ -22,7 +22,7 @@ from recon.insights import (
     top_prediction_errors,
 )
 from recon.recognizer import SpacyEntityRecognizer
-from recon.operations.stats import get_entity_coverage, get_ner_stats
+from recon.stats import get_entity_coverage, get_ner_stats
 from recon.types import Example, HardestExample, PredictionError
 
 

@@ -1,6 +1,6 @@
 import warnings
 from collections import Counter, defaultdict
-from typing import Any, Callable, Dict, Iterator, List, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, TYPE_CHECKING
 
 from pydantic.error_wrappers import ErrorWrapper
 from recon.operations import registry as op_registry
@@ -13,6 +13,7 @@ from recon.preprocess import PreProcessor
 from recon.preprocess import registry as pre_registry
 from recon.types import (
     Example,
+    Op,
     OperationResult,
     OperationState,
     OperationStatus,
@@ -21,6 +22,9 @@ from recon.types import (
 )
 from tqdm import tqdm
 from wasabi import Printer
+
+if TYPE_CHECKING:
+    from recon import Dataset
 
 
 def op_iter(
@@ -54,6 +58,7 @@ class operation:
     def __init__(
         self,
         name: str,
+        *,
         pre: List[Union[str, PreProcessor]] = [],
         handles_tokens: bool = True,
         factory: bool = False,
@@ -71,7 +76,7 @@ class operation:
         self.factory = factory
         self.augmentation = augmentation
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Callable:
+    def __call__(self, op: Op, *args: Any, **kwargs: Any) -> Callable:
         """Decorator for an operation.
         The first arg is the function being decorated.
         This function can either operate on a List[Example]
@@ -83,12 +88,11 @@ class operation:
         recon will take care of applying it to a full Dataset
 
         Args:
-            args: First arg is function to decorate
+            op (Op): First arg is callable to decorate
 
         Returns:
-            Callable: Original function
+            Op: Original operation callable
         """
-        op: Callable = args[0]
         pre: List[PreProcessor] = []
 
         for pre_name_or_op in self.pre:
@@ -99,14 +103,13 @@ class operation:
             pre.append(preprocessor)
 
         if self.factory:
-
             def factory(pre: List[PreProcessor]) -> Operation:
                 return Operation(
                     self.name,
                     pre,
                     op=op,
                     handles_tokens=self.handles_tokens,
-                    augmentation=self.augmentation,
+                    augmentation=self.augmentation
                 )
 
             op_registry.operation_factories.register(self.name)(factory)
@@ -135,7 +138,7 @@ class Operation:
         Args:
             name (str): Name of operation
             pre (List[PreProcessor]): List of preprocessors to run
-            op (Callable): Decorated function
+            op (Op): Operation callable
         """
         self.name = name
         self.pre = pre
@@ -143,7 +146,14 @@ class Operation:
         self.handles_tokens = handles_tokens
         self.augmentation = augmentation
 
-    def __call__(self, dataset: Any, *args: Any, **kwargs: Any) -> OperationResult:
+    def __call__(
+        self,
+        dataset: "Dataset",
+        *args: Any,
+        verbose: Optional[bool] = False,
+        initial_state: Optional[OperationState] = None,
+        **kwargs: Any
+    ) -> OperationResult:
         """Runs op on a dataset and records the results
 
         Args:
@@ -155,8 +165,6 @@ class Operation:
         Returns:
             OperationResult: Container holding new data and the state of the Operation
         """
-        verbose = kwargs.pop("verbose", False)
-        initial_state = kwargs.pop("initial_state", None)
         if not initial_state:
             initial_state = OperationState(name=self.name)
         state = initial_state.copy(deep=True)
@@ -197,11 +205,11 @@ class Operation:
         if has_tokens and not self.handles_tokens:
             warnings.warn(
                 # fmt: off
-                "This dataset seems to have preset tokens. " +
+                "This dataset seems to have preset tokens. "
                 f"Operation: {self.name} is not currently capable of handling tokens and you will "
-                "need to reset tokenization after this operation. " +
-                "Applying the `recon.v1.add_tokens` operation after this " +
-                "is complete will get you back to a clean state."
+                "need to reset tokenization after this operation. "
+                "Applying the `recon.v1.add_tokens` operation after this "
+                "operation is complete will get you back to a clean state."
                 # fmt: on
             )
 

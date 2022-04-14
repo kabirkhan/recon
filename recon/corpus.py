@@ -32,9 +32,9 @@ class Corpus:
 
         Args:
             name (str): Name of the Corpus
-            train (Dataset): List of examples for **train** set
-            dev (Dataset): List of examples for **dev** set
-            test (Dataset, optional): Defaults to None. List of examples for **test** set
+            train (Dataset): Dataset containing examples for **train** set
+            dev (Dataset): Dataset containing examples for **dev** set
+            test (Dataset, optional): Defaults to None. Dataset containing examples for **test** set
         """
         self._name = name
         if example_store is None:
@@ -129,6 +129,12 @@ class Corpus:
     @property
     def example_store(self) -> ExampleStore:
         return self._example_store
+    
+    def print_stats(self) -> str:
+        self.train_ds.print_stats()
+        self.dev_ds.print_stats()
+        if self.test_ds:
+            self.test_ds.print_stats()
 
     def apply(self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any) -> CorpusApplyResult:
         """Apply a function to all datasets

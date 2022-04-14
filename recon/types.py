@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, cast
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Iterable, NamedTuple, Optional, Protocol, Tuple, Union, cast
 
 from pydantic import BaseModel, Extra, root_validator
 from recon.hashing import (
@@ -163,7 +164,8 @@ def track_shim(example_hash: Optional[int] = None, new_example: Optional[Example
 # fmt: on
 
 
-class TransformationCallbacks(NamedTuple):
+@dataclass
+class TransformationCallbacks:
     add_example: Callable[[Example], None] = add_shim
     remove_example: Callable[[int], None] = remove_shim
     change_example: Callable[[int, Example], None] = change_shim
@@ -309,7 +311,10 @@ class NERStats(BaseModel):
     n_examples_no_entities: int
     n_annotations: int
     n_annotations_per_type: Dict[str, int]
-    examples_with_type: Optional[Dict[str, Example]]
+    examples_with_type: Optional[Dict[str, Example]] = None
+
+    def __str__(self) -> str:
+        return self.json(indent=4)
 
 
 class EntityCoverage(BaseModel):
@@ -352,6 +357,46 @@ class Correction(BaseModel):
     from_labels: List[str]
     to_label: Optional[str] = None
 
+    @classmethod
+    def from_dict(cls, obj: Dict[str, Any]) -> "List[Correction]":
+        """Load a list of Corrections from the Dict short-hand syntax.
+
+        Args:
+            obj (Dict[str, Any]): Dictionary of corrections.
+                Example:
+
+                corrections = Correction.from_dict({
+                    "model": ("PRODUCT", "SKILL"),
+                })
+
+                will return a list of Corrections with 1 item, correcting the text "model" from PRODUCT
+                to SKILL.
+
+        Raises:
+            ValueError: If Dict format is invalid
+
+        Returns:
+            List[Correction]: List of Corrections
+        """
+        corrections: List[Correction] = []
+        for key, val in obj.items():
+            if isinstance(val, str) or val == None:
+                from_labels = ["ANY"]
+                to_label = val
+            elif isinstance(val, tuple):
+                if isinstance(val[0], str):
+                    from_labels = [val[0]]
+                else:
+                    from_labels = val[0]
+                to_label = val[1]
+            else:
+                raise ValueError(
+                    "Cannot parse corrections dict. Value must be either a str of the label "
+                    + "to change the annotation to (TO_LABEL) or a tuple of (FROM_LABEL, TO_LABEL)"
+                )
+            corrections.append(cls(annotation=key, from_labels=from_labels, to_label=to_label))
+        return corrections
+
 
 class Scores(BaseModel):
     ents_p: float
@@ -359,3 +404,8 @@ class Scores(BaseModel):
     ents_f: float
     ents_per_type: Dict[str, Any]
     speed: float
+
+
+class Op(Protocol):
+    def __call__(self, example: Example) -> Optional[Union[Example, Iterable[Example]]]:
+        ...
