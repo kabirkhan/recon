@@ -11,3 +11,4 @@ site
 .coverage
 htmlcov
 **/.ipynb_checkpoints
+.coverage.*
