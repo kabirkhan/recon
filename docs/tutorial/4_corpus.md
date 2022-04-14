@@ -1,13 +1,9 @@
 # Tutorial - Using `Corpus.apply`
 
-In the previous step, we used the `stats.get_ner_stats` function to some stats on our train_data. Now, we want to be able to get these same stats across our train/dev/test split.
+So far, we have been operating on a Dataset which represents a single split of our data. Recon's `Corpus` container allows us to work with our full train/dev/test split by managing a separate `Dataset` for each split. The `Corpus` handles either 2 (train, dev) or 3 (train, dev, test) Datasets. If you happen to split up your data in some other way, you may need to just manage the lower level `Dataset` for each split on your own.
 
-SO, ReconNER's `Corpus` class provides a useful method called [`apply`](../../api/corpus)
-that takes a `Callable` as a parameter that can run on a list of `Example`s (e.g. `stats.get_ner_stats`)
-and run that `Callable` over all the datasets as well as a concatenation of all the datasets so you get the full picture.
-
-!!! tip
-    You can pass arbitary `*args` and `**kwargs` to `Corpus.apply` and they will be passed along to the callable you provide as the required argument.
+Recon's `Corpus` class provides the same `apply` method as `Dataset` that accepts an `Operation`.
+S
 
 ## Update script to use `Dataset.apply`
 
@@ -88,16 +84,12 @@ We're also a little low (though not nearly as much) on our `PRODUCT` label.
 
 ### What to do from here
 
-We want our final model to be equally good at extracting these 3 labels of `SKILL`, `PRODUCT` and `JOB_ROLE` so we now know exactly where to invest more time in our annotations effort: getting more examples of `JOB_ROLE`.
-
-!!! note
-    This is a VERY small dataset sampled from a much larger NER dataset that's powering part of our work on the new [v3 Text Analytics Cognitive Service](https://azure.kabirkhan.com/en-us/services/cognitive-services/text-analytics/). So here's your glimpse into how we work with data at kabirkhan. Until we fix the lack of annotations for the `JOB_ROLE` label we won't be launching it in production.
-
+We want our final model to be equally good at extracting these 3 labels of `SKILL`, `PRODUCT` and `JOB_ROLE` so we now know exactly where to invest more time in our annotations effort: getting more examples of `JOB_ROLE` and `PRODUCT`.
 
 ## Next Steps
 
-We've only scratched the surface of ReconNER. It's great to have these global stats about our dataset so we can track trends and make sure we're trending in the right direction as we annotate more data. But this data doesn't debug the data we already have. 34 of our 191 `SKILL` annotations in our `train` set might actually be instances where `JOB_ROLE` or `PRODUCT` is more appropriate.
+We've only scratched the surface of Recon. It's great to have these global stats about our dataset so we can track trends and make sure we're trending in the right direction as we annotate more data. But this data doesn't debug the data we already have. 34 of our 191 `SKILL` annotations in our `train` set might actually be instances where `JOB_ROLE` or `PRODUCT` is more appropriate.
 
 We might have subsets of our data annotated by different people that had a slightly different understanding of the annotation requirements.
 
-In the next step of this tutorial we'll dive into the `insights` module of ReconNER to examine the quality of our existing annotations.
+In the next step of this tutorial we'll dive into the `insights` module of Recon to examine the quality of our existing annotations.
