@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - m1-build
     tags:
       - 'v*'
   pull_request: {}
