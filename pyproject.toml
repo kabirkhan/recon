@@ -32,6 +32,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License"
 ]
 
+[tool.poetry.build]
+script = "build.py"
+
 [tool.poetry.dependencies]
 python = ">= 3.8 , < 3.11"
 click-completion = "*"
@@ -57,7 +60,6 @@ mkdocs = ">= 1.3.0, <2.0.0"
 mkdocs-material = ">= 5.4.0, < 6.0.0"
 markdown-include = ">= 0.5.1, < 0.6.0"
 mkdocstrings = "*"
-
 
 [tool.poetry.scripts]
 recon = "recon.cli:app"
