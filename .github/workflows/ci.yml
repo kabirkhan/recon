@@ -87,6 +87,11 @@ jobs:
         run: |
           arch -arm64 /opt/homebrew/opt/python@3.9/bin/python3 -m poetry build
           arch -arm64 /opt/homebrew/opt/python@3.10/bin/python3 -m poetry build
+          ls dist
+      - uses: actions/upload-artifact@v2
+        with:
+          name: wheel
+          path: dist/*.whl
   
   deploy:
     needs: test
