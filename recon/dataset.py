@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Set, Union, cast
 
 import srsly
 from recon.hashing import dataset_hash
@@ -11,14 +11,24 @@ from recon.store import ExampleStore
 from recon.types import (
     DatasetOperationsState,
     Example,
+    Span,
+    Token,
     NERStats,
     OperationResult,
     OperationState,
     OperationStatus,
     TransformationType,
 )
+import spacy
+from spacy.tokens import Doc
 from spacy.util import ensure_path
 from wasabi import Printer
+
+if TYPE_CHECKING:
+    try:
+        from datasets import Dataset as HFDataset
+    except ImportError:
+        pass
 
 
 class Dataset:
@@ -436,3 +446,27 @@ class Dataset:
         """
         output_dir = ensure_path(output_dir)
         to_spacy(output_dir / (self.name + ".spacy"), self.data)
+    
+
+    def from_hf_dataset(
+        self,
+        hf_dataset: "HFDataset",
+        tokens_prop: str = "tokens",
+        labels_prop: str = "ner_tags",
+        labels: Optional[List[str]] = None,
+        lang: str = "en"
+    ) -> "Dataset":
+        nlp = spacy.blank(lang)
+        examples = []
+        for e in hf_dataset:
+            if labels:
+                tags = [labels[tag_n] for tag_n in e[labels_prop]]
+            else:
+                tags = e[labels_prop]
+            tokens = e[tokens_prop]
+            doc = Doc(nlp.vocab, words=tokens, spaces=[True] * len(tokens), ents=tags)
+            spans = [Span(text=ent.text, start=ent.start_char, end=ent.end_char, label=ent.label_) for ent in doc.ents]
+            tokens = [Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc]
+            examples.append(Example(text=doc.text, spans=spans, tokens=tokens))
+        self._data = examples
+        return self

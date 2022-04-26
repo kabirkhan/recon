@@ -4,6 +4,7 @@
 **/__pycache__
 env3.7
 env3.6
+build
 dist
 .mypy_cache
 .idea

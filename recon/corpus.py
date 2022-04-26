@@ -130,11 +130,11 @@ class Corpus:
     def example_store(self) -> ExampleStore:
         return self._example_store
     
-    def print_stats(self) -> str:
-        self.train_ds.print_stats()
-        self.dev_ds.print_stats()
+    def summary(self) -> str:
+        self.train_ds.summary()
+        self.dev_ds.summary()
         if self.test_ds:
-            self.test_ds.print_stats()
+            self.test_ds.summary()
 
     def apply(self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any) -> CorpusApplyResult:
         """Apply a function to all datasets
@@ -228,15 +228,15 @@ class Corpus:
                 and/or overwrite existing data.
         """
         data_dir = ensure_path(output_dir)
-        state_dir = output_dir / ".recon"
+        state_dir = data_dir / ".recon"
         corpus_meta_path = state_dir / "meta.json"
 
-        if not overwrite and output_dir.exists():
+        if not overwrite and data_dir.exists():
             raise ValueError(
                 "Output directory is not empty. Set overwrite=True in Corpus.to_disk to clear the directory before saving."
             )
 
-        output_dir.mkdir(parents=True, exist_ok=True)
+        data_dir.mkdir(parents=True, exist_ok=True)
         if not state_dir.exists():
             state_dir.mkdir(parents=True, exist_ok=True)
 

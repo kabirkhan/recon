@@ -33,12 +33,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">= 3.8 , < 3.11"
+python = ">= 3.8, < 3.11"
 click-completion = "*"
 colorama = "*"
-numpy = ">= 1.22.0, < 1.23.0"
+numpy = ">= 1.20.0, < 1.23.0"
 spacy = ">= 3.2.0, < 3.4.0"
-scipy = ">= 1.8.0, < 1.9"
+scipy = ">= 1.7.0, < 1.9"
 xxhash = ">= 3.0.0, < 3.1.0"
 
 [tool.poetry.dev-dependencies]
@@ -58,6 +58,10 @@ mkdocs-material = ">= 5.4.0, < 6.0.0"
 markdown-include = ">= 0.5.1, < 0.6.0"
 mkdocstrings = "*"
 
+[tool.poetry.extras]
+hf = ["datasets >= 2.0, <3.0"]
+plot = ["seaborn >= 0.9, <1.0"]
+prodigy = ["prodigy >= 1.11, < 1.12"]
 
 [tool.poetry.scripts]
 recon = "recon.cli:app"
