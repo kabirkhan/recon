@@ -110,11 +110,11 @@ class Dataset:
     @property
     def example_store(self) -> ExampleStore:
         return self._example_store
-    
+
     @property
     def stats(self) -> NERStats:
         return get_ner_stats(self.data)
-    
+
     def summary(self) -> str:
         print(f"Dataset\nName: {self.name}\nStats: {self.stats}")
 
@@ -381,7 +381,7 @@ class Dataset:
         if save_examples:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
 
-        srsly.write_jsonl(output_dir / (self.name + ".jsonl"), [e.dict() for e in self.data])
+        srsly.write_jsonl(output_dir / (self.name + ".jsonl"), [e.dict(exclude_unset=True) for e in self.data])
 
     def from_prodigy(self, prodigy_datasets: List[str]) -> "Dataset":
         """Need to have from_prodigy accept multiple datasets as a list of str so Prodigy
@@ -446,7 +446,7 @@ class Dataset:
         """
         output_dir = ensure_path(output_dir)
         to_spacy(output_dir / (self.name + ".spacy"), self.data)
-    
+
 
     def from_hf_dataset(
         self,

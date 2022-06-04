@@ -36,7 +36,7 @@ def to_prodigy(
 
     prodigy_examples = []
     for e in examples:
-        prodigy_examples.append(set_hashes(e.dict()))
+        prodigy_examples.append(set_hashes(e.dict(exclude_unset=True)))
 
     db.add_examples(prodigy_examples, [prodigy_dataset])
 

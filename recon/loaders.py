@@ -1,4 +1,4 @@
-"""Load a list of Example data from JSON represented records in 
+"""Load a list of Example data from JSON represented records in
 the [Prodigy](https://prodi.gy) format.
 """
 

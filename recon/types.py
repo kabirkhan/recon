@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Iterable, NamedTuple, Optional, Protocol, Tuple, Union, cast
+from typing import Any, Callable, Dict, List, Iterable, Optional, Protocol, Tuple, Union, cast
 
 from pydantic import BaseModel, Extra, root_validator
 from recon.hashing import (
@@ -23,9 +23,10 @@ class Span(BaseModel):
     start: int
     end: int
     label: str
-    token_start: Optional[int]
-    token_end: Optional[int]
-    kb_id: Optional[str]
+    token_start: Optional[int] = None
+    token_end: Optional[int] = None
+    kb_id: Optional[str] = None
+    source: Optional[str] = None
 
     def __hash__(self) -> int:
         return cast(int, span_hash(self))
@@ -270,17 +271,6 @@ class PredictionError(BaseModel):
 
 
 class HardestExample(BaseModel):
-    """Container for how hard an Example is for an EntityRecognizer to predict
-    all entities correctly for.
-    """
-
-    example: Example
-    count: int
-    difficulty: Optional[float]
-    prediction_errors: Optional[List[PredictionError]]
-
-
-class HardestExampleV2(BaseModel):
     reference: Example
     prediction: Example
     count: int

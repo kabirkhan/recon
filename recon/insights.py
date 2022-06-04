@@ -6,7 +6,7 @@ from recon.constants import NOT_LABELED
 from recon.recognizer import EntityRecognizer
 from recon.types import (
     Example,
-    HardestExampleV2,
+    HardestExample,
     LabelDisparity,
     PredictionError,
     PredictionErrorExamplePair,
@@ -133,15 +133,15 @@ def top_prediction_errors(
     if n is not None:
         data = data[:n]
 
-    len(data)
     texts = (e.text for e in data)
     anns = (e.spans for e in data)
+    preds = recognizer.predict(texts)
 
     errors = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))  # type: ignore
     error_examples: DefaultDict[Tuple[str, str, str], List[PredictionErrorExamplePair]] = defaultdict(list)
     n_errors = 0
 
-    for orig_example, pred_example, ann in zip(data, recognizer.predict(texts), anns):
+    for orig_example, pred_example, ann in zip(data, preds, anns):
         if k is not None and n_errors > k:
             break
 
@@ -228,7 +228,7 @@ def get_hardest_examples(
     examples: List[Example],
     score_count: bool = True,
     normalize_scores: bool = True,
-) -> List[HardestExampleV2]:
+) -> List[HardestExample]:
     """Get hardest examples for a recognizer to predict on and sort by difficulty with the goal
     of quickly identifying the biggest holes in a model / annotated data.
 
@@ -239,7 +239,7 @@ def get_hardest_examples(
         normalize_scores (bool): Scale scores adjusted by count between 0 and 1
 
     Returns:
-        List[HardestExampleV2]: HardestExamples sorted by difficulty (hardest first)
+        List[HardestExample]: HardestExamples sorted by difficulty (hardest first)
     """
     preds = recognizer.predict((e.text for e in examples))
 
@@ -258,7 +258,7 @@ def get_hardest_examples(
         if total_errors > max_count:
             max_count = total_errors
 
-        he = HardestExampleV2(reference=ref, prediction=pred, count=total_errors, score=score)
+        he = HardestExample(reference=ref, prediction=pred, count=total_errors, score=score)
         hes.append(he)
 
     if score_count:

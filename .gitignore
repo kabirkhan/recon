@@ -13,3 +13,4 @@ site
 htmlcov
 **/.ipynb_checkpoints
 .coverage.*
+examples/models/*

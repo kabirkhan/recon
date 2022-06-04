@@ -18,7 +18,7 @@ from recon.dataset import Dataset
 from recon.insights import get_hardest_examples
 from recon.operations.core import operation
 from recon.recognizer import SpacyEntityRecognizer
-from recon.types import Example, HardestExampleV2
+from recon.types import Example, HardestExample, Span
 
 
 @prodigy.recipe(
@@ -58,23 +58,7 @@ def ner_correct(
     rec = SpacyEntityRecognizer(nlp)
     hes = get_hardest_examples(rec, stream)
 
-    def stream_from_hardest_examples(hes: List[HardestExampleV2]):
-
-        for he in hes:
-
-            combined = he.reference.copy(deep=True)
-            pred_spans = []
-            for s in he.prediction.spans:
-                span = s.copy(deep=True)
-                span.label = f"{s.label}:PREDICTED"
-                pred_spans.append(span)
-
-            combined.spans = sorted(combined.spans + pred_spans, key=lambda s: s.start)
-
-            task = combined.dict()
-            yield task
-
-    stream = stream_from_hardest_examples(hes)
+    stream = _stream_from_hardest_examples(hes)
 
     def before_db(examples):
         for eg in examples:
@@ -169,3 +153,13 @@ def merge_examples(example, prodigy_texts_to_examples):
         return prodigy_texts_to_examples[example.text]
     else:
         return example
+
+
+def _stream_from_hardest_examples(hes: List[HardestExample]):
+    for he in hes:
+        combined = he.reference.copy(deep=True)
+        annot_spans = [Span(**span.dict(exclude={"source"}), source="ref") for span in he.reference.spans]
+        pred_spans = [Span(**span.dict(exclude={"source", "label"}), source="pred", label=f"{span.label}:PRED") for span in he.prediction.spans]
+        combined.spans = sorted(annot_spans + pred_spans, key=lambda s: s.start)
+        task = combined.dict()
+        yield task
