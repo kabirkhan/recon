@@ -10,17 +10,17 @@ from recon.types import Example
 from spacy.lang.en import English
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def nlp():
     return English()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def spacy_preprocessor(nlp):
     return SpacyPreProcessor(nlp=nlp)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def test_texts():
     return [
         "Machine learning is the most researched area of AI.",
@@ -74,7 +74,7 @@ def example_corpus_processed() -> Corpus:
     return corpus
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def recognizer(nlp, example_corpus):
     patterns = []
 
