@@ -21,7 +21,6 @@ jobs:
           python-version: 3.9
 
       - name: Load cached Poetry installation
-        if: matrix.os == 'ubuntu-latest'
         uses: actions/cache@v2
         with:
           path: ~/.local
