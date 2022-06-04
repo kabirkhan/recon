@@ -42,7 +42,6 @@ scipy = ">= 1.7.0, < 1.9"
 xxhash = ">= 3.0.0, < 4.0"
 
 [tool.poetry.dev-dependencies]
-ipywidgets = "*"
 autoflake = "*"
 flake8 = "*"
 pytest = "*"
@@ -58,7 +57,7 @@ markdown-include = ">= 0.5.1, < 0.6.0"
 mkdocstrings = "*"
 
 [tool.poetry.extras]
-notebooks = ["jupyterlab >= 3.0"]
+notebooks = ["jupyterlab >= 3.0", "ipywidgets"]
 hf = ["datasets >= 2.0, <3.0"]
 plot = ["seaborn >= 0.9, <1.0"]
 prodigy = ["prodigy >= 1.11, < 1.12"]
