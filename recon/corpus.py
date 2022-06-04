@@ -129,7 +129,7 @@ class Corpus:
     @property
     def example_store(self) -> ExampleStore:
         return self._example_store
-    
+
     def summary(self) -> str:
         self.train_ds.summary()
         self.dev_ds.summary()

@@ -1,7 +1,18 @@
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Iterable, Optional, Protocol, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Protocol,
+    Tuple,
+    Union,
+    cast,
+)
 
 from pydantic import BaseModel, Extra, root_validator
 from recon.hashing import (

@@ -2,6 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Set, Union, cast
 
+import spacy
 import srsly
 from recon.hashing import dataset_hash
 from recon.loaders import from_spacy, read_json, read_jsonl, to_spacy
@@ -11,15 +12,14 @@ from recon.store import ExampleStore
 from recon.types import (
     DatasetOperationsState,
     Example,
-    Span,
-    Token,
     NERStats,
     OperationResult,
     OperationState,
     OperationStatus,
+    Span,
+    Token,
     TransformationType,
 )
-import spacy
 from spacy.tokens import Doc
 from spacy.util import ensure_path
 from wasabi import Printer
@@ -447,14 +447,13 @@ class Dataset:
         output_dir = ensure_path(output_dir)
         to_spacy(output_dir / (self.name + ".spacy"), self.data)
 
-
     def from_hf_dataset(
         self,
         hf_dataset: "HFDataset",
         tokens_prop: str = "tokens",
         labels_prop: str = "ner_tags",
         labels: Optional[List[str]] = None,
-        lang: str = "en"
+        lang: str = "en",
     ) -> "Dataset":
         nlp = spacy.blank(lang)
         examples = []

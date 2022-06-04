@@ -1,9 +1,8 @@
 import math
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Union, cast
+from typing import Any, DefaultDict, Dict, List, Sequence, Union, cast
 
 import numpy as np
-import srsly
 from recon.constants import NOT_LABELED
 from recon.types import EntityCoverage, EntityCoverageStats, Example, NERStats, Outliers
 from scipy.spatial.distance import jensenshannon

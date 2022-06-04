@@ -1,6 +1,16 @@
 import warnings
 from collections import Counter, defaultdict
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from pydantic.error_wrappers import ErrorWrapper
 from recon.operations import registry as op_registry
@@ -103,13 +113,10 @@ class operation:
             pre.append(preprocessor)
 
         if self.factory:
+
             def factory(pre: List[PreProcessor]) -> Operation:
                 return Operation(
-                    self.name,
-                    pre,
-                    op=op,
-                    handles_tokens=self.handles_tokens,
-                    augmentation=self.augmentation
+                    self.name, pre, op=op, handles_tokens=self.handles_tokens, augmentation=self.augmentation
                 )
 
             op_registry.operation_factories.register(self.name)(factory)
@@ -152,7 +159,7 @@ class Operation:
         *args: Any,
         verbose: Optional[bool] = False,
         initial_state: Optional[OperationState] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> OperationResult:
         """Runs op on a dataset and records the results
 
