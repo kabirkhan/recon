@@ -12,25 +12,21 @@ jobs:
     name: Build and Deploy Docs
     runs-on: ubuntu-latest
     permissions:
-      contents: write 
+      contents: write
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: set up python
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python }}
-      
+          python-version: 3.9
+
       - name: Install Poetry
         uses: snok/install-poetry@v1
-      
+
       - name: Install
         run: |
           make install
-
-      - name: Build Docs
-        run: |
-          make build-docs
 
       - name: Deploy Docs
         run: |
