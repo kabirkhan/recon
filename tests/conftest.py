@@ -10,17 +10,17 @@ from recon.types import Example
 from spacy.lang.en import English
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def nlp():
     return English()
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def spacy_preprocessor(nlp):
     return SpacyPreProcessor(nlp=nlp)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def test_texts():
     return [
         "Machine learning is the most researched area of AI.",
@@ -28,7 +28,7 @@ def test_texts():
     ]
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def example_data() -> Dict[str, List[Example]]:
     """Fixture to load example train/dev/test data that has inconsistencies.
 
@@ -43,7 +43,7 @@ def example_data() -> Dict[str, List[Example]]:
     }
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def example_corpus() -> Corpus:
     """Fixture to load example train/dev/test data that has inconsistencies.
 
@@ -54,7 +54,7 @@ def example_corpus() -> Corpus:
     return Corpus.from_disk(base_path, name="test_corpus")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def example_corpus_processed() -> Corpus:
     """Fixture to load example train/dev/test data that has inconsistencies.
 
@@ -74,7 +74,7 @@ def example_corpus_processed() -> Corpus:
     return corpus
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def recognizer(nlp, example_corpus):
     patterns = []
 
