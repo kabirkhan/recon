@@ -21,6 +21,12 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Load cached Poetry installation
+        uses: actions/cache@v2
+        with:
+          path: ~/.local
+          key: poetry-0
+
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
