@@ -43,13 +43,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set up python
+      - name: Set up python
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python }}
 
       - name: Load cached Poetry installation
-        if: ${{ matrix.os }} == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
         uses: actions/cache@v2
         with:
           path: ~/.local
