@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set up python
+      - name: Set up python
         uses: actions/setup-python@v3
         with:
           python-version: 3.9
@@ -39,9 +39,6 @@ jobs:
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --no-root
-
-      - name: Install library
-        run: poetry install --no-interaction
 
       - name: lint
         run: make lint
