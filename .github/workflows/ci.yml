@@ -51,10 +51,8 @@ jobs:
       - name: Load cached Poetry installation
         uses: actions/cache@v2
         with:
-          path: ~/.local  # the path depends on the OS
-          key: poetry-0  # increment to reset cache
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+          path: ~/.local
+          key: poetry-0
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
