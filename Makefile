@@ -7,7 +7,7 @@ black = poetry run black -S -l 120 --target-version py39 recon tests
 
 
 .PHONY: install
-install: 
+install:
 	poetry install
 
 
@@ -34,7 +34,7 @@ build-docs:
 
 .PHONY: deploy-docs
 deploy-docs: build-docs
-	poetry run python -m mkdocs gh-deploy
+	poetry run python -m mkdocs gh-deploy --force
 
 .PHONY: docs-live
 docs-live:
