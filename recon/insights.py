@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, Set, Tuple
+from typing import DefaultDict, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 from recon.constants import NOT_LABELED
@@ -105,12 +105,11 @@ def top_label_disparities(
 def top_prediction_errors(
     recognizer: EntityRecognizer,
     data: List[Example],
-    labels: List[str] = None,
-    n: int = None,
-    k: int = None,
+    labels: Optional[List[str]] = None,
     exclude_fp: bool = False,
     exclude_fn: bool = False,
     verbose: bool = False,
+    return_examples: bool = False,
 ) -> List[PredictionError]:
     """Get a sorted list of examples your model is worst at predicting.
 
@@ -124,15 +123,13 @@ def top_prediction_errors(
         exclude_fp (bool, optional): Flag to exclude False Positive errors.
         exclude_fn (bool, optional): Flag to exclude False Negative errors.
         verbose (bool, optional): Show verbose output.
+        return_examples (bool, optional): Return Examples that contain the entity label annotation.
 
     Returns:
         List[PredictionError]: List of Prediction Errors your model is making, sorted by the
             spans your model has the most trouble with.
     """
-    labels or recognizer.labels
-    if n is not None:
-        data = data[:n]
-
+    labels = labels or recognizer.labels
     texts = (e.text for e in data)
     anns = (e.spans for e in data)
     preds = recognizer.predict(texts)
@@ -142,8 +139,6 @@ def top_prediction_errors(
     n_errors = 0
 
     for orig_example, pred_example, ann in zip(data, preds, anns):
-        if k is not None and n_errors > k:
-            break
 
         pred_error_example_pair = PredictionErrorExamplePair(original=orig_example, predicted=pred_example)
 
@@ -191,13 +186,15 @@ def top_prediction_errors(
         for error_text, error_labels in errors_per_label.items():
             for error_label, count in error_labels.items():
                 pe_hash = (error_text, label, error_label)
-                ranked_errors_map[pe_hash] = PredictionError(
+                pe = PredictionError(
                     text=error_text,
                     true_label=label,
                     pred_label=error_label,
                     count=count,
-                    examples=error_examples[pe_hash],
                 )
+                if return_examples:
+                    pe.examples = error_examples[pe_hash]
+                ranked_errors_map[pe_hash] = pe
 
     ranked_errors: List[PredictionError] = sorted(
         list(ranked_errors_map.values()), key=lambda error: error.count, reverse=True  # type: ignore
@@ -236,7 +233,7 @@ def get_hardest_examples(
         recognizer (EntityRecognizer): EntityRecognizer to test predictions for
         examples (List[Example]): Set of input examples
         score_count (bool): Adjust score by total number of errors
-        normalize_scores (bool): Scale scores adjusted by count between 0 and 1
+        normalize_scores (bool): Scale scores to range [0, 1] adjusted by total number of errors
 
     Returns:
         List[HardestExample]: HardestExamples sorted by difficulty (hardest first)

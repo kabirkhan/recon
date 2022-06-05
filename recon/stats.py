@@ -1,6 +1,6 @@
 import math
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Sequence, Union, cast
+from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Union, cast
 
 import numpy as np
 from recon.constants import NOT_LABELED
@@ -10,18 +10,16 @@ from scipy.stats import entropy as scipy_entropy
 
 
 def get_ner_stats(
-    data: List[Example], serialize: bool = False, return_examples: bool = False
-) -> Union[NERStats, str, None]:
+    data: List[Example], return_examples: bool = False
+) -> NERStats:
     """Compute statistics for NER data
 
     Args:
         data (Iterator[Example]): Data as a List of examples
-        serialize (bool, optional): Serialize to a JSON string for printing.
         return_examples (bool, optional): Whether to return examples per type
 
     Returns:
-        Union[NERStats, str, None]:
-            List of examples or string if serialize and no_print are both True
+        NERStats: Summary stats from list of Examples
     """
     annotations_per_type: DefaultDict[str, Any] = defaultdict(int)
     examples: DefaultDict[str, Any] = defaultdict(list)
@@ -50,10 +48,7 @@ def get_ner_stats(
     if return_examples:
         stats.examples_with_type = examples
 
-    if serialize:
-        return stats.json(indent=4)
-    else:
-        return stats
+    return stats
 
 
 def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
@@ -99,8 +94,7 @@ def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) 
         return counts_to_probs
 
     distance = jensenshannon(pipeline(x), pipeline(y))
-
-    return (1 - distance) * 100
+    return float(1 - distance) * 100
 
 
 def get_entity_coverage(
@@ -202,7 +196,7 @@ def get_probs_from_counts(seq: Sequence[int]) -> Sequence[float]:
     return np.asarray(seq) / sum(seq)
 
 
-def entropy(seq: Union[List[int], List[float]], total: int = None) -> float:
+def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) -> float:
     """Calculate Shannon Entropy for a sequence of Floats or Integers.
     If Floats, check they are probabilities
     If Integers, divide each n in seq by total and calculate entropy
@@ -221,12 +215,12 @@ def entropy(seq: Union[List[int], List[float]], total: int = None) -> float:
         raise ValueError("Pass a valid non-empty sequence")
 
     if isinstance(seq[0], float):
-        e = scipy_entropy(seq)
+        res = scipy_entropy(seq)
     elif isinstance(seq[0], int):
-        e = scipy_entropy(get_probs_from_counts(seq))
+        res = scipy_entropy(get_probs_from_counts(seq))
     else:
         raise ValueError("Parameter seq must be a sequence of probabilites or integers.")
-    return e
+    return float(res)
 
 
 def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
@@ -239,8 +233,8 @@ def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
         float: Entropy for annotation counts of each label
     """
     total = ner_stats.n_annotations
-    classes = [count for label, count in ner_stats.n_annotations_per_type.items()]
-    return entropy(classes, total)
+    classes = [count for _, count in ner_stats.n_annotations_per_type.items()]
+    return _entropy(classes, total)
 
 
 def calculate_entity_coverage_entropy(
@@ -256,7 +250,7 @@ def calculate_entity_coverage_entropy(
         float: Entropy for entity coverage counts
     """
     counts = [ecs.count for ecs in entity_coverage]
-    return entropy(counts, sum(counts))  # type: ignore
+    return _entropy(counts, sum(counts))  # type: ignore
 
 
 def detect_outliers(seq: Sequence[Any], use_log: bool = False) -> Outliers:

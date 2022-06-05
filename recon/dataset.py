@@ -73,8 +73,8 @@ class Dataset:
         self,
         name: str,
         data: List[Example] = [],
-        operations: List[OperationState] = None,
-        example_store: ExampleStore = None,
+        operations: List[OperationState] = [],
+        example_store: Optional[ExampleStore] = None,
         verbose: bool = True,
     ):
         self._name = name
