@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+set -x
 
 # Insist repository is clean
 git diff-index --quiet HEAD
