@@ -65,7 +65,9 @@ class PreProcessor:
 
 
 class SpacyPreProcessor(PreProcessor):
-    def __init__(self, nlp: Language = None, name: str = "recon.v1.spacy", field: str = "doc") -> None:
+    def __init__(
+        self, nlp: Language = None, name: str = "recon.v1.spacy", field: str = "doc"
+    ) -> None:
         super().__init__(name, field)
         self._nlp = nlp
 

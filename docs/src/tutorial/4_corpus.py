@@ -7,7 +7,7 @@ from recon import get_ner_stats
 
 def main(data_dir: Path):
     corpus = Corpus.from_disk(data_dir)
-    corpus_stats = corpus.apply(get_ner_stats, serialize=True)
+    corpus_stats = corpus.apply(get_ner_stats)
     for name, stats in corpus_stats.items():
         print(f"{name}")
         print("=" * 50)

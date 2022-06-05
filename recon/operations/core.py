@@ -56,7 +56,9 @@ def op_iter(
     for processor in pre:
         msg.info(f"\t=> Running preprocessor {processor.name}")
         processor_outputs = processor(data)
-        for example, output in tqdm(zip(data, processor_outputs), total=len(data), disable=(not verbose), leave=False):
+        for example, output in tqdm(
+            zip(data, processor_outputs), total=len(data), disable=(not verbose), leave=False
+        ):
             preprocessed_outputs[example][processor.name] = output
             example.__setattr__(processor.field, output)
 
@@ -116,7 +118,11 @@ class operation:
 
             def factory(pre: List[PreProcessor]) -> Operation:
                 return Operation(
-                    self.name, pre, op=op, handles_tokens=self.handles_tokens, augmentation=self.augmentation
+                    self.name,
+                    pre,
+                    op=op,
+                    handles_tokens=self.handles_tokens,
+                    augmentation=self.augmentation,
                 )
 
             op_registry.operation_factories.register(self.name)(factory)
@@ -190,7 +196,9 @@ class Operation:
 
         def remove_example(orig_example_hash: int) -> None:
             state.transformations.append(
-                Transformation(prev_example=orig_example_hash, type=TransformationType.EXAMPLE_REMOVED)
+                Transformation(
+                    prev_example=orig_example_hash, type=TransformationType.EXAMPLE_REMOVED
+                )
             )
 
         def change_example(orig_example_hash: int, new_example: Example) -> None:
@@ -244,7 +252,9 @@ class Operation:
         new_data = []
 
         with tqdm(total=len(dataset), disable=(not verbose)) as pbar:
-            for orig_example_hash, example, preprocessed_outputs in op_iter(dataset.data, self.pre, verbose=verbose):
+            for orig_example_hash, example, preprocessed_outputs in op_iter(
+                dataset.data, self.pre, verbose=verbose
+            ):
                 if preprocessed_outputs:
                     res = self.op(example, preprocessed_outputs=preprocessed_outputs, **values)
                 else:

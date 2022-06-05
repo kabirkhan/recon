@@ -137,7 +137,9 @@ class Corpus:
         if self.test_ds:
             self.test_ds.summary()
 
-    def apply(self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any) -> CorpusApplyResult:
+    def apply(
+        self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
+    ) -> CorpusApplyResult:
         """Apply a function to all datasets
 
         Args:
@@ -155,7 +157,9 @@ class Corpus:
             all=func(self.all, *args, **kwargs),  # type: ignore
         )
 
-    def apply_(self, operation: Callable[[Any], OperationResult], *args: Any, **kwargs: Any) -> None:
+    def apply_(
+        self, operation: Callable[[Any], OperationResult], *args: Any, **kwargs: Any
+    ) -> None:
         """Apply a function to all data inplace.
 
         Args:
@@ -269,7 +273,9 @@ class Corpus:
         """
         train_ds = Dataset("train").from_prodigy(prodigy_train_datasets)
         dev_ds = Dataset("dev").from_prodigy(prodigy_dev_datasets)
-        test_ds = Dataset("test").from_prodigy(prodigy_test_datasets) if prodigy_test_datasets else None
+        test_ds = (
+            Dataset("test").from_prodigy(prodigy_test_datasets) if prodigy_test_datasets else None
+        )
 
         ds = cls(name, train_ds, dev_ds, test_ds)
         return ds

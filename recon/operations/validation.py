@@ -87,10 +87,16 @@ def remove_overlapping_entities(sorted_spans: List[Span]) -> List[Span]:
             max_start = max(current_entity_start, current_overlapping_chain_start)
             if min_end - max_start > 0:
                 current_overlapping_chain.append(current_entity)
-                current_overlapping_chain_start = min(current_entity_start, current_overlapping_chain_start)
-                current_overlapping_chain_end = max(current_entity_end, current_overlapping_chain_end)
+                current_overlapping_chain_start = min(
+                    current_entity_start, current_overlapping_chain_start
+                )
+                current_overlapping_chain_end = max(
+                    current_entity_end, current_overlapping_chain_end
+                )
             else:
-                selections_from_chain: List[Span] = select_subset_of_overlapping_chain(current_overlapping_chain)
+                selections_from_chain: List[Span] = select_subset_of_overlapping_chain(
+                    current_overlapping_chain
+                )
 
                 current_overlapping_chain = []
                 spans_without_overlap.extend(selections_from_chain)

@@ -68,7 +68,9 @@ def fix_annotations(
                     ents_to_remove.append(i)
             elif s.label in c.from_labels or "ANY" in c.from_labels:
                 if dryrun:
-                    prints.append(f"Correction span: {s.text} from labels: {c.from_labels} to label: {c.to_label}")
+                    prints.append(
+                        f"Correction span: {s.text} from labels: {c.from_labels} to label: {c.to_label}"
+                    )
                 else:
                     s.label = cast(str, c.to_label)
 
@@ -147,7 +149,9 @@ def strip_annotations(
 
     def fix_tokens(example: Example, span: Span) -> bool:
         fix_tokens = example.tokens and any(example.tokens)
-        return bool(fix_tokens and span.token_start and span.token_end and span.token_start < span.token_end)
+        return bool(
+            fix_tokens and span.token_start and span.token_end and span.token_start < span.token_end
+        )
 
     for s in example.spans:
         for ch in strip_chars:
@@ -213,7 +217,10 @@ def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {})
                 )
                 for e in sent_doc.ents
             ],
-            tokens=[Token(text=t.text, start=t.idx, end=t.idx + len(t.text), id=i) for i, t in enumerate(sent_doc)],
+            tokens=[
+                Token(text=t.text, start=t.idx, end=t.idx + len(t.text), id=i)
+                for i, t in enumerate(sent_doc)
+            ],
         )
         new_examples.append(new_example)
     return new_examples

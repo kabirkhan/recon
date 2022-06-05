@@ -9,13 +9,13 @@ def main(data_file: Path, output_file: Path):
 
     print("STATS BEFORE")
     print("============")
-    print(ds.apply(get_ner_stats, serialize=True))
+    print(ds.apply(get_ner_stats))
 
     ds.apply_("recon.v1.upcase_labels")
 
     print("STATS AFTER")
     print("===========")
-    print(ds.apply(get_ner_stats, serialize=True))
+    print(ds.apply(get_ner_stats))
 
 
 if __name__ == "__main__":

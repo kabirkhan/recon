@@ -5,7 +5,9 @@ from typing import Any, Dict, List, Tuple
 from recon.types import Example
 
 
-def hash_example_meta(example: Example, fields: List[str] = None, ignore_field_absence: bool = False) -> Tuple:
+def hash_example_meta(
+    example: Example, fields: List[str] = None, ignore_field_absence: bool = False
+) -> Tuple:
     """Create a hash out of the metadata of an example
 
     Args:
@@ -78,7 +80,9 @@ def sample_examples(
             if example.meta[meta_field] not in meta_vals:
                 break
 
-        meta_hash = hash_example_meta(example, fields=fields, ignore_field_absence=ignore_field_absence)
+        meta_hash = hash_example_meta(
+            example, fields=fields, ignore_field_absence=ignore_field_absence
+        )
         if examples_counter[meta_hash] <= top_k_per_hash:
             out_examples.append(example)
             examples_counter[meta_hash] += 1

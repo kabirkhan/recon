@@ -1,5 +1,3 @@
-# Tutorial - Using `Corpus.apply`
-
 So far, we have been operating on a Dataset which represents a single split of our data. Recon's `Corpus` container allows us to work with our full train/dev/test split by managing a separate `Dataset` for each split. The `Corpus` handles either 2 (train, dev) or 3 (train, dev, test) Datasets. If you happen to split up your data in some other way, you may need to just manage the lower level `Dataset` for each split on your own.
 
 Recon's `Corpus` class provides the same `apply` method as `Dataset` that accepts an `Operation`.
@@ -26,7 +24,7 @@ train
 {
     "n_examples":102,
     "n_examples_no_entities":29,
-    "ents_per_type":{
+    "n_annotations_per_type":{
         "SKILL":191,
         "PRODUCT":34,
         "JOB_ROLE":5
@@ -37,7 +35,7 @@ dev
 {
     "n_examples":110,
     "n_examples_no_entities":49,
-    "ents_per_type":{
+    "n_annotations_per_type":{
         "SKILL":159,
         "PRODUCT":20,
         "JOB_ROLE":1
@@ -48,7 +46,7 @@ test
 {
     "n_examples":96,
     "n_examples_no_entities":38,
-    "ents_per_type":{
+    "n_annotations_per_type":{
         "PRODUCT":35,
         "SKILL":107,
         "JOB_ROLE":2
@@ -59,7 +57,7 @@ all
 {
     "n_examples":308,
     "n_examples_no_entities":116,
-    "ents_per_type":{
+    "n_annotations_per_type":{
         "SKILL":457,
         "PRODUCT":89,
         "JOB_ROLE":8
@@ -88,8 +86,10 @@ We want our final model to be equally good at extracting these 3 labels of `SKIL
 
 ## Next Steps
 
-We've only scratched the surface of Recon. It's great to have these global stats about our dataset so we can track trends and make sure we're trending in the right direction as we annotate more data. But this data doesn't debug the data we already have. 34 of our 191 `SKILL` annotations in our `train` set might actually be instances where `JOB_ROLE` or `PRODUCT` is more appropriate.
+We've only scratched the surface of Recon. It's great to have these global stats about our dataset so we can make sure we're trending in the right direction as we annotate more data. But this information doesn't help us debug the data we already have.
 
-We might have subsets of our data annotated by different people that had a slightly different understanding of the annotation requirements.
+For example, 34 of our 191 `SKILL` annotations in our `train` set might actually be instances where `JOB_ROLE` or `PRODUCT` is more appropriate.
 
-In the next step of this tutorial we'll dive into the `insights` module of Recon to examine the quality of our existing annotations.
+Or, we might have subsets of our data annotated by different people that had a slightly different understanding of the annotation requirements (or just made a couple mistakes), creating disparities in the final dataset.
+
+In the next step of this tutorial we'll put away the toy skills dataset and take a look at the widely used Conll 2003 Benchmark Dataset. We'll use Recon to find and correct errors in the original dataset and publish our new and improved Conll 2003 dataset.

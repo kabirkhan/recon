@@ -130,7 +130,9 @@ class Dataset:
                 return e
         raise KeyError(f"Example with hash {example_hash} does not exist")
 
-    def apply(self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any) -> Any:
+    def apply(
+        self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
+    ) -> Any:
         """Apply a function to the dataset
 
         Args:
@@ -234,7 +236,9 @@ class Dataset:
         if n < 1:
             raise ValueError("Cannot rollback dataset: n must be 1 or higher.")
         elif n > len(self.operations):
-            raise ValueError("Cannot rollback dataset: n is larger than the total number of dataset operations.")
+            raise ValueError(
+                "Cannot rollback dataset: n is larger than the total number of dataset operations."
+            )
 
         store = self.example_store
 
@@ -353,7 +357,9 @@ class Dataset:
 
         return self
 
-    def to_disk(self, output_dir: Path, overwrite: bool = False, save_examples: bool = True) -> None:
+    def to_disk(
+        self, output_dir: Path, overwrite: bool = False, save_examples: bool = True
+    ) -> None:
         """Save Corpus to Disk
 
         Args:
@@ -381,7 +387,9 @@ class Dataset:
         if save_examples:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
 
-        srsly.write_jsonl(output_dir / (self.name + ".jsonl"), [e.dict(exclude_unset=True) for e in self.data])
+        srsly.write_jsonl(
+            output_dir / (self.name + ".jsonl"), [e.dict(exclude_unset=True) for e in self.data]
+        )
 
     def from_prodigy(self, prodigy_datasets: List[str]) -> "Dataset":
         """Need to have from_prodigy accept multiple datasets as a list of str so Prodigy
@@ -464,7 +472,10 @@ class Dataset:
                 tags = e[labels_prop]
             tokens = e[tokens_prop]
             doc = Doc(nlp.vocab, words=tokens, spaces=[True] * len(tokens), ents=tags)
-            spans = [Span(text=ent.text, start=ent.start_char, end=ent.end_char, label=ent.label_) for ent in doc.ents]
+            spans = [
+                Span(text=ent.text, start=ent.start_char, end=ent.end_char, label=ent.label_)
+                for ent in doc.ents
+            ]
             tokens = [Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc]
             examples.append(Example(text=doc.text, spans=spans, tokens=tokens))
         self._data = examples

@@ -35,7 +35,9 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStat
                 annotations_per_type[s.label] += 1
                 examples[s.label].append(e)
 
-    sorted_anns_by_count = {a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)}
+    sorted_anns_by_count = {
+        a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
+    }
 
     stats = NERStats(
         n_examples=length,

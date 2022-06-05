@@ -1,6 +1,6 @@
 Now that we have our data managed in a Recon `Dataset`, we can make corrections to our data automatically and Recon will take care of keeping track of all operations and transformations run on our data.
 
-The key is the `Dataset.apply_` funciton. 
+The key is the `Dataset.apply_` funciton.
 
 !!!tip
     It's a common python convention that as far as I know was popularized by PyTorch to have a function return a value (i.e. `apply`) and a that same function name followed by an underscore (i.e. `apply_`) operate on that data inplace.
@@ -32,8 +32,7 @@ STATS BEFORE
         "JOB_ROLE":10,
         "skill":2,
         "product":1
-    },
-    "examples_with_type":null
+    }
 }
 STATS AFTER
 ===========
@@ -45,8 +44,7 @@ STATS AFTER
         "SKILL":199,
         "PRODUCT":34,
         "JOB_ROLE":10
-    },
-    "examples_with_type":null
+    }
 }
 ```
 </div>
@@ -59,7 +57,7 @@ But that's not all...
 
 It would be really easy to lose track of the operations run on our data if we ran a bunch of operations. Even with our single operation, we'd have to save a copy of the data before running the `upcase_labels` operation and drill into both versions of the dataset to identify which examples we actually changed. Recon takes care of this tracking for us.
 
-Let's extend our previous example by saving our new Dataset to disk using (conveniently) `Dataset.to_disk`. 
+Let's extend our previous example by saving our new Dataset to disk using (conveniently) `Dataset.to_disk`.
 
 
 ```Python hl_lines="21"
@@ -83,8 +81,7 @@ STATS BEFORE
         "JOB_ROLE":10,
         "skill":2,
         "product":1
-    },
-    "examples_with_type":null
+    }
 }
 STATS AFTER
 ===========
@@ -96,8 +93,7 @@ STATS AFTER
         "SKILL":199,
         "PRODUCT":34,
         "JOB_ROLE":10
-    },
-    "examples_with_type":null
+    }
 }
 
 ```
@@ -179,16 +175,16 @@ Let's dig into the saved state a bit more.
 ## Dataset state
 
 The first property stored is the dataset name. Pretty self-explanatory.
-The second, `commit`, is a bit more complex. 
+The second, `commit`, is a bit more complex.
 
 !!!tip
-    A core principal of Recon is that all the data types can be hashed deterministically. This means you'll get the same hash if across Python environments and sessions for each core data type including: Corpus, Dataset, Example, Span and Token. 
+    A core principal of Recon is that all the data types can be hashed deterministically. This means you'll get the same hash if across Python environments and sessions for each core data type including: Corpus, Dataset, Example, Span and Token.
 
 The `commit` property is a SHA-1 hash of the dataset
 name combined with that hash of each example in the dataset.
 If you're familiar with how [git](https://git-scm.com/) works the idea is pretty similar.
 
-The `commit` property of a dataset allows us to understand if a Dataset changes between operations. 
+The `commit` property of a dataset allows us to understand if a Dataset changes between operations.
 This can happen if you add new examples and want to rerun or run new operations later based on insights from that new data.
 
 ```json hl_lines="4 6 7 8 9 10"
@@ -278,7 +274,7 @@ The `examples_added`, `examples_removed`, `examples_changed` give you a summary 
 
 
 Finally, the `transformations` property is the most useful for actually auditing and tracking your data changes.
-Each transformation has a `prev_example`, `example` and transformation `type`. 
+Each transformation has a `prev_example`, `example` and transformation `type`.
 
 The example properties contain the Example hash or the example before and after the transformation occured. This is really not useful by itself, but these hashes coincide to the hash -> Example mappings in the example_store.jsonl file that Recon saves for you. The ExampleStore is a central store that keeps track of all examples you've ever had in your dataset. This way, we can always revert back or see a concrete comparison of what each operation added/removed/changed by resolving the transformations to their corresponding examples.
 
@@ -288,7 +284,7 @@ The example properties contain the Example hash or the example before and after 
 The transformation `type` will always be one of (EXAMPLE_ADDED, EXAMPLE_REMOVED, or EXAMPLE_CHANGED).
 
 * EXAMPLE_ADDED - In this case, the `prev_example` property will be `null` since we're just adding an example to our dataset.
-    This can happen if an operation returns more than one example for every example it sees. A good reference example is the [`recon.v1.split_sentences`](link/to/split_sentences) operation. This operation will find all the sentences in an example and split them out into separate examples. 
+    This can happen if an operation returns more than one example for every example it sees. A good reference example is the [`recon.v1.split_sentences`](link/to/split_sentences) operation. This operation will find all the sentences in an example and split them out into separate examples.
 
 !!!tip
     So if an example has 2 sentences, Recon will track this operation as removing the original example and adding 2 examples. You'll see those reflected in the transformations

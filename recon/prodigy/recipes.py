@@ -158,9 +158,13 @@ def merge_examples(example, prodigy_texts_to_examples):
 def _stream_from_hardest_examples(hes: List[HardestExample]):
     for he in hes:
         combined = he.reference.copy(deep=True)
-        annot_spans = [Span(**span.dict(exclude={"source"}), source="ref") for span in he.reference.spans]
+        annot_spans = [
+            Span(**span.dict(exclude={"source"}), source="ref") for span in he.reference.spans
+        ]
         pred_spans = [
-            Span(**span.dict(exclude={"source", "label"}), source="pred", label=f"{span.label}:PRED")
+            Span(
+                **span.dict(exclude={"source", "label"}), source="pred", label=f"{span.label}:PRED"
+            )
             for span in he.prediction.spans
         ]
         combined.spans = sorted(annot_spans + pred_spans, key=lambda s: s.start)

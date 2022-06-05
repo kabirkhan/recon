@@ -3,7 +3,7 @@
 autoflake = poetry run autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place docs/src/ recon tests --exclude=__init__.py
 flake8 = poetry run flake8 --ignore E501 recon tests
 isort = poetry run isort recon tests
-black = poetry run black -S -l 120 --target-version py39 recon tests
+black = poetry run black -S -l 100 --target-version py39 recon tests
 
 
 .PHONY: install
