@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import srsly
 from recon.dataset import Dataset
@@ -25,8 +25,8 @@ class Corpus:
         name: str,
         train: Dataset,
         dev: Dataset,
-        test: Dataset = None,
-        example_store: ExampleStore = None,
+        test: Optional[Dataset] = None,
+        example_store: Optional[ExampleStore] = None,
     ):
         """Initialize a Corpus.
 
@@ -34,7 +34,8 @@ class Corpus:
             name (str): Name of the Corpus
             train (Dataset): Dataset containing examples for **train** set
             dev (Dataset): Dataset containing examples for **dev** set
-            test (Dataset, optional): Defaults to None. Dataset containing examples for **test** set
+            test (Optional[Dataset]): Optional Dataset containing examples for **test** set
+            example_store (Optional[ExampleStore]): Optional ExampleStore
         """
         self._name = name
         if example_store is None:
@@ -253,14 +254,15 @@ class Corpus:
         name: str,
         prodigy_train_datasets: List[str],
         prodigy_dev_datasets: List[str],
-        prodigy_test_datasets: List[str] = None,
+        prodigy_test_datasets: Optional[List[str]] = None,
     ) -> "Corpus":
         """Load a Corpus from 3 separate datasets in Prodigy
 
         Args:
-            prodigy_train_dataset (str, optional): Train dataset name in Prodigy
-            prodigy_dev_dataset (str, optional): Dev dataset name in Prodigy
-            prodigy_test_dataset (str, optional): Test dataset name in Prodigy
+            name: Corpus name
+            prodigy_train_datasets (List[str]): Prodigy datasets to load as Recon train dataset
+            prodigy_dev_datasets (List[str]): Prodigy datasets to load as Recon dev dataset
+            prodigy_test_datasets (Optional[List[str]]): Prodigy datasets to load as Recon test dataset
 
         Returns:
             Corpus: Corpus initialized from prodigy datasets
@@ -274,18 +276,19 @@ class Corpus:
 
     def to_prodigy(
         self,
-        name: str = None,
-        prodigy_train_dataset: str = None,
-        prodigy_dev_dataset: str = None,
-        prodigy_test_dataset: str = None,
+        name: Optional[str] = None,
+        prodigy_train_dataset: Optional[str] = None,
+        prodigy_dev_dataset: Optional[str] = None,
+        prodigy_test_dataset: Optional[str] = None,
         overwrite: bool = True,
     ) -> Tuple[str, str, str]:
         """Save a Corpus to 3 separate Prodigy datasets
 
         Args:
-            prodigy_train_dataset (str, optional): Train dataset name in Prodigy
-            prodigy_dev_dataset (str, optional): Dev dataset name in Prodigy
-            prodigy_test_dataset (str, optional): Test dataset name in Prodigy
+            name (Optional[str]): Name prefix for datasets in Prodigy
+            prodigy_train_dataset (Optional[str]): Train dataset name in Prodigy
+            prodigy_dev_dataset (Optional[str]): Dev dataset name in Prodigy
+            prodigy_test_dataset (Optional[str]): Test dataset name in Prodigy
         """
         name = name if name else self.name
 

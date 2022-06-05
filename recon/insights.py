@@ -32,7 +32,6 @@ def get_ents_by_label(data: List[Example], case_sensitive: bool = False) -> Defa
     Args:
         data (List[Example]): List of examples
         case_sensitive (bool, optional): Consider case of text for each annotation
-        sort_by (SortBy): Sort by text or by count
 
     Returns:
         DefaultDict[str, List[str]]: DefaultDict mapping label to sorted list of the unique
@@ -118,8 +117,6 @@ def top_prediction_errors(
         data (List[Example]): List of annotated Examples
         labels (List[str], optional): List of labels to get errors for.
             Defaults to the labels property of `recognizer`.
-        n (int, optional): If set, only use the top n examples from data.
-        k (int, optional): If set, return the top k prediction errors, otherwise the whole list.
         exclude_fp (bool, optional): Flag to exclude False Positive errors.
         exclude_fn (bool, optional): Flag to exclude False Negative errors.
         verbose (bool, optional): Show verbose output.

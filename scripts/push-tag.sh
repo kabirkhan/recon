@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
 
 # Insist repository is clean
 git diff-index --quiet HEAD
 
 git checkout $1
 git pull origin $1
-git push origin $1
 
 version=$(grep "__version__ = " recon/__init__.py)
 version=${version/__version__ = }

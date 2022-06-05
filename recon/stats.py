@@ -9,9 +9,7 @@ from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy as scipy_entropy
 
 
-def get_ner_stats(
-    data: List[Example], return_examples: bool = False
-) -> NERStats:
+def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStats:
     """Compute statistics for NER data
 
     Args:

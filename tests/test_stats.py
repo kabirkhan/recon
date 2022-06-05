@@ -11,10 +11,7 @@ from recon.types import NERStats
 
 
 def test_get_ner_stats(example_corpus_processed):
-    stats: NERStats = get_ner_stats(example_corpus_processed.train)  # type: ignore
-    str_stats = get_ner_stats(example_corpus_processed.train, serialize=True)
-    assert isinstance(str_stats, str)
-
+    stats: NERStats = get_ner_stats(example_corpus_processed.train)
     assert stats.n_examples == 106
     assert stats.n_examples_no_entities == 29
     assert stats.n_annotations_per_type == {"SKILL": 199, "PRODUCT": 34, "JOB_ROLE": 10}

@@ -44,7 +44,7 @@ class EntityRecognizer:
     def _evaluate(self, examples: List[Example]) -> Scores:
         raise NotImplementedError
 
-    def evaluate(self, examples: List[Example], verbose: bool = True) -> Scores:
+    def evaluate(self, data: List[Example], verbose: bool = True) -> Scores:
         """Evaluate recognizer performance on dataset and print metrics
 
         Args:
@@ -54,7 +54,7 @@ class EntityRecognizer:
         Returns:
             Scorer: spaCy scorer object
         """
-        sc = self._evaluate(examples)
+        sc = self._evaluate(data)
 
         msg = Printer(no_print=not verbose)
         msg.divider("Recognizer Results")
@@ -109,8 +109,6 @@ class SpacyEntityRecognizer(EntityRecognizer):
         Yields:
             Iterator[Example]: Examples constructed from spaCy Model predictions
         """
-        examples: List[Example] = []
-
         for doc in self.nlp.pipe(texts):
             yield Example(
                 text=doc.text,
