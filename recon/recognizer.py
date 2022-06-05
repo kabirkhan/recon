@@ -71,7 +71,7 @@ class EntityRecognizer:
                 (label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}")
             )
         header = ("Label", "Precision", "Recall", "F-Score")
-        formatted = msg.table(table_data, header=header, divider=True)
+        msg.table(table_data, header=header, divider=True)
         return sc
 
 

@@ -83,7 +83,8 @@ class Example(BaseModel):
             for span in spans:
                 if not isinstance(span, Span):
                     if "text" not in span:
-                        span["text"] = values["text"][span["start"] : span["end"]]
+                        start, end = span["start"], span["end"]
+                        span["text"] = values["text"][start:end]
 
             # Ensure the meta has a source property
             # if something that's not a dict is passed in
@@ -165,11 +166,14 @@ class Transformation(BaseModel):
 def add_shim(example: Example) -> None:
     return None
 
+
 def remove_shim(example_hash: int) -> None:
     return None
 
+
 def change_shim(example_hash: int, new_example: Example) -> None:
     return None
+
 
 def track_shim(example_hash: Optional[int] = None, new_example: Optional[Example] = None) -> None:
     return None
