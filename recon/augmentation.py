@@ -47,9 +47,9 @@ def substitute_spans(example: Example, span_subs: Dict[Span, str]) -> Example:
             new_end = new_start + len(new_text)
 
             new_example_text = (
-                new_example_text[:span.start + span_sub_start_counter]
+                new_example_text[: span.start + span_sub_start_counter]
                 + new_text
-                + new_example_text[span.end + span_sub_start_counter:]
+                + new_example_text[span.end + span_sub_start_counter :]
             )
 
             span.text = new_text
