@@ -30,6 +30,8 @@ def main():
     corpus = Corpus("conll2003", train_ds, dev_ds, test_ds)
     corpus.summary()
 
+    corpus.to_disk("./examples/data/conll2003", overwrite=True)
+
 
 if __name__ == "__main__":
     main()

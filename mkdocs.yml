@@ -20,16 +20,17 @@ edit_uri: 'https://github.com/kabirkhan/recon/tree/master/docs'
 nav:
     - Recon: 'index.md'
     - Tutorial:
-        - Loading Data: 'tutorial/1_loading_data.md'
-        - NER Stats: 'tutorial/2_ner_stats.md'
+        - Loading Data: 'tutorial/loading_data.md'
+        - NER Stats: 'tutorial/ner_stats.md'
         - Dataset:
-            - Dataset Intro: 'tutorial/3_dataset_intro.md'
-            - Making changes to a Dataset: 'tutorial/3_dataset_mutate.md'
-        - Using a Corpus: 'tutorial/4_corpus.md'
+            - Dataset Intro: 'tutorial/dataset_intro.md'
+            - Making changes to a Dataset: 'tutorial/dataset_mutate.md'
+        - Using a Corpus: 'tutorial/corpus.md'
         - Fixing Conll 2003:
-            - Loading Conll 2003: 'tutorial/5_conll_loading.md'
-        - More NER Stats: 'tutorial/4_more_stats.md'
-        - Getting Insights: 'tutorial/5_getting_insights.md'
+            - Loading Data: 'tutorial/conll/loading.md'
+            - Advanced Stats: 'tutorial/conll/stats.md'
+        # - More NER Stats: 'tutorial/4_more_stats.md'
+        # - Getting Insights: 'tutorial/5_getting_insights.md'
         - Custom EntityRecognizer: 'tutorial/custom_entity_recognizer.md'
     - API Reference:
         - Corpus: 'api/corpus.md'

@@ -1,7 +1,9 @@
 # Introduction to Conll 2003
 
 
-The Conll 2003 NER Dataset is a widely used, cited, and benchmarked dataset for Named Entity Recognition. The Dataset has four entity types: persons, locations, organizations, and names of miscellaneous entities that don't belong in the other 3 groups.
+The Conll 2003 NER Dataset is a widely used, cited, and benchmarked dataset for Named Entity Recognition. The Dataset has four entity types: persons (`PER`), locations (`LOC`), organizations (`ORG`), and names of miscellaneous entities (`MISC`) that don't belong in the other 3 groups.
+
+For the rest of this tutorial, we'll use Recon to find and correct errors in the original Conll 2003 NER dataset.
 
 The Conll 2003 data is publicly available and we'll be utilizing [HuggingFace Datasets](https://huggingface.co/datasets/conll2003) to download it.
 
@@ -19,6 +21,8 @@ An example row of the raw data looks like this.
 |-------------|---------------|-----------------|-------------------|-----------------|
 | 0 | [ "EU", "rejects", "German", "call", "to", "boycott", "British", "lamb", "." ] | [ 22, 42, 16, 21, 35, 37, 16, 21, 7] | [ 11, 21, 11, 12, 21, 22, 11, 12, 0 ]	| [ 3, 0, 7, 0, 0, 0, 7, 0, 0 ] |
 
+
+We're primaliry interested in the `tokens` and `ner_tags` columns. The `ner_tags` are integer tags from 0-7
 
 The data is already split into train/dev/test datasets so we'll load the whole HF Dataset into a Recon Corpus to get started.
 
@@ -80,3 +84,8 @@ Stats: {
 ```
 
 </div>
+
+
+## Next Steps
+
+Now that we have the data loaded, let's see what other stats we can get besides the basic ones provided by `Corpus.summary`
