@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from recon import Corpus
-from recon.stats import get_entity_coverage, calculate_entity_coverage_entropy, calculate_entity_coverage_similarity
+from recon.stats import get_entity_coverage
 
 
 def main():

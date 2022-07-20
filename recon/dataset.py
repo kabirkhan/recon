@@ -12,7 +12,7 @@ from recon.store import ExampleStore
 from recon.types import (
     DatasetOperationsState,
     Example,
-    NERStats,
+    Stats,
     OperationResult,
     OperationState,
     OperationStatus,
@@ -87,7 +87,7 @@ class Dataset:
             example_store = ExampleStore(data)
         self._example_store = example_store
         self._verbose = verbose
-        self._stats: Optional[NERStats] = None
+        self._stats: Optional[Stats] = None
 
     @property
     def name(self) -> str:
@@ -112,7 +112,7 @@ class Dataset:
         return self._example_store
 
     @property
-    def stats(self) -> NERStats:
+    def stats(self) -> Stats:
         return get_ner_stats(self.data)
 
     def summary(self) -> str:
@@ -148,7 +148,7 @@ class Dataset:
         self,
         operation: Union[str, Callable[[Any], OperationResult]],
         *args: Any,
-        initial_state: OperationState = None,
+        initial_state: Optional[OperationState] = None,
         **kwargs: Any,
     ) -> None:
         """Apply an operation to all data inplace.
@@ -192,7 +192,7 @@ class Dataset:
         """
 
         msg = Printer(no_print=self._verbose == False)
-        msg.text(f"Applying pipeline of operations inplace to the dataset: {self.name}")
+        msg.text(f"Applying pipeline of operations inplace to Dataset: {self.name}")
 
         for op in operations:
             op_name = op.name if isinstance(op, OperationState) else op
@@ -209,6 +209,8 @@ class Dataset:
                 args = op.args
                 kwargs = op.kwargs
                 initial_state = op
+            else:
+                raise ValueError("Operation is not resolvable. Must be a name for a registered operation or an instance of OperationState.")
 
             operation = registry.operations.get(op_name)
 

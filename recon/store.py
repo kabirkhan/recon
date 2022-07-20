@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import srsly
 from recon.types import Example
@@ -7,7 +7,7 @@ from spacy.util import ensure_path
 
 
 class ExampleStore:
-    def __init__(self, examples: List[Example] = None):
+    def __init__(self, examples: Optional[List[Example]] = None):
         self._map: Dict[int, Example] = {}
         if examples is not None:
             for e in examples:

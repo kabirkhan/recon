@@ -4,12 +4,12 @@ from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Union, cast
 
 import numpy as np
 from recon.constants import NOT_LABELED
-from recon.types import EntityCoverage, EntityCoverageStats, Example, NERStats, Outliers
+from recon.types import EntityCoverage, EntityCoverageStats, Example, Stats, Outliers
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy as scipy_entropy
 
 
-def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStats:
+def get_ner_stats(data: List[Example], return_examples: bool = False) -> Stats:
     """Compute statistics for NER data
 
     Args:
@@ -17,7 +17,7 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStat
         return_examples (bool, optional): Whether to return examples per type
 
     Returns:
-        NERStats: Summary stats from list of Examples
+        Stats: Summary stats from list of Examples
     """
     annotations_per_type: DefaultDict[str, Any] = defaultdict(int)
     examples: DefaultDict[str, Any] = defaultdict(list)
@@ -39,7 +39,7 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStat
         a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
     }
 
-    stats = NERStats(
+    stats = Stats(
         n_examples=length,
         n_examples_no_entities=n_examples_no_entities,
         n_annotations=sum(annotations_per_type.values()),
@@ -51,12 +51,12 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStat
     return stats
 
 
-def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
+def get_sorted_type_counts(ner_stats: Stats) -> List[int]:
     """Get list of counts for each type in n_annotations_per_type property
-    of an NERStats object sorted by type name
+    of an Stats object sorted by type name
 
     Args:
-        ner_stats (NERStats): Dataset stats
+        ner_stats (Stats): Dataset stats
 
     Returns:
         List[int]: List of counts sorted by type name
@@ -88,7 +88,7 @@ def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) 
     """
 
     def pipeline(data: List[Example]) -> Sequence[float]:
-        stats = cast(NERStats, get_ner_stats(data))
+        stats = cast(Stats, get_ner_stats(data))
         sorted_type_counts = get_sorted_type_counts(stats)
         counts_to_probs = get_probs_from_counts(sorted_type_counts)
         return counts_to_probs
@@ -223,11 +223,11 @@ def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) ->
     return float(res)
 
 
-def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
-    """Use Entropy to calculate a metric for label balance based on an NERStats object
+def calculate_label_balance_entropy(ner_stats: Stats) -> float:
+    """Use Entropy to calculate a metric for label balance based on an Stats object
 
     Args:
-        ner_stats (NERStats): NERStats for a dataset.
+        ner_stats (Stats): Stats for a dataset.
 
     Returns:
         float: Entropy for annotation counts of each label

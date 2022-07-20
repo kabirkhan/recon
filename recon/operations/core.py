@@ -5,6 +5,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     Iterator,
     List,
     Optional,
@@ -23,7 +24,6 @@ from recon.preprocess import PreProcessor
 from recon.preprocess import registry as pre_registry
 from recon.types import (
     Example,
-    Op,
     OperationResult,
     OperationState,
     OperationStatus,
@@ -88,11 +88,11 @@ class operation:
         self.factory = factory
         self.augmentation = augmentation
 
-    def __call__(self, op: Op, *args: Any, **kwargs: Any) -> Callable:
+    def __call__(
+        self, op: Callable[..., Union[None, Example, Iterable[Example]]]
+    ) -> Callable[..., Union[None, Example, Iterable[Example]]]:
         """Decorator for an operation.
-        The first arg is the function being decorated.
-        This function can either operate on a List[Example]
-        and in that case self.batch should be True.
+        The first arg to the op callable needs to be an Example.
 
         e.g. @operation("recon.v1.some_name", batch=True)
 
@@ -107,30 +107,15 @@ class operation:
         """
         pre: List[PreProcessor] = []
 
-        for pre_name_or_op in self.pre:
-            preprocessor = pre_name_or_op
+        for preprocessor in self.pre:
             if isinstance(preprocessor, str):
-                preprocessor = pre_registry.preprocessors.get(pre_name_or_op)
+                preprocessor = pre_registry.preprocessors.get(preprocessor)
             assert isinstance(preprocessor, PreProcessor)
             pre.append(preprocessor)
 
-        if self.factory:
-
-            def factory(pre: List[PreProcessor]) -> Operation:
-                return Operation(
-                    self.name,
-                    pre,
-                    op=op,
-                    handles_tokens=self.handles_tokens,
-                    augmentation=self.augmentation,
-                )
-
-            op_registry.operation_factories.register(self.name)(factory)
-        else:
-            op_registry.operations.register(self.name)(
-                Operation(self.name, pre, op, self.handles_tokens, augmentation=self.augmentation)
-            )
-
+        op_registry.operations.register(self.name)(
+            Operation(self.name, pre, op, self.handles_tokens, augmentation=self.augmentation)
+        )
         return op
 
 
@@ -163,7 +148,7 @@ class Operation:
         self,
         dataset: "Dataset",
         *args: Any,
-        verbose: Optional[bool] = False,
+        verbose: bool = False,
         initial_state: Optional[OperationState] = None,
         **kwargs: Any,
     ) -> OperationResult:
@@ -188,20 +173,20 @@ class Operation:
         state.args = args
         state.kwargs = kwargs
 
-        def add_example(new_example: Example) -> None:
+        def track_add_example(new_example: Example) -> None:
             state.transformations.append(
                 Transformation(example=hash(new_example), type=TransformationType.EXAMPLE_ADDED)
             )
             dataset.example_store.add(new_example)
 
-        def remove_example(orig_example_hash: int) -> None:
+        def track_remove_example(orig_example_hash: int) -> None:
             state.transformations.append(
                 Transformation(
                     prev_example=orig_example_hash, type=TransformationType.EXAMPLE_REMOVED
                 )
             )
 
-        def change_example(orig_example_hash: int, new_example: Example) -> None:
+        def track_change_example(orig_example_hash: int, new_example: Example) -> None:
             state.transformations.append(
                 Transformation(
                     prev_example=orig_example_hash,
@@ -249,19 +234,18 @@ class Operation:
 
         state.args = ()
         state.kwargs = values
-        new_data = []
 
+        new_data = []
         with tqdm(total=len(dataset), disable=(not verbose)) as pbar:
-            for orig_example_hash, example, preprocessed_outputs in op_iter(
-                dataset.data, self.pre, verbose=verbose
-            ):
+            it = op_iter(dataset.data, self.pre, verbose=verbose)
+            for orig_example_hash, example, preprocessed_outputs in it:
                 if preprocessed_outputs:
                     res = self.op(example, preprocessed_outputs=preprocessed_outputs, **values)
                 else:
                     res = self.op(example, **values)
 
                 if res is None:
-                    remove_example(orig_example_hash)
+                    track_remove_example(orig_example_hash)
                 elif isinstance(res, list):
                     old_example_present = False
                     for new_example in res:
@@ -269,14 +253,14 @@ class Operation:
                         if hash(new_example) == orig_example_hash:
                             old_example_present = True
                         else:
-                            add_example(new_example)
+                            track_add_example(new_example)
                     if not old_example_present:
-                        remove_example(orig_example_hash)
+                        track_remove_example(orig_example_hash)
                 else:
                     assert isinstance(res, Example)
                     new_data.append(res)
                     if hash(res) != orig_example_hash:
-                        change_example(orig_example_hash, res)
+                        track_change_example(orig_example_hash, res)
 
                 pbar.update(1)
 

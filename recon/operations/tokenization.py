@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional
 
 from recon.operations.core import operation
 from recon.types import Example, Token
@@ -8,7 +8,7 @@ from recon.types import Example, Token
 @operation("recon.v1.fix_tokenization_and_spacing", pre=["recon.v1.spacy"])
 def fix_tokenization_and_spacing(
     example: Example, *, preprocessed_outputs: Dict[str, Any] = {}
-) -> Union[Example, None]:
+) -> Optional[Example]:
     """Fix tokenization and spacing issues where there are annotation spans that
     don't fall on a token boundary. This can happen if annotations are done at the
     character level, not the token level. Often, when scraping web text it's easy to
@@ -120,7 +120,7 @@ def fix_tokenization_and_spacing(
 @operation("recon.v1.add_tokens", pre=["recon.v1.spacy"])
 def add_tokens(
     example: Example, *, use_spacy_token_ends: bool = False, preprocessed_outputs: Dict[str, Any]
-) -> Union[Example, None]:
+) -> Optional[Example]:
     """Add tokens to each Example
 
     Args:

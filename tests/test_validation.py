@@ -3,7 +3,7 @@ from typing import cast
 import pytest
 from recon.operations.validation import filter_overlaps
 from recon.stats import get_ner_stats
-from recon.types import Example, NERStats, Span
+from recon.types import Example, Stats, Span
 
 
 @pytest.fixture()
@@ -21,13 +21,13 @@ def messy_data():
 
 
 def test_upcase_labels(example_corpus):
-    stats = cast(NERStats, get_ner_stats(example_corpus.train))
+    stats = cast(Stats, get_ner_stats(example_corpus.train))
     assert "skill" in stats.n_annotations_per_type
     assert "product" in stats.n_annotations_per_type
     assert "SKILL" in stats.n_annotations_per_type
 
     example_corpus._train.apply_("recon.v1.upcase_labels")
-    fixed_stats = cast(NERStats, get_ner_stats(example_corpus.train))
+    fixed_stats = cast(Stats, get_ner_stats(example_corpus.train))
     assert "skill" not in fixed_stats.n_annotations_per_type
     assert "product" not in fixed_stats.n_annotations_per_type
 

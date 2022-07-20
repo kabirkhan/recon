@@ -1,3 +1,7 @@
+"""Utils for running operations and resolving parameters dynamically. The utilties for resolving parameters dynamically are
+based on the functionality from FastAPI's process of resolving route params and request bodies to Pydantic Models"""
+
+
 import functools
 import inspect
 from collections import OrderedDict

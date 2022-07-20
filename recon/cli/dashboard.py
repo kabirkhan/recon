@@ -52,7 +52,7 @@ def dashboard(data_dir: Path) -> None:
 
     # app = dash.Dash(__name__, external_stylesheets=external_stylesheets, external_scripts=external_scripts)
 
-    # def generate_bar_chart_stats(id: str, ner_stats: NERStats, name: str = None):
+    # def generate_bar_chart_stats(id: str, ner_stats: Stats, name: str = None):
     #     return dcc.Graph(
     #         id=id,
     #         figure={

@@ -1,18 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Protocol,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import Any, Callable, Dict, List, Optional, Tuple, cast
 
 from pydantic import BaseModel, Extra, root_validator
 from recon.hashing import (
@@ -192,12 +181,13 @@ class OperationStatus(str, Enum):
     NOT_STARTED = "NOT_STARTED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
+    NEEDS_TOKENIZATION = "NEEDS_TOKENIZATION"
 
 
 class OperationState(BaseModel):
     name: str
     batch: bool = False
-    args: List[Any] = []
+    args: Tuple[Any, ...] = tuple()
     kwargs: Dict[str, Any] = {}
     status: OperationStatus = OperationStatus.NOT_STARTED
     ts: datetime = datetime.now()
@@ -309,7 +299,7 @@ class LabelDisparity(BaseModel):
     examples: Optional[List[Example]] = []
 
 
-class NERStats(BaseModel):
+class Stats(BaseModel):
     """Container for tracking basic NER statistics"""
 
     n_examples: int
@@ -409,8 +399,3 @@ class Scores(BaseModel):
     ents_f: float
     ents_per_type: Dict[str, Any]
     speed: float
-
-
-class Op(Protocol):
-    def __call__(self, example: Example) -> Optional[Union[Example, Iterable[Example]]]:
-        ...

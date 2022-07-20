@@ -28,6 +28,9 @@ nav:
         - Using a Corpus: 'tutorial/corpus.md'
         - Fixing Conll 2003:
             - Loading Data: 'tutorial/conll/loading.md'
+            - Insights:
+                Label Disparities: 'tutorial/conll/label_insights.md'
+                Model Based Insights: 'tutorial/conll/model_insights.md'
             - Advanced Stats: 'tutorial/conll/stats.md'
         # - More NER Stats: 'tutorial/4_more_stats.md'
         # - Getting Insights: 'tutorial/5_getting_insights.md'

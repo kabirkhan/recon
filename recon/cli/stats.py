@@ -3,7 +3,7 @@ from typing import cast
 
 from recon.corpus import Corpus
 from recon.stats import calculate_label_distribution_similarity, get_ner_stats
-from recon.types import NERStats
+from recon.types import Stats
 from wasabi import Printer
 
 
@@ -18,7 +18,7 @@ def stats(data_dir: Path) -> None:
 
     def print_stats(corpus: Corpus) -> None:
         for ds, ner_stats in corpus.apply(get_ner_stats).items():
-            ner_stats = cast(NERStats, ner_stats)
+            ner_stats = cast(Stats, ner_stats)
             sorted_labels = sorted(ner_stats.n_annotations_per_type.keys())
 
             msg.text(f"Stats for {ds.capitalize()} data")

@@ -76,8 +76,8 @@ def substitute_spans(example: Example, span_subs: Dict[Span, str]) -> Example:
 def augment_example(
     example: Example,
     span_f: Callable[[Span, Any], Optional[str]],
-    spans: List[Span] = None,
-    span_label: str = None,
+    spans: Optional[List[Span]] = None,
+    span_label: Optional[str] = None,
     n_augs: int = 1,
     sub_prob: float = 0.5,
     **kwargs: Any,
@@ -140,7 +140,9 @@ def ent_label_sub(
             sub = np.random.choice(subs)
         return sub
 
-    return augment_example(example, augmentation, n_augs=n_augs, sub_prob=sub_prob, subs=subs)
+    return augment_example(
+        example, augmentation, span_label=label, n_augs=n_augs, sub_prob=sub_prob, subs=subs
+    )
 
 
 @operation("recon.v1.augment.kb_expansion", factory=True)
