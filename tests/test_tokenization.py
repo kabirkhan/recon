@@ -22,7 +22,7 @@ def test_fix_tokenization_and_spacing(spacy_preprocessor):
     ds = Dataset("test_dataset", data=[example1, example2])
 
     assert len(ds) == 2
-    ds.apply_("recon.v1.fix_tokenization_and_spacing")
+    ds.apply_("recon.fix_tokenization_and_spacing.v1")
 
     assert len(ds) == 2
 

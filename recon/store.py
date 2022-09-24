@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import cast, Any, Dict, List, Union
 
 import srsly
 from recon.types import Example
@@ -7,7 +7,7 @@ from spacy.util import ensure_path
 
 
 class ExampleStore:
-    def __init__(self, examples: Optional[List[Example]] = None):
+    def __init__(self, examples: List[Example] | None = None):
         self._map: Dict[int, Example] = {}
         if examples is not None:
             for e in examples:
@@ -24,7 +24,7 @@ class ExampleStore:
         """
         return len(self._map)
 
-    def __contains__(self, example: Union[int, Example]) -> bool:
+    def __contains__(self, example: int | Example) -> bool:
         """Check whether a string is in the store.
 
         Args:
@@ -57,6 +57,7 @@ class ExampleStore:
         path = ensure_path(path)
         examples = srsly.read_jsonl(path)
         for e in examples:
+            e = cast(Dict[str, Any], e)
             example_hash = e["example_hash"]
             raw_example = e["example"]
             example = Example(**raw_example)

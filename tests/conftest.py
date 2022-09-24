@@ -65,10 +65,10 @@ def example_corpus_processed() -> Corpus:
     corpus = Corpus.from_disk(base_path, name="test_corpus")
     corpus.pipe_(
         [
-            "recon.v1.fix_tokenization_and_spacing",
-            "recon.v1.add_tokens",
-            "recon.v1.upcase_labels",
-            "recon.v1.filter_overlaps",
+            "recon.fix_tokenization_and_spacing.v1",
+            "recon.add_tokens.v1",
+            "recon.upcase_labels.v1",
+            "recon.filter_overlaps.v1",
         ]
     )
     return corpus

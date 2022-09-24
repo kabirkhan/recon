@@ -115,7 +115,7 @@ class Example(BaseModel):
             Doc: Output spaCy Doc with ents set from example spans
         """
         if not self.tokens:
-            raise ValueError("Tokens are not set. Try running the recon.v1.add_tokens operation.")
+            raise ValueError("Tokens are not set. Try running the recon.add_tokens.v1 operation.")
         tokens = [token.text for token in self.tokens]
         words, spaces = get_words_and_spaces(tokens, self.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)

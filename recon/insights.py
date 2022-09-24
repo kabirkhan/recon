@@ -110,7 +110,7 @@ def top_label_disparities(
 def top_prediction_errors(
     recognizer: EntityRecognizer,
     data: List[Example],
-    labels: Optional[List[str]] = None,
+    labels: List[str] | None = None,
     exclude_fp: bool = False,
     exclude_fn: bool = False,
     verbose: bool = False,

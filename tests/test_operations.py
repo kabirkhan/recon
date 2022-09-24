@@ -16,7 +16,7 @@ def ds():
             )
         ],
     )
-    ds.apply_("recon.v1.add_tokens")
+    ds.apply_("recon.add_tokens.v1")
 
     return ds
 

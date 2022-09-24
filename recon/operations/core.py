@@ -208,7 +208,7 @@ class Operation:
                 "This dataset seems to have preset tokens. "
                 f"Operation: {self.name} is not currently capable of handling tokens and you will "
                 "need to reset tokenization after this operation. "
-                "Applying the `recon.v1.add_tokens` operation after this "
+                "Applying the `recon.add_tokens.v1` operation after this "
                 "operation is complete will get you back to a clean state."
                 # fmt: on
             )

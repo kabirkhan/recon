@@ -4,6 +4,7 @@ __version__ = "0.10.0"
 
 from recon.corpus import Corpus
 from recon.dataset import Dataset
+from recon.augmentation import ent_label_sub
 
 try:
     # This needs to be imported in order for the entry points to be loaded
@@ -12,4 +13,4 @@ except ImportError:
     pass
 
 
-__all__ = ["Corpus", "Dataset"]
+__all__ = ["Corpus", "Dataset", "ent_label_sub"]
