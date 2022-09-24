@@ -36,7 +36,7 @@ def read_json(path: Path) -> List[Example]:
     Returns:
         List[Example]: List of examples
     """
-    data = srsly.read_jsonl(path)
+    data = srsly.read_json(path)
     examples = json_to_examples(data)
     return examples
 

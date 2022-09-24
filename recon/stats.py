@@ -23,10 +23,7 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> Stats:
     examples: DefaultDict[str, Any] = defaultdict(list)
     n_examples_no_entities = 0
 
-    length = 0
-
     for e in data:
-        length += 1
         if not e.spans:
             n_examples_no_entities += 1
             examples[NOT_LABELED].append(e)
@@ -40,7 +37,7 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> Stats:
     }
 
     stats = Stats(
-        n_examples=length,
+        n_examples=len(data),
         n_examples_no_entities=n_examples_no_entities,
         n_annotations=sum(annotations_per_type.values()),
         n_annotations_per_type=sorted_anns_by_count,

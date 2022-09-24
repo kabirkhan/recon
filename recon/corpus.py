@@ -138,7 +138,7 @@ class Corpus:
             self.test_ds.summary()
 
     def apply(
-        self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
+        self, func: Callable[[List[Example], Any], Any], *args: Any, **kwargs: Any
     ) -> CorpusApplyResult:
         """Apply a function to all datasets
 

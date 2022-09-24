@@ -19,6 +19,7 @@ from recon.types import (
     Span,
     Token,
     TransformationType,
+    ApplyType
 )
 from spacy.tokens import Doc
 from spacy.util import ensure_path
@@ -131,12 +132,12 @@ class Dataset:
         raise KeyError(f"Example with hash {example_hash} does not exist")
 
     def apply(
-        self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any
+        self, func: ApplyType, *args: Any, **kwargs: Any
     ) -> Any:
         """Apply a function to the dataset
 
         Args:
-            func (Callable[[List[Example], Any, Any], Any]):
+            func (Callable[[List[Example], Any], Any]):
                 Function from an existing recon module that can operate on a List of examples
 
         Returns:
@@ -213,7 +214,6 @@ class Dataset:
                 raise ValueError("Operation is not resolvable. Must be a name for a registered operation or an instance of OperationState.")
 
             operation = registry.operations.get(op_name)
-
             self.apply_(operation, *args, initial_state=initial_state, **kwargs)
 
     def rollback(self, n: int = 1) -> None:
@@ -236,14 +236,13 @@ class Dataset:
         """
 
         if n < 1:
-            raise ValueError("Cannot rollback dataset: n must be 1 or higher.")
+            raise ValueError(f"Cannot rollback dataset: provided n: ({n}) must be 1 or higher.")
         elif n > len(self.operations):
             raise ValueError(
-                "Cannot rollback dataset: n is larger than the total number of dataset operations."
+                f"Cannot rollback dataset: provided n ({n}) is larger than the total number of dataset operations."
             )
 
         store = self.example_store
-
         examples_to_remove = set()
         examples_to_add = []
 

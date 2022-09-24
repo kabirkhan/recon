@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 from pydantic import BaseModel, Extra, root_validator
 from recon.hashing import (
@@ -119,7 +119,7 @@ class Example(BaseModel):
         tokens = [token.text for token in self.tokens]
         words, spaces = get_words_and_spaces(tokens, self.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)
-        doc.ents = [doc.char_span(s.start, s.end, label=s.label) for s in self.spans]
+        doc.ents = tuple(doc.char_span(s.start, s.end, label=s.label) for s in self.spans)
         return doc
 
     def show(self, jupyter: Optional[bool] = None, options: Dict[str, Any] = {}) -> None:
@@ -131,6 +131,12 @@ class Example(BaseModel):
                 See: https://spacy.io/usage/visualizers#ent
         """
         displacy.render(self.doc, style="ent", jupyter=jupyter, options=options)
+
+
+OpType = Callable[[Example, Any], Any]
+BatchOpType = Callable[[List[Example], Any], Any]
+ApplyType = Union[str, BatchOpType]
+ApplyInPlaceType = Union[str, BatchOpType]
 
 
 class Entity(BaseModel):

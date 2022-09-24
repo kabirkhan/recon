@@ -212,6 +212,7 @@ class Operation:
                 "operation is complete will get you back to a clean state."
                 # fmt: on
             )
+            state.status = OperationStatus.NEEDS_TOKENIZATION
 
         required_params = get_required_operation_params(self.op)
         received_data = get_received_operation_data(required_params, state)
@@ -265,7 +266,6 @@ class Operation:
                 pbar.update(1)
 
         transformation_counts = Counter([t.type for t in state.transformations])
-
         state.examples_added = transformation_counts[TransformationType.EXAMPLE_ADDED]
         state.examples_removed = transformation_counts[TransformationType.EXAMPLE_REMOVED]
         state.examples_changed = transformation_counts[TransformationType.EXAMPLE_CHANGED]
