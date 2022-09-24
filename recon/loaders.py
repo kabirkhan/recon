@@ -3,7 +3,7 @@ the [Prodigy](https://prodi.gy) format.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 import spacy
 import srsly
@@ -53,7 +53,9 @@ def json_to_examples(data: List[Dict[str, Any]]) -> List[Example]:
     return [Example(**example) for example in data]
 
 
-def from_spacy(path: Path, nlp: Language | None = None, lang_code: str = "en") -> Iterable[Example]:
+def from_spacy(
+    path: Path, nlp: Optional[Language] = None, lang_code: str = "en"
+) -> Iterable[Example]:
     """Load examples from .spacy docbin format
 
     Args:
@@ -87,7 +89,7 @@ def from_spacy(path: Path, nlp: Language | None = None, lang_code: str = "en") -
 
 
 def to_spacy(
-    path: Path, data: Iterable[Example], nlp: Language | None = None, lang_code: str = "en"
+    path: Path, data: Iterable[Example], nlp: Optional[Language] = None, lang_code: str = "en"
 ) -> DocBin:
     """Save a batch of examples to disk in the .spacy DocBin format
 

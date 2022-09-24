@@ -1,6 +1,5 @@
 from recon.dataset import Dataset
 from recon.types import Example, Span
-from recon.operations import *
 
 
 def test_ent_label_substitution():

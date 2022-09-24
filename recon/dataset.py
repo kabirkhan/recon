@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union, cast
 
 import spacy
 import srsly
@@ -75,7 +75,7 @@ class Dataset:
         name: str,
         data: List[Example] = [],
         operations: List[OperationState] = [],
-        example_store: ExampleStore | None = None,
+        example_store: Optional[ExampleStore] = None,
         verbose: bool = True,
     ):
         self._name = name
@@ -88,7 +88,7 @@ class Dataset:
             example_store = ExampleStore(data)
         self._example_store = example_store
         self._verbose = verbose
-        self._stats: Stats | None = None
+        self._stats: Optional[Stats] = None
 
     @property
     def name(self) -> str:
@@ -153,7 +153,7 @@ class Dataset:
         self,
         operation: Union[str, Callable[[Any], OperationResult]],
         *args: Any,
-        initial_state: OperationState | None = None,
+        initial_state: Optional[OperationState] = None,
         **kwargs: Any,
     ) -> None:
         """Apply an operation to all data inplace.
@@ -311,7 +311,9 @@ class Dataset:
         path = ensure_path(path)
         state = None
         if (path / ".recon" / self.name).exists():
-            state = cast(Dict[str, Any], srsly.read_json(path / ".recon" / self.name / "state.json"))
+            state = cast(
+                Dict[str, Any], srsly.read_json(path / ".recon" / self.name / "state.json")
+            )
             state = DatasetOperationsState(**state)
             self._operations = state.operations
 
@@ -412,7 +414,7 @@ class Dataset:
         self._data = data
         return self
 
-    def to_prodigy(self, prodigy_dataset: str | None = None, overwrite: bool = True) -> str:
+    def to_prodigy(self, prodigy_dataset: Optional[str] = None, overwrite: bool = True) -> str:
         """Save examples to prodigy dataset
 
         Args:
@@ -460,7 +462,7 @@ class Dataset:
         hf_dataset: "HFDataset",
         tokens_prop: str = "tokens",
         labels_prop: str = "ner_tags",
-        labels: List[str] | None = None,
+        labels: List[str] = [],
         lang: str = "en",
     ) -> "Dataset":
         nlp = spacy.blank(lang)

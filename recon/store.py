@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import cast, Any, Dict, List, Union
+from typing import Any, Dict, List, Union, cast
 
 import srsly
 from recon.types import Example
@@ -7,11 +7,10 @@ from spacy.util import ensure_path
 
 
 class ExampleStore:
-    def __init__(self, examples: List[Example] | None = None):
+    def __init__(self, examples: List[Example] = []):
         self._map: Dict[int, Example] = {}
-        if examples is not None:
-            for e in examples:
-                self.add(e)
+        for e in examples:
+            self.add(e)
 
     def __getitem__(self, example_hash: int) -> Example:
         return self._map[example_hash]
@@ -24,7 +23,7 @@ class ExampleStore:
         """
         return len(self._map)
 
-    def __contains__(self, example: int | Example) -> bool:
+    def __contains__(self, example: Union[int, Example]) -> bool:
         """Check whether a string is in the store.
 
         Args:

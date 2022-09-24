@@ -193,7 +193,7 @@ def get_probs_from_counts(seq: List[int]) -> Sequence[float]:
     return list(np.asarray(seq) / sum(seq))
 
 
-def _entropy(seq: Union[List[int], List[float]], total: int | None = None) -> float:
+def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) -> float:
     """Calculate Shannon Entropy for a sequence of Floats or Integers.
     If Floats, check they are probabilities
     If Integers, divide each n in seq by total and calculate entropy
@@ -222,7 +222,7 @@ def _entropy(seq: Union[List[int], List[float]], total: int | None = None) -> fl
 
 
 def calculate_label_balance_entropy(ner_stats: Stats) -> float:
-    """Use Entropy to calculate a metric for label balance based on an Stats object
+    """Use Entropy to calculate a metric for label balance based on a Stats object
 
     Args:
         ner_stats (Stats): Stats for a dataset.

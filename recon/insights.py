@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, Optional, Set, Tuple
+from typing import DefaultDict, Dict, List, Set, Tuple
 
 import numpy as np
 from recon.constants import NOT_LABELED
@@ -110,7 +110,7 @@ def top_label_disparities(
 def top_prediction_errors(
     recognizer: EntityRecognizer,
     data: List[Example],
-    labels: List[str] | None = None,
+    labels: List[str] = [],
     exclude_fp: bool = False,
     exclude_fn: bool = False,
     verbose: bool = False,
@@ -121,7 +121,7 @@ def top_prediction_errors(
     Args:
         recognizer (EntityRecognizer): An instance of EntityRecognizer
         data (List[Example]): List of annotated Examples
-        labels (List[str], optional): List of labels to get errors for.
+        labels (List[str]): List of labels to get errors for.
             Defaults to the labels property of `recognizer`.
         exclude_fp (bool, optional): Flag to exclude False Positive errors.
         exclude_fn (bool, optional): Flag to exclude False Negative errors.

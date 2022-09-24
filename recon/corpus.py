@@ -1,9 +1,8 @@
 from pathlib import Path
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import srsly
 from recon.dataset import Dataset
-from recon.loaders import read_jsonl
 from recon.store import ExampleStore
 from recon.types import (
     CorpusApplyResult,
@@ -25,8 +24,8 @@ class Corpus:
         name: str,
         train: Dataset,
         dev: Dataset,
-        test: Dataset | None = None,
-        example_store: ExampleStore | None = None,
+        test: Optional[Dataset] = None,
+        example_store: Optional[ExampleStore] = None,
     ):
         """Initialize a Corpus.
 
@@ -261,7 +260,7 @@ class Corpus:
         name: str,
         prodigy_train_datasets: List[str],
         prodigy_dev_datasets: List[str],
-        prodigy_test_datasets: List[str] | None = None,
+        prodigy_test_datasets: Optional[List[str]] = None,
     ) -> "Corpus":
         """Load a Corpus from 3 separate datasets in Prodigy
 
@@ -285,10 +284,10 @@ class Corpus:
 
     def to_prodigy(
         self,
-        name: str | None = None,
-        prodigy_train_dataset: str | None = None,
-        prodigy_dev_dataset: str | None = None,
-        prodigy_test_dataset: str | None = None,
+        name: Optional[str] = None,
+        prodigy_train_dataset: Optional[str] = None,
+        prodigy_dev_dataset: Optional[str] = None,
+        prodigy_test_dataset: Optional[str] = None,
         overwrite: bool = True,
     ) -> Tuple[str, str, str]:
         """Save a Corpus to 3 separate Prodigy datasets

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Callable, Dict, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import catalogue
 import spacy
@@ -66,7 +66,7 @@ class PreProcessor:
 
 class SpacyPreProcessor(PreProcessor):
     def __init__(
-        self, nlp: Language | None = None, name: str = "recon.spacy.v1", field: str = "doc"
+        self, nlp: Optional[Language] = None, name: str = "recon.spacy.v1", field: str = "doc"
     ) -> None:
         super().__init__(name, field)
         self._nlp = nlp

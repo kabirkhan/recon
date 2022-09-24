@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 from recon.operations.core import operation
@@ -75,9 +75,9 @@ def substitute_spans(example: Example, span_subs: Dict[Span, str]) -> Example:
 
 def augment_example(
     example: Example,
-    span_f: Callable[[Span, Any], str | None],
-    spans: List[Span] | None = None,
-    span_label: str | None = None,
+    span_f: Callable[[Span, Any], Optional[str]],
+    spans: Optional[List[Span]] = None,
+    span_label: Optional[str] = None,
     n_augs: int = 1,
     sub_prob: float = 0.5,
     **kwargs: Any,
@@ -133,7 +133,7 @@ def ent_label_sub(
         List[Example]: List of augmented examples including the original.
     """
 
-    def augmentation(span: Span, subs: List[str]) -> str | None:
+    def augmentation(span: Span, subs: List[str]) -> Optional[str]:
         subs = [s for s in subs if s != span.text]
         sub = None
         if len(subs) > 0:
@@ -155,7 +155,7 @@ def kb_expansion(
 
     spans_to_aliases_map = preprocessed_outputs["recon.span_aliases.v1"]
 
-    def augmentation(span: Span, spans_to_aliases_map: Dict[int, List[str]]) -> str | None:
+    def augmentation(span: Span, spans_to_aliases_map: Dict[int, List[str]]) -> Optional[str]:
         sub = None
         if hash(span) in spans_to_aliases_map:
             aliases = spans_to_aliases_map[hash(span)]
