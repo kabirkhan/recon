@@ -53,7 +53,7 @@ def json_to_examples(data: List[Dict[str, Any]]) -> List[Example]:
     return [Example(**example) for example in data]
 
 
-def from_spacy(path: Path, nlp: Language = None, lang_code: str = "en") -> Iterable[Example]:
+def from_spacy(path: Path, nlp: Language | None = None, lang_code: str = "en") -> Iterable[Example]:
     """Load examples from .spacy docbin format
 
     Args:
@@ -87,7 +87,7 @@ def from_spacy(path: Path, nlp: Language = None, lang_code: str = "en") -> Itera
 
 
 def to_spacy(
-    path: Path, data: Iterable[Example], nlp: Language = None, lang_code: str = "en"
+    path: Path, data: Iterable[Example], nlp: Language | None = None, lang_code: str = "en"
 ) -> DocBin:
     """Save a batch of examples to disk in the .spacy DocBin format
 
@@ -110,7 +110,7 @@ def to_spacy(
             tokens = [token.text for token in example.tokens]
             words, spaces = get_words_and_spaces(tokens, example.text)
             doc = Doc(nlp.vocab, words=words, spaces=spaces)
-            doc.ents = [doc.char_span(s.start, s.end, label=s.label) for s in example.spans]
+            doc.ents = tuple([doc.char_span(s.start, s.end, label=s.label) for s in example.spans])
             doc_bin.add(doc)
     doc_bin.to_disk(path)
     return doc_bin

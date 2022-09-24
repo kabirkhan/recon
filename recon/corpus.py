@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union
 
 import srsly
 from recon.dataset import Dataset
@@ -25,8 +25,8 @@ class Corpus:
         name: str,
         train: Dataset,
         dev: Dataset,
-        test: Optional[Dataset] = None,
-        example_store: Optional[ExampleStore] = None,
+        test: Dataset | None = None,
+        example_store: ExampleStore | None = None,
     ):
         """Initialize a Corpus.
 
@@ -132,10 +132,16 @@ class Corpus:
         return self._example_store
 
     def summary(self) -> str:
-        self.train_ds.summary()
-        self.dev_ds.summary()
+        summaries = [self.train_ds.summary(), self.dev_ds.summary()]
         if self.test_ds:
-            self.test_ds.summary()
+            summaries.append(self.test_ds.summary())
+        return "\n".join(summaries)
+
+    def print_summary(self) -> None:
+        print(self.summary())
+
+    def __str(self) -> str:
+        return self.summary()
 
     def apply(
         self, func: Callable[[List[Example], Any], Any], *args: Any, **kwargs: Any
@@ -189,7 +195,6 @@ class Corpus:
         train_name: str = "train",
         dev_name: str = "dev",
         test_name: str = "test",
-        loader_func: Callable = read_jsonl,
     ) -> "Corpus":
         """Load Corpus from disk given a directory with files
         named explicitly train.jsonl, dev.jsonl, and test.jsonl
@@ -199,8 +204,6 @@ class Corpus:
             train_name (str, optional): Name of train data under data_dir. Defaults to train.
             dev_name (str, optional): Name of dev data under data_dir. Defaults to dev.
             test_name (str, optional): Name of test data under data_dir. Defaults to test.
-            loader_func (Callable, optional): Callable that reads a file and returns a List of examples.
-                Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         data_dir = ensure_path(data_dir)
 
@@ -214,11 +217,11 @@ class Corpus:
         if example_store_path.exists():
             example_store.from_disk(example_store_path)
 
-        train = Dataset("train", example_store=example_store).from_disk(data_dir)
-        dev = Dataset("dev", example_store=example_store).from_disk(data_dir)
+        train = Dataset(train_name, example_store=example_store).from_disk(data_dir)
+        dev = Dataset(dev_name, example_store=example_store).from_disk(data_dir)
 
         try:
-            test = Dataset("test", example_store=example_store).from_disk(data_dir)
+            test = Dataset(test_name, example_store=example_store).from_disk(data_dir)
             corpus = cls(name, train, dev, test=test)
         except ValueError:
             corpus = cls(name, train, dev)
@@ -258,7 +261,7 @@ class Corpus:
         name: str,
         prodigy_train_datasets: List[str],
         prodigy_dev_datasets: List[str],
-        prodigy_test_datasets: Optional[List[str]] = None,
+        prodigy_test_datasets: List[str] | None = None,
     ) -> "Corpus":
         """Load a Corpus from 3 separate datasets in Prodigy
 
@@ -282,10 +285,10 @@ class Corpus:
 
     def to_prodigy(
         self,
-        name: Optional[str] = None,
-        prodigy_train_dataset: Optional[str] = None,
-        prodigy_dev_dataset: Optional[str] = None,
-        prodigy_test_dataset: Optional[str] = None,
+        name: str | None = None,
+        prodigy_train_dataset: str | None = None,
+        prodigy_dev_dataset: str | None = None,
+        prodigy_test_dataset: str | None = None,
         overwrite: bool = True,
     ) -> Tuple[str, str, str]:
         """Save a Corpus to 3 separate Prodigy datasets

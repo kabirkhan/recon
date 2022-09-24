@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List
 
 import numpy as np
 from recon.operations.core import operation
@@ -75,9 +75,9 @@ def substitute_spans(example: Example, span_subs: Dict[Span, str]) -> Example:
 
 def augment_example(
     example: Example,
-    span_f: Callable[[Span, Any], Optional[str]],
-    spans: Optional[List[Span]] = None,
-    span_label: Optional[str] = None,
+    span_f: Callable[[Span, Any], str | None],
+    spans: List[Span] | None = None,
+    span_label: str | None = None,
     n_augs: int = 1,
     sub_prob: float = 0.5,
     **kwargs: Any,
@@ -97,7 +97,7 @@ def augment_example(
 
         span_subs = {}
         for span in spans_to_sub:
-            res = span_f(span, **kwargs)  #  type: ignore
+            res = span_f(span, **kwargs)  # type: ignore
             if res:
                 span_subs[span] = res
 
@@ -111,7 +111,7 @@ def augment_example(
     return list(augmented_examples)
 
 
-@operation("recon.v1.augment.ent_label_sub", handles_tokens=False)
+@operation("recon.augment.ent_label_sub.v1", handles_tokens=False)
 def ent_label_sub(
     example: Example, label: str, subs: List[str], n_augs: int = 1, sub_prob: float = 0.5
 ) -> List[Example]:
@@ -133,7 +133,7 @@ def ent_label_sub(
         List[Example]: List of augmented examples including the original.
     """
 
-    def augmentation(span: Span, subs: List[str]) -> Optional[str]:
+    def augmentation(span: Span, subs: List[str]) -> str | None:
         subs = [s for s in subs if s != span.text]
         sub = None
         if len(subs) > 0:
@@ -145,7 +145,7 @@ def ent_label_sub(
     )
 
 
-@operation("recon.v1.augment.kb_expansion", factory=True)
+@operation("recon.augment.kb_expansion.v1", factory=True)
 def kb_expansion(
     example: Example,
     preprocessed_outputs: Dict[str, Any] = {},
@@ -153,9 +153,9 @@ def kb_expansion(
     sub_prob: float = 0.5,
 ) -> List[Example]:
 
-    spans_to_aliases_map = preprocessed_outputs["recon.v1.span_aliases"]
+    spans_to_aliases_map = preprocessed_outputs["recon.span_aliases.v1"]
 
-    def augmentation(span: Span, spans_to_aliases_map: Dict[int, List[str]]) -> Optional[str]:
+    def augmentation(span: Span, spans_to_aliases_map: Dict[int, List[str]]) -> str | None:
         sub = None
         if hash(span) in spans_to_aliases_map:
             aliases = spans_to_aliases_map[hash(span)]
@@ -189,7 +189,7 @@ def kb_expansion(
 #             return words[0].replace("_", " ")
 
 
-# @operation("recon.v1.augment.replace_pos_with_synonym", pre=[spacy_pre])
+# @operation("recon.augment.replace_pos_with_synonym.v1", pre=[spacy_pre])
 # def replace_pos_with_synonym(example: Example, pos: str, synonym_f: Callable[[str], str] = get_synonym, preprocessed_outputs={}, n_augs: int = 1):
 
 #     pos_map = {

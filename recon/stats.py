@@ -4,7 +4,7 @@ from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Union, cast
 
 import numpy as np
 from recon.constants import NOT_LABELED
-from recon.types import EntityCoverage, EntityCoverageStats, Example, Stats, Outliers
+from recon.types import EntityCoverage, EntityCoverageStats, Example, Outliers, Stats
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy as scipy_entropy
 
@@ -180,7 +180,7 @@ def calculate_entity_coverage_similarity(x: List[Example], y: List[Example]) -> 
     )
 
 
-def get_probs_from_counts(seq: Sequence[int]) -> Sequence[float]:
+def get_probs_from_counts(seq: List[int]) -> Sequence[float]:
     """Convert a sequence of counts to a sequence of probabilties
     by dividing each n by the sum of all n in seq
 
@@ -190,7 +190,7 @@ def get_probs_from_counts(seq: Sequence[int]) -> Sequence[float]:
     Returns:
         Sequence[float]: Sequence of probabilities
     """
-    return np.asarray(seq) / sum(seq)
+    return list(np.asarray(seq) / sum(seq))
 
 
 def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) -> float:
@@ -214,6 +214,7 @@ def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) ->
     if isinstance(seq[0], float):
         res = scipy_entropy(seq)
     elif isinstance(seq[0], int):
+        seq = cast(List[int], seq)
         res = scipy_entropy(get_probs_from_counts(seq))
     else:
         raise ValueError("Parameter seq must be a sequence of probabilites or integers.")

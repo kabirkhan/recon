@@ -5,7 +5,7 @@ from recon.operations.core import operation
 from recon.types import Example, Token
 
 
-@operation("recon.v1.fix_tokenization_and_spacing", pre=["recon.v1.spacy"])
+@operation("recon.fix_tokenization_and_spacing.v1", pre=["recon.spacy.v1"])
 def fix_tokenization_and_spacing(
     example: Example, *, preprocessed_outputs: Dict[str, Any] = {}
 ) -> Optional[Example]:
@@ -22,7 +22,7 @@ def fix_tokenization_and_spacing(
         Example: Example with spans fixed to align to token boundaries.
     """
 
-    doc = preprocessed_outputs["recon.v1.spacy"]
+    doc = preprocessed_outputs["recon.spacy.v1"]
 
     tokens = []
     token_starts = {}
@@ -117,7 +117,7 @@ def fix_tokenization_and_spacing(
     return example
 
 
-@operation("recon.v1.add_tokens", pre=["recon.v1.spacy"])
+@operation("recon.add_tokens.v1", pre=["recon.spacy.v1"])
 def add_tokens(
     example: Example, *, use_spacy_token_ends: bool = False, preprocessed_outputs: Dict[str, Any]
 ) -> Optional[Example]:
@@ -130,7 +130,7 @@ def add_tokens(
     Returns:
         Example: Example with tokens
     """
-    doc = preprocessed_outputs["recon.v1.spacy"]
+    doc = preprocessed_outputs["recon.spacy.v1"]
 
     tokens = []
     token_starts = {}

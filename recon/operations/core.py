@@ -51,7 +51,7 @@ def op_iter(
     Yields:
         Iterator[Tuple[int, Example]]: Tuples of (example hash, example)
     """
-    msg = Printer(no_print=verbose == False, hide_animation=verbose == False)
+    msg = Printer(no_print=not verbose, hide_animation=not verbose)
     preprocessed_outputs: Dict[Example, Dict[str, Any]] = defaultdict(dict)
     for processor in pre:
         msg.info(f"\t=> Running preprocessor {processor.name}")
@@ -89,12 +89,12 @@ class operation:
         self.augmentation = augmentation
 
     def __call__(
-        self, op: Callable[..., Union[None, Example, Iterable[Example]]]
-    ) -> Callable[..., Union[None, Example, Iterable[Example]]]:
+        self, op: Callable[..., Example | Iterable[Example] | None]
+    ) -> Callable[..., Example | Iterable[Example] | None]:
         """Decorator for an operation.
         The first arg to the op callable needs to be an Example.
 
-        e.g. @operation("recon.v1.some_name", batch=True)
+        e.g. @operation("recon.some_name", batch=True)
 
         Or it should operate on a single example and
         recon will take care of applying it to a full Dataset

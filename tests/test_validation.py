@@ -3,7 +3,7 @@ from typing import cast
 import pytest
 from recon.operations.validation import filter_overlaps
 from recon.stats import get_ner_stats
-from recon.types import Example, Stats, Span
+from recon.types import Example, Span, Stats
 
 
 @pytest.fixture()

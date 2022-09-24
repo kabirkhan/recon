@@ -8,7 +8,7 @@ from spacy.tokens import Span as SpacySpan
 from wasabi import msg
 
 
-@operation("recon.v1.rename_labels")
+@operation("recon.rename_labels.v1")
 def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
     """Rename labels in a copy of List[Example] data
 
@@ -24,7 +24,7 @@ def rename_labels(example: Example, label_map: Dict[str, str]) -> Example:
     return example
 
 
-@operation("recon.v1.fix_annotations")
+@operation("recon.fix_annotations.v1")
 def fix_annotations(
     example: Example,
     corrections: List[Correction],
@@ -110,7 +110,7 @@ def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
     """
     corrections: List[Correction] = []
     for key, val in corrections_dict.items():
-        if isinstance(val, str) or val == None:
+        if isinstance(val, str) or val is None:
             from_labels = ["ANY"]
             to_label = val
         elif isinstance(val, tuple):
@@ -128,7 +128,7 @@ def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
     return corrections
 
 
-@operation("recon.v1.strip_annotations", pre=["recon.v1.spacy"], handles_tokens=False)
+@operation("recon.strip_annotations.v1", pre=["recon.spacy.v1"], handles_tokens=False)
 def strip_annotations(
     example: Example,
     *,
@@ -146,7 +146,7 @@ def strip_annotations(
         Example: Example with stripped spans
     """
 
-    preprocessed_outputs["recon.v1.spacy"]
+    preprocessed_outputs["recon.spacy.v1"]
 
     def fix_tokens(example: Example, span: Span) -> bool:
         fix_tokens = example.tokens and any(example.tokens)
@@ -171,7 +171,7 @@ def strip_annotations(
     return example
 
 
-@operation("recon.v1.split_sentences", pre=["recon.v1.spacy"])
+@operation("recon.split_sentences.v1", pre=["recon.spacy.v1"])
 def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {}) -> List[Example]:
     """Split a single example into multiple examples by splitting the text into
     multiple sentences and resetting entity and token offsets based on offsets
@@ -185,7 +185,7 @@ def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {})
         List[Example]: List of split examples.
             Could be list of 1 if the example is just one sentence.
     """
-    doc = preprocessed_outputs["recon.v1.spacy"]
+    doc = preprocessed_outputs["recon.spacy.v1"]
 
     new_examples = []
     ents = []

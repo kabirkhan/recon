@@ -6,7 +6,7 @@ from recon.types import Example
 
 
 def hash_example_meta(
-    example: Example, fields: List[str] = None, ignore_field_absence: bool = False
+    example: Example, fields: List[str] | None = None, ignore_field_absence: bool = False
 ) -> Tuple:
     """Create a hash out of the metadata of an example
 
@@ -44,7 +44,7 @@ def hash_example_meta(
 def sample_examples(
     examples: List[Example],
     meta_filters: Dict[str, List[str]] = {},
-    fields: List[str] = None,
+    fields: List[str] | None = None,
     ignore_field_absence: bool = False,
     top_k_per_hash: int = 10,
     top_k: int = -1,

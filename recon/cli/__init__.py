@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import typer
 from recon.cli.stats import stats
 

@@ -6,7 +6,7 @@ from recon.dataset import Dataset
 from recon.operations.corrections import corrections_from_dict
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
-from recon.types import Correction, Stats, OperationStatus, TransformationType
+from recon.types import Correction, OperationStatus, Stats, TransformationType
 
 
 def test_dataset_initialize(example_data):
@@ -59,13 +59,13 @@ def test_apply(example_data):
 
 def test_apply_(example_data):
     train_dataset = Dataset("train", example_data["train"])
-    ner_stats_pre: Stats = cast(Stats, train_dataset.apply(get_ner_stats))
+    ner_stats_pre = cast(Stats, train_dataset.apply(get_ner_stats))
 
     assert len(train_dataset.operations) == 0
 
-    train_dataset.apply_("recon.v1.upcase_labels")
+    train_dataset.apply_("recon.upcase_labels.v1")
 
-    ner_stats_post: Stats = cast(Stats, train_dataset.apply(get_ner_stats))
+    ner_stats_post = cast(Stats, train_dataset.apply(get_ner_stats))
 
     pre_keys = sorted(ner_stats_pre.n_annotations_per_type.keys())
     post_keys = sorted(ner_stats_post.n_annotations_per_type.keys())
@@ -79,7 +79,7 @@ def test_apply_(example_data):
 
     op = train_dataset.operations[0]
 
-    assert op.name == "recon.v1.upcase_labels"
+    assert op.name == "recon.upcase_labels.v1"
     assert op.status == OperationStatus.COMPLETED
     assert len(op.transformations) == 3
 
@@ -93,7 +93,7 @@ def test_rollback(example_data):
 
     assert len(train_dataset.operations) == 0
 
-    train_dataset.apply_("recon.v1.upcase_labels")
+    train_dataset.apply_("recon.upcase_labels.v1")
 
     ner_stats_post: Stats = cast(Stats, train_dataset.apply(get_ner_stats))
 
@@ -130,7 +130,6 @@ def test_dataset_search(example_data):
 def test_dataset_to_from_disk(example_data, tmp_path):
 
     train_dataset = Dataset("train", example_data["train"])
-    ner_stats_pre: Stats = cast(Stats, train_dataset.apply(get_ner_stats))
 
     assert len(train_dataset.operations) == 0
 
@@ -142,12 +141,12 @@ def test_dataset_to_from_disk(example_data, tmp_path):
     assert len(train_dataset_loaded.operations) == 0
     assert train_dataset_loaded.commit_hash == train_dataset.commit_hash
 
-    train_dataset.apply_("recon.v1.upcase_labels")
+    train_dataset.apply_("recon.upcase_labels.v1")
     corrections = corrections_from_dict(
         {"software development engineer": "JOB_ROLE", "model": None}
     )
     assert len(corrections) == 2
-    train_dataset.apply_("recon.v1.fix_annotations", corrections)
+    train_dataset.apply_("recon.fix_annotations.v1", corrections)
 
     train_dataset.to_disk(tmp_path, overwrite=True)
     train_dataset_loaded_2 = Dataset("train").from_disk(tmp_path)
@@ -158,7 +157,7 @@ def test_dataset_to_from_disk(example_data, tmp_path):
 
     op = train_dataset_loaded_2.operations[0]
 
-    assert op.name == "recon.v1.upcase_labels"
+    assert op.name == "recon.upcase_labels.v1"
     assert op.status == OperationStatus.COMPLETED
     assert len(op.transformations) == 3
 

@@ -4,7 +4,7 @@ from recon.operations.core import operation
 from recon.types import Example, Span
 
 
-@operation("recon.v1.upcase_labels")
+@operation("recon.upcase_labels.v1")
 def upcase_labels(example: Example) -> Example:
     """Convert all span labels to uppercase to normalize
 
@@ -19,7 +19,7 @@ def upcase_labels(example: Example) -> Example:
     return example
 
 
-@operation("recon.v1.filter_overlaps")
+@operation("recon.filter_overlaps.v1")
 def filter_overlaps(example: Example) -> Example:
     """Filter overlapping entity spans by picking the longest one.
 

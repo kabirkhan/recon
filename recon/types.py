@@ -381,7 +381,7 @@ class Correction(BaseModel):
         """
         corrections: List[Correction] = []
         for key, val in obj.items():
-            if isinstance(val, str) or val == None:
+            if isinstance(val, str) or val is None:
                 from_labels = ["ANY"]
                 to_label = val
             elif isinstance(val, tuple):

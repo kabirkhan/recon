@@ -5,7 +5,7 @@ from typing import Iterable, Iterator, List, Set
 from recon.loaders import to_spacy
 from recon.types import Example, Scores, Span, Token
 from spacy.language import Language
-from spacy.training import Corpus as SpacyCorpus
+from spacy.training.corpus import Corpus as SpacyCorpus
 from wasabi import Printer
 
 

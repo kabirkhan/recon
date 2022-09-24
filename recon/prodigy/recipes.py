@@ -22,7 +22,7 @@ from recon.types import Example, HardestExample, Span
 
 
 @prodigy.recipe(
-    "recon.ner_correct",
+    "recon.ner-correct.v1",
     # fmt: off
     dataset=("Dataset to save annotations to", "positional", None, str),
     spacy_model=("Loadable spaCy model for tokenization or blank:lang (e.g. blank:en)", "positional", None, str),
@@ -32,7 +32,7 @@ from recon.types import Example, HardestExample, Span
     exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
     # fmt: on
 )
-def ner_correct(
+def recon_ner_correct_v1(
     dataset: str,
     spacy_model: str,
     source: Union[str, Iterable[dict]],
@@ -84,17 +84,17 @@ def ner_correct(
             "blocks": [
                 {"view_id": "spans_manual", "overlapping_spans": True},
             ],
-            "javascript": f"""
+            "javascript": """
 
-            const disablePredInteraction = event => {{
+            const disablePredInteraction = event => {
                 let xpath = "//span[contains(text(),':PREDICTED')]";
                 let matchingElement = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
                 let length = matchingElement.snapshotLength;
 
-                for (var i = 0; i < length; i++) {{
-                    matchingElement.snapshotItem(i).parentElement.parentElement.onclick = function(e) {{ console.log('PRED SPAN CLIECKED'); e.stopImmediatePropagation(); }}
-                }}
-            }}
+                for (var i = 0; i < length; i++) {
+                    matchingElement.snapshotItem(i).parentElement.parentElement.onclick = function(e) { e.stopImmediatePropagation(); }
+                }
+            }
 
             document.addEventListener('prodigyanswer', disablePredInteraction)
             """,
@@ -103,7 +103,7 @@ def ner_correct(
 
 
 @prodigy.recipe(
-    "recon.ner_merge",
+    "recon.ner-merge.v1",
     # fmt: off
     dataset=("Dataset with saved annotations to from recon.ner_correct", "positional", None, str),
     recon_dataset=("Recon dataset name", "positional", None, str),
@@ -112,7 +112,7 @@ def ner_correct(
     exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
     # fmt: on
 )
-def ner_merge(
+def recon_ner_merge_v1(
     dataset: str,
     recon_dataset: str,
     source: Union[str, Dataset],
@@ -139,7 +139,7 @@ def ner_merge(
     prodigy_texts_to_examples = {e.text: e for e in prodigy_examples}
 
     prev_len = len(dataset)
-    dataset.apply_("recon.v1.prodigy.merge_examples", prodigy_texts_to_examples)
+    dataset.apply_("recon.prodigy.merge_examples", prodigy_texts_to_examples)
     assert len(dataset) == prev_len
 
     if output_dir:
@@ -147,7 +147,7 @@ def ner_merge(
         dataset.to_disk(output_dir)
 
 
-@operation("recon.v1.prodigy.merge_examples")
+@operation("recon.prodigy.merge_examples.v1")
 def merge_examples(example, prodigy_texts_to_examples):
     if example.text in prodigy_texts_to_examples:
         return prodigy_texts_to_examples[example.text]

@@ -1,4 +1,5 @@
 from typing import Dict, List
+
 from recon.corpus import Corpus
 from recon.stats import (
     calculate_entity_coverage_entropy,
