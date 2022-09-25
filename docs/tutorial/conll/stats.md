@@ -1,4 +1,4 @@
-As far as stats go, we've only scene the basic `get_ner_stats` function. But Recon has a lot of useful statistics for your data. Let's start with Entity Coverage.
+As far as stats go, we've only seen the basic `get_ner_stats` function. But Recon has a lot of useful statistics for your data. Let's start with Entity Coverage.
 
 
 ## Entity Coverage
