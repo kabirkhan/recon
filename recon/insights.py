@@ -1,7 +1,10 @@
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, Optional, Set, Tuple
+from typing import DefaultDict, Dict, List, Set, Tuple
 
 import numpy as np
+from spacy.scorer import PRFScore
+from wasabi import Printer
+
 from recon.constants import NOT_LABELED
 from recon.recognizer import EntityRecognizer
 from recon.types import (
@@ -11,11 +14,11 @@ from recon.types import (
     PredictionError,
     PredictionErrorExamplePair,
 )
-from spacy.scorer import PRFScore
-from wasabi import Printer
 
 
-def get_ents_by_label(data: List[Example], case_sensitive: bool = False) -> DefaultDict[str, List[str]]:
+def get_ents_by_label(
+    data: List[Example], case_sensitive: bool = False
+) -> DefaultDict[str, List[str]]:
     """Get a dictionary of unique text spans by label for your data
 
     # TODO: Ok so this needs to return more than just a set for each label.
@@ -51,7 +54,9 @@ def get_ents_by_label(data: List[Example], case_sensitive: bool = False) -> Defa
     return sorted_annotations
 
 
-def get_label_disparities(data: List[Example], label1: str, label2: str, case_sensitive: bool = False) -> Set[str]:
+def get_label_disparities(
+    data: List[Example], label1: str, label2: str, case_sensitive: bool = False
+) -> Set[str]:
     """Identify annotated spans that have different labels in different examples
 
     Args:
@@ -96,7 +101,9 @@ def top_label_disparities(
                     else:
                         input_hash = "||".join([label1, label2])
 
-                    label_disparities[input_hash] = LabelDisparity(label1=label1, label2=label2, count=n_disparities)
+                    label_disparities[input_hash] = LabelDisparity(
+                        label1=label1, label2=label2, count=n_disparities
+                    )
 
     return sorted(label_disparities.values(), key=lambda ld: ld.count, reverse=True)
 
@@ -104,7 +111,7 @@ def top_label_disparities(
 def top_prediction_errors(
     recognizer: EntityRecognizer,
     data: List[Example],
-    labels: Optional[List[str]] = None,
+    labels: List[str] = [],
     exclude_fp: bool = False,
     exclude_fn: bool = False,
     verbose: bool = False,
@@ -115,7 +122,7 @@ def top_prediction_errors(
     Args:
         recognizer (EntityRecognizer): An instance of EntityRecognizer
         data (List[Example]): List of annotated Examples
-        labels (List[str], optional): List of labels to get errors for.
+        labels (List[str]): List of labels to get errors for.
             Defaults to the labels property of `recognizer`.
         exclude_fp (bool, optional): Flag to exclude False Positive errors.
         exclude_fn (bool, optional): Flag to exclude False Negative errors.
@@ -132,12 +139,16 @@ def top_prediction_errors(
     preds = recognizer.predict(texts)
 
     errors = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))  # type: ignore
-    error_examples: DefaultDict[Tuple[str, str, str], List[PredictionErrorExamplePair]] = defaultdict(list)
+    error_examples: DefaultDict[
+        Tuple[str, str, str], List[PredictionErrorExamplePair]
+    ] = defaultdict(list)
     n_errors = 0
 
     for orig_example, pred_example, ann in zip(data, preds, anns):
 
-        pred_error_example_pair = PredictionErrorExamplePair(original=orig_example, predicted=pred_example)
+        pred_error_example_pair = PredictionErrorExamplePair(
+            original=orig_example, predicted=pred_example
+        )
 
         cand = set([(s.start, s.end, s.label) for s in pred_example.spans])
         gold = set([(s.start, s.end, s.label) for s in ann])
@@ -268,7 +279,9 @@ def get_hardest_examples(
     return sorted_hes
 
 
-def get_annotation_labels(examples: List[Example], case_sensitive: bool = False) -> Dict[str, Dict[str, list]]:
+def get_annotation_labels(
+    examples: List[Example], case_sensitive: bool = False
+) -> Dict[str, Dict[str, list]]:
     """Constructs a map of each annotation in the list of examples to each label that annotation
     has and references all examples associated with that label.
 

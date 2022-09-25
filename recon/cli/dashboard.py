@@ -32,11 +32,11 @@ def dashboard(data_dir: Path) -> None:
     Args:
         data_dir (Path): Path to data folder
     """
-    msg: Printer = Printer()
+    msg = Printer()
 
-    # with msg.loading("Loading Corpus from Disk"):
-    corpus = Corpus.from_disk(data_dir)
-    # msg.good("Done")
+    with msg.loading("Loading Corpus from Disk"):
+        corpus = Corpus.from_disk(data_dir)
+        msg.good("Done")
 
     corpus.apply(get_ner_stats)
 
@@ -52,7 +52,7 @@ def dashboard(data_dir: Path) -> None:
 
     # app = dash.Dash(__name__, external_stylesheets=external_stylesheets, external_scripts=external_scripts)
 
-    # def generate_bar_chart_stats(id: str, ner_stats: NERStats, name: str = None):
+    # def generate_bar_chart_stats(id: str, ner_stats: Stats, name: str = None):
     #     return dcc.Graph(
     #         id=id,
     #         figure={

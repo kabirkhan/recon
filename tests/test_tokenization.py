@@ -15,12 +15,14 @@ def test_fix_tokenization_and_spacing(spacy_preprocessor):
         formatted=True,
     )
 
-    example2 = Example(text="An entityand other text", spans=[Span(text="entity", start=3, end=9, label="ENTITY")])
+    example2 = Example(
+        text="An entityand other text", spans=[Span(text="entity", start=3, end=9, label="ENTITY")]
+    )
 
     ds = Dataset("test_dataset", data=[example1, example2])
 
     assert len(ds) == 2
-    ds.apply_("recon.v1.fix_tokenization_and_spacing")
+    ds.apply_("recon.fix_tokenization_and_spacing.v1")
 
     assert len(ds) == 2
 
@@ -57,7 +59,9 @@ def test_add_tokens(spacy_preprocessor):
     # fmt: on
 
     fixed_examples = []
-    for orig_example_hash, example, preprocessed_outputs in op_iter(untokenized_examples, pre=[spacy_preprocessor]):
+    for orig_example_hash, example, preprocessed_outputs in op_iter(
+        untokenized_examples, pre=[spacy_preprocessor]
+    ):
         fixed_examples.append(add_tokens(example, preprocessed_outputs=preprocessed_outputs))
 
     for fixed_example, tokenized_example in zip(fixed_examples, tokenized_examples):
@@ -84,7 +88,9 @@ def test_add_tokens_bad_example(spacy_preprocessor):
     examples = [Example(text=bad_example["text"], spans=[]), Example(**bad_example)]
 
     fixed_examples = []
-    for orig_example_hash, example, preprocessed_outputs in op_iter(examples, pre=[spacy_preprocessor]):
+    for orig_example_hash, example, preprocessed_outputs in op_iter(
+        examples, pre=[spacy_preprocessor]
+    ):
         fixed_example = add_tokens(example, preprocessed_outputs=preprocessed_outputs)
         if fixed_example:
             fixed_examples.append(fixed_example)

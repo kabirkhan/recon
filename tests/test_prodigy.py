@@ -1,14 +1,19 @@
 import pytest
+
 from recon.corpus import Corpus
 
 prodigy = pytest.importorskip("prodigy")
 
 
 def test_corpus_to_from_prodigy(example_corpus):
-    prodigy_train_dataset, prodigy_dev_dataset, prodigy_test_dataset = example_corpus.to_prodigy(overwrite=True)
+    prodigy_train_dataset, prodigy_dev_dataset, prodigy_test_dataset = example_corpus.to_prodigy(
+        overwrite=True
+    )
     name = example_corpus.name
 
-    corpus_loaded = Corpus.from_prodigy(name, [prodigy_train_dataset], [prodigy_dev_dataset], [prodigy_test_dataset])
+    corpus_loaded = Corpus.from_prodigy(
+        name, [prodigy_train_dataset], [prodigy_dev_dataset], [prodigy_test_dataset]
+    )
 
     assert example_corpus.name == corpus_loaded.name
     assert len(example_corpus.train) == len(corpus_loaded.train)

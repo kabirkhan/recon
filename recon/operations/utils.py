@@ -1,3 +1,7 @@
+"""Utils for running operations and resolving parameters dynamically. The utilties for resolving parameters dynamically are
+based on the functionality from FastAPI's process of resolving route params and request bodies to Pydantic Models"""
+
+
 import functools
 import inspect
 from collections import OrderedDict
@@ -23,6 +27,7 @@ from pydantic.fields import (
 from pydantic.schema import get_annotation_from_field_info
 from pydantic.typing import ForwardRef, evaluate_forwardref
 from pydantic.utils import lenient_issubclass
+
 from recon.types import OperationState
 
 sequence_shapes = {
@@ -122,7 +127,9 @@ def create_response_field(
     try:
         return response_field(field_info=field_info)
     except RuntimeError:
-        raise ValueError(f"Invalid args for response field! Hint: check that {type_} is a valid pydantic field type")
+        raise ValueError(
+            f"Invalid args for response field! Hint: check that {type_} is a valid pydantic field type"
+        )
 
 
 def get_param_field(
@@ -188,7 +195,7 @@ def request_body_to_args(
             else:
                 loc = ("body", field.alias)
 
-            value: Optional[Any] = None
+            value = None
             if received_body is not None:
                 try:
                     value = received_body.get(field.alias)
@@ -245,13 +252,17 @@ def get_required_operation_params(op: Callable) -> Dict[str, ModelField]:
             # already handled by the internals of the operation
             continue
 
-        param_field = get_param_field(param=param, default_field_info=FieldInfo, param_name=param_name)
+        param_field = get_param_field(
+            param=param, default_field_info=FieldInfo, param_name=param_name
+        )
         required_params[param_name] = param_field
 
     return required_params
 
 
-def get_received_operation_data(required_params: Dict[str, ModelField], state: OperationState) -> Dict[str, Any]:
+def get_received_operation_data(
+    required_params: Dict[str, ModelField], state: OperationState
+) -> Dict[str, Any]:
     """Resolve serialized args and kwargs data of an operation to their Pydantic types
 
     Args:

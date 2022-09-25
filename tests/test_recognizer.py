@@ -1,5 +1,6 @@
 import pytest
-from recon.recognizer import *
+
+from recon.recognizer import EntityRecognizer, SpacyEntityRecognizer
 
 
 def test_base_recognizer(test_texts):

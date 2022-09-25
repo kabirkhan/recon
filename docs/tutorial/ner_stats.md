@@ -1,5 +1,3 @@
-# Tutorial - NER Statistics
-
 Getting statistics about your NER data can be extremely helpful throughout the annotation process. It can help you ensure that you're spending time on the right annotations and that you have enough examples for each type as well as enough examples with **no entities** at all (this is often overlooked but **very** important to build a model that generalizes well).
 
 Once you have your data loaded either by itself as a list of `Example`s or as a `Dataset` you can easily get statistics using the [`stats.ner_stats`](../../api/stats#ner_stats) function.
@@ -37,8 +35,7 @@ $ python main.py ./examples/data/skills/train.jsonl
         "JOB_ROLE":10,
         "skill":2,
         "product":1
-    },
-    "examples_with_type":null
+    }
 }
 ```
 
@@ -51,13 +48,13 @@ And it'd be really annoying to have to call the same function on each list of ex
 
 ```Python
 train = read_jsonl(train_file)
-print(get_ner_stats(train, serialize=True))
+print(get_ner_stats(train))
 
 dev = read_jsonl(dev_file)
-print(get_ner_stats(dev, serialize=True))
+print(get_ner_stats(dev))
 
 test = read_jsonl(test_file)
-print(get_ner_stats(test, serialize=True))
+print(get_ner_stats(test))
 ```
 
 ## Next Steps

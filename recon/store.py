@@ -1,17 +1,17 @@
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union, cast
 
 import srsly
+
 from recon.types import Example
-from spacy.util import ensure_path
+from recon.utils import ensure_path
 
 
 class ExampleStore:
-    def __init__(self, examples: List[Example] = None):
+    def __init__(self, examples: List[Example] = []):
         self._map: Dict[int, Example] = {}
-        if examples is not None:
-            for e in examples:
-                self.add(e)
+        for e in examples:
+            self.add(e)
 
     def __getitem__(self, example_hash: int) -> Example:
         return self._map[example_hash]
@@ -45,7 +45,7 @@ class ExampleStore:
         example_hash = hash(example)
         self._map[example_hash] = example
 
-    def from_disk(self, path: Path) -> "ExampleStore":
+    def from_disk(self, path: Union[str, Path]) -> "ExampleStore":
         """Load store from disk
 
         Args:
@@ -57,6 +57,7 @@ class ExampleStore:
         path = ensure_path(path)
         examples = srsly.read_jsonl(path)
         for e in examples:
+            e = cast(Dict[str, Any], e)
             example_hash = e["example_hash"]
             raw_example = e["example"]
             example = Example(**raw_example)
@@ -65,7 +66,7 @@ class ExampleStore:
 
         return self
 
-    def to_disk(self, path: Path) -> None:
+    def to_disk(self, path: Union[str, Path]) -> None:
         """Save store to disk
 
         Args:

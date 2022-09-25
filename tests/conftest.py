@@ -2,12 +2,13 @@ from pathlib import Path
 from typing import Dict, List
 
 import pytest
+from spacy.lang.en import English
+
 from recon.corpus import Corpus
 from recon.loaders import read_jsonl
 from recon.preprocess import SpacyPreProcessor
 from recon.recognizer import SpacyEntityRecognizer
 from recon.types import Example
-from spacy.lang.en import English
 
 
 @pytest.fixture()
@@ -65,10 +66,10 @@ def example_corpus_processed() -> Corpus:
     corpus = Corpus.from_disk(base_path, name="test_corpus")
     corpus.pipe_(
         [
-            "recon.v1.fix_tokenization_and_spacing",
-            "recon.v1.add_tokens",
-            "recon.v1.upcase_labels",
-            "recon.v1.filter_overlaps",
+            "recon.fix_tokenization_and_spacing.v1",
+            "recon.add_tokens.v1",
+            "recon.upcase_labels.v1",
+            "recon.filter_overlaps.v1",
         ]
     )
     return corpus

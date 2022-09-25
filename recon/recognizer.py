@@ -2,11 +2,12 @@ import tempfile
 from pathlib import Path
 from typing import Iterable, Iterator, List, Set
 
+from spacy.language import Language
+from spacy.training.corpus import Corpus as SpacyCorpus
+from wasabi import Printer
+
 from recon.loaders import to_spacy
 from recon.types import Example, Scores, Span, Token
-from spacy.language import Language
-from spacy.training import Corpus as SpacyCorpus
-from wasabi import Printer
 
 
 class EntityRecognizer:
@@ -67,9 +68,11 @@ class EntityRecognizer:
 
         table_data = []
         for label, scores in sorted(sc.ents_per_type.items(), key=lambda tup: tup[0]):
-            table_data.append((label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}"))
+            table_data.append(
+                (label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}")
+            )
         header = ("Label", "Precision", "Recall", "F-Score")
-        formatted = msg.table(table_data, header=header, divider=True)
+        msg.table(table_data, header=header, divider=True)
         return sc
 
 
