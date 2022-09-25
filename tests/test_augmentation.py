@@ -12,7 +12,7 @@ def test_ent_label_substitution():
     )
 
     ds = Dataset("test_dataset", data=[example])
-    ds.apply_("recon.v1.augment.ent_label_sub", label="ENTITY", subs=["new entity"], sub_prob=1.0)
+    ds.apply_("recon.augment.ent_label_sub.v1", label="ENTITY", subs=["new entity"], sub_prob=1.0)
 
     assert len(ds) == 2
 

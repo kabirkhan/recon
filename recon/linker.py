@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Iterable, Iterator
 
-from recon.types import Example
 from spacy.kb import KnowledgeBase
+
+from recon.types import Example
 
 
 class BaseEntityLinker(ABC):

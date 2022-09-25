@@ -2,8 +2,8 @@ from pathlib import Path
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import srsly
+
 from recon.dataset import Dataset
-from recon.loaders import read_jsonl
 from recon.store import ExampleStore
 from recon.types import (
     CorpusApplyResult,
@@ -12,7 +12,7 @@ from recon.types import (
     OperationResult,
     OperationState,
 )
-from spacy.util import ensure_path
+from recon.utils import ensure_path
 
 
 class Corpus:
@@ -132,12 +132,20 @@ class Corpus:
         return self._example_store
 
     def summary(self) -> str:
-        self.train_ds.summary()
-        self.dev_ds.summary()
+        summaries = [self.train_ds.summary(), self.dev_ds.summary()]
         if self.test_ds:
-            self.test_ds.summary()
+            summaries.append(self.test_ds.summary())
+        return "\n".join(summaries)
 
-    def apply(self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any) -> CorpusApplyResult:
+    def print_summary(self) -> None:
+        print(self.summary())
+
+    def __str(self) -> str:
+        return self.summary()
+
+    def apply(
+        self, func: Callable[[List[Example], Any], Any], *args: Any, **kwargs: Any
+    ) -> CorpusApplyResult:
         """Apply a function to all datasets
 
         Args:
@@ -155,7 +163,9 @@ class Corpus:
             all=func(self.all, *args, **kwargs),  # type: ignore
         )
 
-    def apply_(self, operation: Callable[[Any], OperationResult], *args: Any, **kwargs: Any) -> None:
+    def apply_(
+        self, operation: Callable[[Any], OperationResult], *args: Any, **kwargs: Any
+    ) -> None:
         """Apply a function to all data inplace.
 
         Args:
@@ -180,12 +190,11 @@ class Corpus:
     @classmethod
     def from_disk(
         cls,
-        data_dir: Path,
+        data_dir: Union[str, Path],
         name: str = "corpus",
         train_name: str = "train",
         dev_name: str = "dev",
         test_name: str = "test",
-        loader_func: Callable = read_jsonl,
     ) -> "Corpus":
         """Load Corpus from disk given a directory with files
         named explicitly train.jsonl, dev.jsonl, and test.jsonl
@@ -195,8 +204,6 @@ class Corpus:
             train_name (str, optional): Name of train data under data_dir. Defaults to train.
             dev_name (str, optional): Name of dev data under data_dir. Defaults to dev.
             test_name (str, optional): Name of test data under data_dir. Defaults to test.
-            loader_func (Callable, optional): Callable that reads a file and returns a List of examples.
-                Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         data_dir = ensure_path(data_dir)
 
@@ -210,17 +217,17 @@ class Corpus:
         if example_store_path.exists():
             example_store.from_disk(example_store_path)
 
-        train = Dataset("train", example_store=example_store).from_disk(data_dir)
-        dev = Dataset("dev", example_store=example_store).from_disk(data_dir)
+        train = Dataset(train_name, example_store=example_store).from_disk(data_dir)
+        dev = Dataset(dev_name, example_store=example_store).from_disk(data_dir)
 
         try:
-            test = Dataset("test", example_store=example_store).from_disk(data_dir)
+            test = Dataset(test_name, example_store=example_store).from_disk(data_dir)
             corpus = cls(name, train, dev, test=test)
         except ValueError:
             corpus = cls(name, train, dev)
         return corpus
 
-    def to_disk(self, output_dir: Path, overwrite: bool = False) -> None:
+    def to_disk(self, output_dir: Union[str, Path], overwrite: bool = False) -> None:
         """Save Corpus to Disk
 
         Args:
@@ -269,7 +276,9 @@ class Corpus:
         """
         train_ds = Dataset("train").from_prodigy(prodigy_train_datasets)
         dev_ds = Dataset("dev").from_prodigy(prodigy_dev_datasets)
-        test_ds = Dataset("test").from_prodigy(prodigy_test_datasets) if prodigy_test_datasets else None
+        test_ds = (
+            Dataset("test").from_prodigy(prodigy_test_datasets) if prodigy_test_datasets else None
+        )
 
         ds = cls(name, train_ds, dev_ds, test_ds)
         return ds

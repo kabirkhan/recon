@@ -84,11 +84,15 @@ def dataset_hash(dataset: "Dataset", as_int: bool = True) -> Union[str, int]:
     Returns:
         Union[str, int]: Dataset hash
     """
-    hash_data = (dataset.name,) + tuple((example_hash(example, as_int=False) for example in dataset.data))
+    hash_data = (dataset.name,) + tuple(
+        (example_hash(example, as_int=False) for example in dataset.data)
+    )
     return _hash(hash_data, as_int=as_int)
 
 
-def prediction_error_hash(prediction_error: "PredictionError", as_int: bool = True) -> Union[str, int]:
+def prediction_error_hash(
+    prediction_error: "PredictionError", as_int: bool = True
+) -> Union[str, int]:
     """Hash of PredictionError
 
     Args:
@@ -102,7 +106,9 @@ def prediction_error_hash(prediction_error: "PredictionError", as_int: bool = Tr
     return _hash(hash_data, as_int=as_int)
 
 
-def _hash(tpl: Tuple, hash_function: Callable = xxhash.xxh64, as_int: bool = True) -> Union[str, int]:
+def _hash(
+    tpl: Tuple, hash_function: Callable = xxhash.xxh64, as_int: bool = True
+) -> Union[str, int]:
     """Deterministic hash function. The main use here is
     providing a `commit_hash` for a Dataset to compare across
     saves/loads and ensure that operations are re-run if the hash

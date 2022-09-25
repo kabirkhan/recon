@@ -1,7 +1,8 @@
 from pathlib import Path
 
 import typer
-from recon import Dataset, get_ner_stats
+from recon import Dataset
+from recon.stats import get_ner_stats
 
 
 def main(data_file: Path, output_file: Path):
@@ -9,13 +10,13 @@ def main(data_file: Path, output_file: Path):
 
     print("STATS BEFORE")
     print("============")
-    print(ds.apply(get_ner_stats, serialize=True))
+    print(ds.apply(get_ner_stats))
 
     ds.apply_("recon.v1.upcase_labels")
 
     print("STATS AFTER")
     print("===========")
-    print(ds.apply(get_ner_stats, serialize=True))
+    print(ds.apply(get_ner_stats))
 
     ds.to_disk(output_file, overwrite=True)
 

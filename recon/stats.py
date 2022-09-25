@@ -3,13 +3,14 @@ from collections import defaultdict
 from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Union, cast
 
 import numpy as np
-from recon.constants import NOT_LABELED
-from recon.types import EntityCoverage, EntityCoverageStats, Example, NERStats, Outliers
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy as scipy_entropy
 
+from recon.constants import NOT_LABELED
+from recon.types import EntityCoverage, EntityCoverageStats, Example, Outliers, Stats
 
-def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStats:
+
+def get_ner_stats(data: List[Example], return_examples: bool = False) -> Stats:
     """Compute statistics for NER data
 
     Args:
@@ -17,16 +18,13 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStat
         return_examples (bool, optional): Whether to return examples per type
 
     Returns:
-        NERStats: Summary stats from list of Examples
+        Stats: Summary stats from list of Examples
     """
     annotations_per_type: DefaultDict[str, Any] = defaultdict(int)
     examples: DefaultDict[str, Any] = defaultdict(list)
     n_examples_no_entities = 0
 
-    length = 0
-
     for e in data:
-        length += 1
         if not e.spans:
             n_examples_no_entities += 1
             examples[NOT_LABELED].append(e)
@@ -35,10 +33,12 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStat
                 annotations_per_type[s.label] += 1
                 examples[s.label].append(e)
 
-    sorted_anns_by_count = {a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)}
+    sorted_anns_by_count = {
+        a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
+    }
 
-    stats = NERStats(
-        n_examples=length,
+    stats = Stats(
+        n_examples=len(data),
         n_examples_no_entities=n_examples_no_entities,
         n_annotations=sum(annotations_per_type.values()),
         n_annotations_per_type=sorted_anns_by_count,
@@ -49,12 +49,12 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> NERStat
     return stats
 
 
-def get_sorted_type_counts(ner_stats: NERStats) -> List[int]:
+def get_sorted_type_counts(ner_stats: Stats) -> List[int]:
     """Get list of counts for each type in n_annotations_per_type property
-    of an NERStats object sorted by type name
+    of an Stats object sorted by type name
 
     Args:
-        ner_stats (NERStats): Dataset stats
+        ner_stats (Stats): Dataset stats
 
     Returns:
         List[int]: List of counts sorted by type name
@@ -86,7 +86,7 @@ def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) 
     """
 
     def pipeline(data: List[Example]) -> Sequence[float]:
-        stats = cast(NERStats, get_ner_stats(data))
+        stats = cast(Stats, get_ner_stats(data))
         sorted_type_counts = get_sorted_type_counts(stats)
         counts_to_probs = get_probs_from_counts(sorted_type_counts)
         return counts_to_probs
@@ -181,7 +181,7 @@ def calculate_entity_coverage_similarity(x: List[Example], y: List[Example]) -> 
     )
 
 
-def get_probs_from_counts(seq: Sequence[int]) -> Sequence[float]:
+def get_probs_from_counts(seq: List[int]) -> Sequence[float]:
     """Convert a sequence of counts to a sequence of probabilties
     by dividing each n by the sum of all n in seq
 
@@ -191,7 +191,7 @@ def get_probs_from_counts(seq: Sequence[int]) -> Sequence[float]:
     Returns:
         Sequence[float]: Sequence of probabilities
     """
-    return np.asarray(seq) / sum(seq)
+    return list(np.asarray(seq) / sum(seq))
 
 
 def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) -> float:
@@ -215,17 +215,18 @@ def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) ->
     if isinstance(seq[0], float):
         res = scipy_entropy(seq)
     elif isinstance(seq[0], int):
+        seq = cast(List[int], seq)
         res = scipy_entropy(get_probs_from_counts(seq))
     else:
         raise ValueError("Parameter seq must be a sequence of probabilites or integers.")
     return float(res)
 
 
-def calculate_label_balance_entropy(ner_stats: NERStats) -> float:
-    """Use Entropy to calculate a metric for label balance based on an NERStats object
+def calculate_label_balance_entropy(ner_stats: Stats) -> float:
+    """Use Entropy to calculate a metric for label balance based on a Stats object
 
     Args:
-        ner_stats (NERStats): NERStats for a dataset.
+        ner_stats (Stats): Stats for a dataset.
 
     Returns:
         float: Entropy for annotation counts of each label

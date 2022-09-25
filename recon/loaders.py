@@ -3,14 +3,15 @@ the [Prodigy](https://prodi.gy) format.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 import spacy
 import srsly
-from recon.types import Example, Span, Token
 from spacy.language import Language
 from spacy.tokens import Doc, DocBin
 from spacy.util import get_words_and_spaces
+
+from recon.types import Example, Span, Token
 
 
 def read_jsonl(path: Path) -> List[Example]:
@@ -36,7 +37,7 @@ def read_json(path: Path) -> List[Example]:
     Returns:
         List[Example]: List of examples
     """
-    data = srsly.read_jsonl(path)
+    data = srsly.read_json(path)
     examples = json_to_examples(data)
     return examples
 
@@ -53,7 +54,9 @@ def json_to_examples(data: List[Dict[str, Any]]) -> List[Example]:
     return [Example(**example) for example in data]
 
 
-def from_spacy(path: Path, nlp: Language = None, lang_code: str = "en") -> Iterable[Example]:
+def from_spacy(
+    path: Path, nlp: Optional[Language] = None, lang_code: str = "en"
+) -> Iterable[Example]:
     """Load examples from .spacy docbin format
 
     Args:
@@ -86,7 +89,9 @@ def from_spacy(path: Path, nlp: Language = None, lang_code: str = "en") -> Itera
         )
 
 
-def to_spacy(path: Path, data: Iterable[Example], nlp: Language = None, lang_code: str = "en") -> DocBin:
+def to_spacy(
+    path: Path, data: Iterable[Example], nlp: Optional[Language] = None, lang_code: str = "en"
+) -> DocBin:
     """Save a batch of examples to disk in the .spacy DocBin format
 
     Args:
@@ -108,7 +113,7 @@ def to_spacy(path: Path, data: Iterable[Example], nlp: Language = None, lang_cod
             tokens = [token.text for token in example.tokens]
             words, spaces = get_words_and_spaces(tokens, example.text)
             doc = Doc(nlp.vocab, words=words, spaces=spaces)
-            doc.ents = [doc.char_span(s.start, s.end, label=s.label) for s in example.spans]
+            doc.ents = tuple([doc.char_span(s.start, s.end, label=s.label) for s in example.spans])
             doc_bin.add(doc)
     doc_bin.to_disk(path)
     return doc_bin

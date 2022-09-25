@@ -1,4 +1,5 @@
 import pytest
+
 from recon.dataset import Dataset
 from recon.operations import registry
 from recon.operations.core import Operation, operation
@@ -16,7 +17,7 @@ def ds():
             )
         ],
     )
-    ds.apply_("recon.v1.add_tokens")
+    ds.apply_("recon.add_tokens.v1")
 
     return ds
 

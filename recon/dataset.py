@@ -1,32 +1,34 @@
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Set, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union, cast
 
 import spacy
 import srsly
+from spacy.tokens import Doc
+from wasabi import Printer
+
 from recon.hashing import dataset_hash
-from recon.loaders import from_spacy, read_json, read_jsonl, to_spacy
+from recon.loaders import from_spacy, read_jsonl, to_spacy
 from recon.operations import registry
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import (
+    ApplyType,
     DatasetOperationsState,
     Example,
-    NERStats,
     OperationResult,
     OperationState,
     OperationStatus,
     Span,
+    Stats,
     Token,
     TransformationType,
 )
-from spacy.tokens import Doc
-from spacy.util import ensure_path
-from wasabi import Printer
+from recon.utils import ensure_path
 
 if TYPE_CHECKING:
     try:
-        from datasets import Dataset as HFDataset
+        from datasets.arrow_dataset import Dataset as HFDataset
     except ImportError:
         pass
 
@@ -87,7 +89,7 @@ class Dataset:
             example_store = ExampleStore(data)
         self._example_store = example_store
         self._verbose = verbose
-        self._stats: Optional[NERStats] = None
+        self._stats: Optional[Stats] = None
 
     @property
     def name(self) -> str:
@@ -112,11 +114,17 @@ class Dataset:
         return self._example_store
 
     @property
-    def stats(self) -> NERStats:
+    def stats(self) -> Stats:
         return get_ner_stats(self.data)
 
     def summary(self) -> str:
-        print(f"Dataset\nName: {self.name}\nStats: {self.stats}")
+        return f"Dataset\nName: {self.name}\nStats: {self.stats}"
+
+    def print_summary(self) -> None:
+        print(self.summary())
+
+    def __str__(self) -> str:
+        return self.summary()
 
     def __hash__(self) -> int:
         return cast(int, dataset_hash(self))
@@ -130,11 +138,11 @@ class Dataset:
                 return e
         raise KeyError(f"Example with hash {example_hash} does not exist")
 
-    def apply(self, func: Callable[[List[Example], Any, Any], Any], *args: Any, **kwargs: Any) -> Any:
+    def apply(self, func: ApplyType, *args: Any, **kwargs: Any) -> Any:
         """Apply a function to the dataset
 
         Args:
-            func (Callable[[List[Example], Any, Any], Any]):
+            func (Callable[[List[Example], Any], Any]):
                 Function from an existing recon module that can operate on a List of examples
 
         Returns:
@@ -146,7 +154,7 @@ class Dataset:
         self,
         operation: Union[str, Callable[[Any], OperationResult]],
         *args: Any,
-        initial_state: OperationState = None,
+        initial_state: Optional[OperationState] = None,
         **kwargs: Any,
     ) -> None:
         """Apply an operation to all data inplace.
@@ -164,7 +172,7 @@ class Dataset:
         if not name:
             raise ValueError("This function is not an operation since it does not have a name.")
 
-        msg = Printer(no_print=self._verbose == False)
+        msg = Printer(no_print=not self._verbose)
         msg.text(f"=> Applying operation '{name}' to dataset '{self.name}'")
         result: OperationResult = operation(self, *args, initial_state=initial_state, verbose=self._verbose, **kwargs)  # type: ignore
         msg.good(f"Completed operation '{name}'")
@@ -189,8 +197,8 @@ class Dataset:
             operations (List[Union[str, OperationState]]): List of operations
         """
 
-        msg = Printer(no_print=self._verbose == False)
-        msg.text(f"Applying pipeline of operations inplace to the dataset: {self.name}")
+        msg = Printer(no_print=not self._verbose)
+        msg.text(f"Applying pipeline of operations inplace to Dataset: {self.name}")
 
         for op in operations:
             op_name = op.name if isinstance(op, OperationState) else op
@@ -207,9 +215,12 @@ class Dataset:
                 args = op.args
                 kwargs = op.kwargs
                 initial_state = op
+            else:
+                raise ValueError(
+                    "Operation is not resolvable. Must be a name for a registered operation or an instance of OperationState."
+                )
 
             operation = registry.operations.get(op_name)
-
             self.apply_(operation, *args, initial_state=initial_state, **kwargs)
 
     def rollback(self, n: int = 1) -> None:
@@ -232,12 +243,13 @@ class Dataset:
         """
 
         if n < 1:
-            raise ValueError("Cannot rollback dataset: n must be 1 or higher.")
+            raise ValueError(f"Cannot rollback dataset: provided n: ({n}) must be 1 or higher.")
         elif n > len(self.operations):
-            raise ValueError("Cannot rollback dataset: n is larger than the total number of dataset operations.")
+            raise ValueError(
+                f"Cannot rollback dataset: provided n ({n}) is larger than the total number of dataset operations."
+            )
 
         store = self.example_store
-
         examples_to_remove = set()
         examples_to_add = []
 
@@ -288,7 +300,7 @@ class Dataset:
         """
         self._example_store = example_store
 
-    def from_disk(self, path: Path, loader_func: Callable = read_jsonl) -> "Dataset":
+    def from_disk(self, path: Union[str, Path]) -> "Dataset":
         """Load Dataset from disk given a path and a loader function that reads the data
         and returns an iterator of Examples
 
@@ -300,7 +312,9 @@ class Dataset:
         path = ensure_path(path)
         state = None
         if (path / ".recon" / self.name).exists():
-            state = srsly.read_json(path / ".recon" / self.name / "state.json")
+            state = cast(
+                Dict[str, Any], srsly.read_json(path / ".recon" / self.name / "state.json")
+            )
             state = DatasetOperationsState(**state)
             self._operations = state.operations
 
@@ -308,12 +322,7 @@ class Dataset:
             if example_store_path.exists():
                 self._example_store.from_disk(example_store_path)
 
-        if loader_func == read_json:
-            suffix = ".json"
-        else:
-            suffix = ".jsonl"
-
-        data = loader_func(path / f"{self.name}{suffix}")
+        data = read_jsonl(path / f"{self.name}.jsonl")
         self._data = data
 
         for example in self._data:
@@ -323,7 +332,7 @@ class Dataset:
             # Dataset changed, examples added
             self._operations.append(
                 OperationState(
-                    name="recon.v1.examples_added_external",
+                    name="recon.examples_added_external.v1",
                     status=OperationStatus.COMPLETED,
                     ts=datetime.now(),
                     examples_added=max(len(self) - state.size, 0),
@@ -336,9 +345,7 @@ class Dataset:
             for op in self._operations:
                 op._status = OperationStatus.NOT_STARTED
 
-        seen: Set[str] = set()
         operations_to_run: Dict[str, OperationState] = {}
-
         for op in self._operations:
             if (
                 op.name not in operations_to_run
@@ -353,7 +360,9 @@ class Dataset:
 
         return self
 
-    def to_disk(self, output_dir: Path, overwrite: bool = False, save_examples: bool = True) -> None:
+    def to_disk(
+        self, output_dir: Union[str, Path], overwrite: bool = False, save_examples: bool = True
+    ) -> None:
         """Save Corpus to Disk
 
         Args:
@@ -381,7 +390,9 @@ class Dataset:
         if save_examples:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
 
-        srsly.write_jsonl(output_dir / (self.name + ".jsonl"), [e.dict(exclude_unset=True) for e in self.data])
+        srsly.write_jsonl(
+            output_dir / f"{self.name}.jsonl", [e.dict(exclude_unset=True) for e in self.data]
+        )
 
     def from_prodigy(self, prodigy_datasets: List[str]) -> "Dataset":
         """Need to have from_prodigy accept multiple datasets as a list of str so Prodigy
@@ -404,7 +415,7 @@ class Dataset:
         self._data = data
         return self
 
-    def to_prodigy(self, prodigy_dataset: str = None, overwrite: bool = True) -> str:
+    def to_prodigy(self, prodigy_dataset: Optional[str] = None, overwrite: bool = True) -> str:
         """Save examples to prodigy dataset
 
         Args:
@@ -452,19 +463,23 @@ class Dataset:
         hf_dataset: "HFDataset",
         tokens_prop: str = "tokens",
         labels_prop: str = "ner_tags",
-        labels: Optional[List[str]] = None,
+        labels: List[str] = [],
         lang: str = "en",
     ) -> "Dataset":
         nlp = spacy.blank(lang)
         examples = []
         for e in hf_dataset:
+            e = cast(Dict[str, Any], e)
             if labels:
                 tags = [labels[tag_n] for tag_n in e[labels_prop]]
             else:
                 tags = e[labels_prop]
             tokens = e[tokens_prop]
             doc = Doc(nlp.vocab, words=tokens, spaces=[True] * len(tokens), ents=tags)
-            spans = [Span(text=ent.text, start=ent.start_char, end=ent.end_char, label=ent.label_) for ent in doc.ents]
+            spans = [
+                Span(text=ent.text, start=ent.start_char, end=ent.end_char, label=ent.label_)
+                for ent in doc.ents
+            ]
             tokens = [Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc]
             examples.append(Example(text=doc.text, spans=spans, tokens=tokens))
         self._data = examples

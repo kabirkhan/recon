@@ -1,11 +1,12 @@
 from collections import defaultdict
-from typing import Any, Callable, Dict, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import catalogue
 import spacy
+from spacy.language import Language
+
 from recon.linker import BaseEntityLinker, EntityLinker
 from recon.types import Entity, Example
-from spacy.language import Language
 
 
 class registry:
@@ -26,7 +27,7 @@ class preprocessor:
         The first arg is the function being decorated.
         This function operates on a List[Example].
 
-        e.g. @preprocessor("recon.v1.some_name")
+        e.g. @preprocessor("recon.some_name.v1")
 
         Or it should operate on a single example and
         recon will take care of applying it to a full Dataset
@@ -65,7 +66,9 @@ class PreProcessor:
 
 
 class SpacyPreProcessor(PreProcessor):
-    def __init__(self, nlp: Language = None, name: str = "recon.v1.spacy", field: str = "doc") -> None:
+    def __init__(
+        self, nlp: Optional[Language] = None, name: str = "recon.spacy.v1", field: str = "doc"
+    ) -> None:
         super().__init__(name, field)
         self._nlp = nlp
 
@@ -93,7 +96,7 @@ class SpanAliasesPreProcessor(PreProcessor):
     def __init__(
         self,
         entities: List[Entity],
-        name: str = "recon.v1.span_aliases",
+        name: str = "recon.span_aliases.v1",
         field: str = "aliases",
         linker: BaseEntityLinker = EntityLinker(),
     ):
@@ -123,5 +126,5 @@ class SpanAliasesPreProcessor(PreProcessor):
         return outputs
 
 
-if "recon.v1.spacy" not in registry.preprocessors:
-    registry.preprocessors.register("recon.v1.spacy")(SpacyPreProcessor())
+if "recon.spacy.v1" not in registry.preprocessors:
+    registry.preprocessors.register("recon.spacy.v1")(SpacyPreProcessor())

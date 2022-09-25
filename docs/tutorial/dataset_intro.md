@@ -46,8 +46,7 @@ $ python main.py ./examples/data/skills/train.jsonl
         "JOB_ROLE":10,
         "skill":2,
         "product":1
-    },
-    "examples_with_type":null
+    }
 }
 ```
 
@@ -96,7 +95,7 @@ if __name__ == "__main__":
 ```
 
 This means you don't have to import the get_ner_stats function. It also means you can easily write custom operations beyond what is built in to Recon. For a full list of built in operations see
-the [operations API guide](/api/operations). 
+the [operations API guide](/api/operations).
 
 All of these examples should return the exact same response. See for yourself:
 
@@ -114,8 +113,7 @@ $ python main.py ./examples/data/skills/train.jsonl
         "JOB_ROLE":10,
         "skill":2,
         "product":1
-    },
-    "examples_with_type":null
+    }
 }
 ```
 </div>

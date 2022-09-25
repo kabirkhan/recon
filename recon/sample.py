@@ -5,12 +5,14 @@ from typing import Any, Dict, List, Tuple
 from recon.types import Example
 
 
-def hash_example_meta(example: Example, fields: List[str] = None, ignore_field_absence: bool = False) -> Tuple:
+def hash_example_meta(
+    example: Example, fields: List[str] = [], ignore_field_absence: bool = False
+) -> Tuple:
     """Create a hash out of the metadata of an example
 
     Args:
         example (Example): Input Example
-        fields (List[str], optional): Meta fields to use in hash. Defaults to all availabile fields.
+        fields (List[str]): Meta fields to use in hash. Defaults to all availabile fields.
         ignore_field_absence (bool, optional): Determines behavior of when a field does not exist
             in an example's meta property
 
@@ -20,7 +22,7 @@ def hash_example_meta(example: Example, fields: List[str] = None, ignore_field_a
     Returns:
         Tuple: Tuple of hashable attributes from the meta of an example
     """
-    if fields is None:
+    if not fields:
         fields = list(example.meta.keys())
 
     tpl = []
@@ -42,7 +44,7 @@ def hash_example_meta(example: Example, fields: List[str] = None, ignore_field_a
 def sample_examples(
     examples: List[Example],
     meta_filters: Dict[str, List[str]] = {},
-    fields: List[str] = None,
+    fields: List[str] = [],
     ignore_field_absence: bool = False,
     top_k_per_hash: int = 10,
     top_k: int = -1,
@@ -78,7 +80,9 @@ def sample_examples(
             if example.meta[meta_field] not in meta_vals:
                 break
 
-        meta_hash = hash_example_meta(example, fields=fields, ignore_field_absence=ignore_field_absence)
+        meta_hash = hash_example_meta(
+            example, fields=fields, ignore_field_absence=ignore_field_absence
+        )
         if examples_counter[meta_hash] <= top_k_per_hash:
             out_examples.append(example)
             examples_counter[meta_hash] += 1

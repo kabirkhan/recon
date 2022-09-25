@@ -1,30 +1,20 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Protocol,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 from pydantic import BaseModel, Extra, root_validator
+from spacy import displacy
+from spacy.tokens import Doc
+from spacy.util import get_words_and_spaces
+from spacy.vocab import Vocab
+
 from recon.hashing import (
     prediction_error_hash,
     span_hash,
     token_hash,
     tokenized_example_hash,
 )
-from spacy import displacy
-from spacy.tokens import Doc
-from spacy.util import get_words_and_spaces
-from spacy.vocab import Vocab
 
 
 class Span(BaseModel):
@@ -83,7 +73,8 @@ class Example(BaseModel):
             for span in spans:
                 if not isinstance(span, Span):
                     if "text" not in span:
-                        span["text"] = values["text"][span["start"] : span["end"]]
+                        start, end = span["start"], span["end"]
+                        span["text"] = values["text"][start:end]
 
             # Ensure the meta has a source property
             # if something that's not a dict is passed in
@@ -125,11 +116,11 @@ class Example(BaseModel):
             Doc: Output spaCy Doc with ents set from example spans
         """
         if not self.tokens:
-            raise ValueError("Tokens are not set. Try running the recon.v1.add_tokens operation.")
+            raise ValueError("Tokens are not set. Try running the recon.add_tokens.v1 operation.")
         tokens = [token.text for token in self.tokens]
         words, spaces = get_words_and_spaces(tokens, self.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)
-        doc.ents = [doc.char_span(s.start, s.end, label=s.label) for s in self.spans]
+        doc.ents = tuple(doc.char_span(s.start, s.end, label=s.label) for s in self.spans)
         return doc
 
     def show(self, jupyter: Optional[bool] = None, options: Dict[str, Any] = {}) -> None:
@@ -141,6 +132,12 @@ class Example(BaseModel):
                 See: https://spacy.io/usage/visualizers#ent
         """
         displacy.render(self.doc, style="ent", jupyter=jupyter, options=options)
+
+
+OpType = Callable[[Example, Any], Any]
+BatchOpType = Callable[[List[Example], Any], Any]
+ApplyType = Union[str, BatchOpType]
+ApplyInPlaceType = Union[str, BatchOpType]
 
 
 class Entity(BaseModel):
@@ -165,11 +162,14 @@ class Transformation(BaseModel):
 def add_shim(example: Example) -> None:
     return None
 
+
 def remove_shim(example_hash: int) -> None:
     return None
 
+
 def change_shim(example_hash: int, new_example: Example) -> None:
     return None
+
 
 def track_shim(example_hash: Optional[int] = None, new_example: Optional[Example] = None) -> None:
     return None
@@ -188,12 +188,13 @@ class OperationStatus(str, Enum):
     NOT_STARTED = "NOT_STARTED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
+    NEEDS_TOKENIZATION = "NEEDS_TOKENIZATION"
 
 
 class OperationState(BaseModel):
     name: str
     batch: bool = False
-    args: List[Any] = []
+    args: Tuple[Any, ...] = tuple()
     kwargs: Dict[str, Any] = {}
     status: OperationStatus = OperationStatus.NOT_STARTED
     ts: datetime = datetime.now()
@@ -305,7 +306,7 @@ class LabelDisparity(BaseModel):
     examples: Optional[List[Example]] = []
 
 
-class NERStats(BaseModel):
+class Stats(BaseModel):
     """Container for tracking basic NER statistics"""
 
     n_examples: int
@@ -315,7 +316,7 @@ class NERStats(BaseModel):
     examples_with_type: Optional[Dict[str, Example]] = None
 
     def __str__(self) -> str:
-        return self.json(indent=4)
+        return self.json(indent=4, exclude_unset=True)
 
 
 class EntityCoverage(BaseModel):
@@ -381,7 +382,7 @@ class Correction(BaseModel):
         """
         corrections: List[Correction] = []
         for key, val in obj.items():
-            if isinstance(val, str) or val == None:
+            if isinstance(val, str) or val is None:
                 from_labels = ["ANY"]
                 to_label = val
             elif isinstance(val, tuple):
@@ -405,8 +406,3 @@ class Scores(BaseModel):
     ents_f: float
     ents_per_type: Dict[str, Any]
     speed: float
-
-
-class Op(Protocol):
-    def __call__(self, example: Example) -> Optional[Union[Example, Iterable[Example]]]:
-        ...
