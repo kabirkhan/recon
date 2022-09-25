@@ -58,7 +58,7 @@ class Example(BaseModel):
 
     text: str
     spans: List[Span]
-    tokens: Optional[List[Token]]
+    tokens: Optional[List[Token]] = None
     meta: Dict[str, Any] = {}
     formatted: bool = False
 
