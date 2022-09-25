@@ -1,6 +1,7 @@
 # flake8: noqa
 
 import typer
+
 from recon.cli.stats import stats
 
 app = typer.Typer(no_args_is_help=True)

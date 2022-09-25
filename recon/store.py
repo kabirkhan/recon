@@ -2,8 +2,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, cast
 
 import srsly
+
 from recon.types import Example
-from spacy.util import ensure_path
+from recon.utils import ensure_path
 
 
 class ExampleStore:

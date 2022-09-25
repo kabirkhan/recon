@@ -3,9 +3,10 @@ from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import catalogue
 import spacy
+from spacy.language import Language
+
 from recon.linker import BaseEntityLinker, EntityLinker
 from recon.types import Entity, Example
-from spacy.language import Language
 
 
 class registry:

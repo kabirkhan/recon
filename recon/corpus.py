@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import srsly
+
 from recon.dataset import Dataset
 from recon.store import ExampleStore
 from recon.types import (
@@ -11,7 +12,7 @@ from recon.types import (
     OperationResult,
     OperationState,
 )
-from spacy.util import ensure_path
+from recon.utils import ensure_path
 
 
 class Corpus:

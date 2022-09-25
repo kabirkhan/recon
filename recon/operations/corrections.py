@@ -2,10 +2,11 @@
 
 from typing import Any, Dict, List, cast
 
-from recon.operations.core import operation
-from recon.types import Correction, Example, Span, Token
 from spacy.tokens import Span as SpacySpan
 from wasabi import msg
+
+from recon.operations.core import operation
+from recon.types import Correction, Example, Span, Token
 
 
 @operation("recon.rename_labels.v1")

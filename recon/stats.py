@@ -3,10 +3,11 @@ from collections import defaultdict
 from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Union, cast
 
 import numpy as np
-from recon.constants import NOT_LABELED
-from recon.types import EntityCoverage, EntityCoverageStats, Example, Outliers, Stats
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy as scipy_entropy
+
+from recon.constants import NOT_LABELED
+from recon.types import EntityCoverage, EntityCoverageStats, Example, Outliers, Stats
 
 
 def get_ner_stats(data: List[Example], return_examples: bool = False) -> Stats:

@@ -4,6 +4,9 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union, ca
 
 import spacy
 import srsly
+from spacy.tokens import Doc
+from wasabi import Printer
+
 from recon.hashing import dataset_hash
 from recon.loaders import from_spacy, read_jsonl, to_spacy
 from recon.operations import registry
@@ -21,9 +24,7 @@ from recon.types import (
     Token,
     TransformationType,
 )
-from spacy.tokens import Doc
-from spacy.util import ensure_path
-from wasabi import Printer
+from recon.utils import ensure_path
 
 if TYPE_CHECKING:
     try:
@@ -299,7 +300,7 @@ class Dataset:
         """
         self._example_store = example_store
 
-    def from_disk(self, path: Path) -> "Dataset":
+    def from_disk(self, path: Union[str, Path]) -> "Dataset":
         """Load Dataset from disk given a path and a loader function that reads the data
         and returns an iterator of Examples
 
@@ -360,7 +361,7 @@ class Dataset:
         return self
 
     def to_disk(
-        self, output_dir: Path, overwrite: bool = False, save_examples: bool = True
+        self, output_dir: Union[str, Path], overwrite: bool = False, save_examples: bool = True
     ) -> None:
         """Save Corpus to Disk
 

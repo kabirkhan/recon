@@ -1,4 +1,5 @@
 import pytest
+
 from recon.recognizer import EntityRecognizer, SpacyEntityRecognizer
 
 

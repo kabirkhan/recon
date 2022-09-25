@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import cast
 
+from wasabi import Printer
+
 from recon.corpus import Corpus
 from recon.stats import calculate_label_distribution_similarity, get_ner_stats
 from recon.types import Stats
-from wasabi import Printer
 
 
 def stats(data_dir: Path) -> None:

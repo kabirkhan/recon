@@ -14,6 +14,9 @@ from typing import (
 )
 
 from pydantic.error_wrappers import ErrorWrapper
+from tqdm import tqdm
+from wasabi import Printer
+
 from recon.operations import registry as op_registry
 from recon.operations.utils import (
     get_received_operation_data,
@@ -30,8 +33,6 @@ from recon.types import (
     Transformation,
     TransformationType,
 )
-from tqdm import tqdm
-from wasabi import Printer
 
 if TYPE_CHECKING:
     from recon import Dataset

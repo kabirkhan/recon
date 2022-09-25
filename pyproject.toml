@@ -84,7 +84,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-known_third_party = ["recon"]
+known_first_party = ["recon"]
 
 [tool.pyright]
 include = ["recon"]

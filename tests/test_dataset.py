@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+
 from recon.dataset import Dataset
 from recon.operations.corrections import corrections_from_dict
 from recon.stats import get_ner_stats

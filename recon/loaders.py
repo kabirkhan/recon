@@ -7,10 +7,11 @@ from typing import Any, Dict, Iterable, List, Optional
 
 import spacy
 import srsly
-from recon.types import Example, Span, Token
 from spacy.language import Language
 from spacy.tokens import Doc, DocBin
 from spacy.util import get_words_and_spaces
+
+from recon.types import Example, Span, Token
 
 
 def read_jsonl(path: Path) -> List[Example]:

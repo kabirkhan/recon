@@ -1,4 +1,4 @@
-from datasets import load_dataset
+from datasets.load import load_dataset
 from recon import Corpus, Dataset
 
 
@@ -28,7 +28,7 @@ def main():
 
     # Initialize a Recon Corpus from the 3 Datasets
     corpus = Corpus("conll2003", train_ds, dev_ds, test_ds)
-    corpus.summary()
+    print(corpus)
 
     corpus.to_disk("./examples/data/conll2003", overwrite=True)
 

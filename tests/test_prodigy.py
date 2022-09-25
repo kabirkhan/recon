@@ -1,4 +1,5 @@
 import pytest
+
 from recon.corpus import Corpus
 
 prodigy = pytest.importorskip("prodigy")

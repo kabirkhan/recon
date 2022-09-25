@@ -4,16 +4,17 @@ from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 from pydantic import BaseModel, Extra, root_validator
+from spacy import displacy
+from spacy.tokens import Doc
+from spacy.util import get_words_and_spaces
+from spacy.vocab import Vocab
+
 from recon.hashing import (
     prediction_error_hash,
     span_hash,
     token_hash,
     tokenized_example_hash,
 )
-from spacy import displacy
-from spacy.tokens import Doc
-from spacy.util import get_words_and_spaces
-from spacy.vocab import Vocab
 
 
 class Span(BaseModel):

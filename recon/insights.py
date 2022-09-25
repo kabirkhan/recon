@@ -2,6 +2,9 @@ from collections import defaultdict
 from typing import DefaultDict, Dict, List, Set, Tuple
 
 import numpy as np
+from spacy.scorer import PRFScore
+from wasabi import Printer
+
 from recon.constants import NOT_LABELED
 from recon.recognizer import EntityRecognizer
 from recon.types import (
@@ -11,8 +14,6 @@ from recon.types import (
     PredictionError,
     PredictionErrorExamplePair,
 )
-from spacy.scorer import PRFScore
-from wasabi import Printer
 
 
 def get_ents_by_label(
