@@ -6,7 +6,7 @@ import functools
 import inspect
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Tuple, Type
+from typing import Any, Callable, Dict, List, Tuple, Type, Optional, Union
 
 from pydantic import BaseConfig, BaseModel
 from pydantic.class_validators import Validator
@@ -99,12 +99,12 @@ def get_typed_annotation(param: inspect.Parameter, globalns: Dict[str, Any]) -> 
 def create_response_field(
     name: str,
     type_: Type[Any],
-    class_validators: Dict[str, Validator] | None = None,
-    default: Any | None = None,
-    required: bool | UndefinedType = False,
+    class_validators: Optional[Dict[str, Validator]] = None,
+    default: Optional[Any] = None,
+    required: Union[bool, UndefinedType] = False,
     model_config: Type[BaseConfig] = BaseConfig,
-    field_info: FieldInfo | None = None,
-    alias: str | None = None,
+    field_info: Optional[FieldInfo] = None,
+    alias: Optional[str] = None,
 ) -> ModelField:
     """
     Create a new response field. Raises if type_ is invalid.
