@@ -6,7 +6,7 @@ import functools
 import inspect
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Tuple, Type, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from pydantic import BaseConfig, BaseModel
 from pydantic.class_validators import Validator
