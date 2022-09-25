@@ -45,7 +45,7 @@ class ExampleStore:
         example_hash = hash(example)
         self._map[example_hash] = example
 
-    def from_disk(self, path: Path) -> "ExampleStore":
+    def from_disk(self, path: Union[str, Path]) -> "ExampleStore":
         """Load store from disk
 
         Args:
@@ -66,7 +66,7 @@ class ExampleStore:
 
         return self
 
-    def to_disk(self, path: Path) -> None:
+    def to_disk(self, path: Union[str, Path]) -> None:
         """Save store to disk
 
         Args:
