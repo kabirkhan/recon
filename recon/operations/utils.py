@@ -174,7 +174,7 @@ def get_param_field(
 
 def request_body_to_args(
     required_params: List[ModelField],
-    received_body: Dict[str, Any] | None,
+    received_body: Optional[Dict[str, Any]],
 ) -> Tuple[Dict[str, Any], List[ErrorWrapper]]:
     values = {}
     errors = []
