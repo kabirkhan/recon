@@ -89,8 +89,8 @@ class operation:
         self.augmentation = augmentation
 
     def __call__(
-        self, op: Callable[..., Example | Iterable[Example] | None]
-    ) -> Callable[..., Example | Iterable[Example] | None]:
+        self, op: Callable[..., Union[Example, Iterable[Example], None]]
+    ) -> Callable[..., Union[Example, Iterable[Example], None]]:
         """Decorator for an operation.
         The first arg to the op callable needs to be an Example.
 
