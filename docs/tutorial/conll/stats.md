@@ -5,8 +5,8 @@ As far as stats go, we've only seen the basic `get_ner_stats` function. But Reco
 
 To build a good NER model, it's important to have enough representative annotations for the types of predictions you want your model to make. Entity Coverage stats can help you ensure you aren't just annotating the same spans of text for every example in your dataset.
 
-To start working with Entity Coverage, run `get_entity_coverage` on a Dataset. `get_entity_coverage` returns
-a list of EntityCoverage data classes which have the annotation label, the span of text, and the count of how many times that annotation text/label combination appears in the Dataset. The final list is sorted by the count, so the most common entities are at the beginning, and the least common are at the end.
+To start working with Entity Coverage, run `get_entity_coverage` on a Dataset's examples. `get_entity_coverage` returns
+a list of EntityCoverage objects which have the annotation label, the span of text, and the count of how many times that annotation text/label combination appears in the list of Examples. The final list is sorted by the count, so the most common entities are at the beginning, and the least common are at the end.
 
 Let's take a look at our Train dataset.
 
