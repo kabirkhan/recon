@@ -190,7 +190,7 @@ class Corpus:
     @classmethod
     def from_disk(
         cls,
-        data_dir: Path,
+        data_dir: Union[str, Path],
         name: str = "corpus",
         train_name: str = "train",
         dev_name: str = "dev",
@@ -227,7 +227,7 @@ class Corpus:
             corpus = cls(name, train, dev)
         return corpus
 
-    def to_disk(self, output_dir: Path, overwrite: bool = False) -> None:
+    def to_disk(self, output_dir: Union[str, Path], overwrite: bool = False) -> None:
         """Save Corpus to Disk
 
         Args:
