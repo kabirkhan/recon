@@ -1,12 +1,13 @@
 # isort:skip_file
 # type: ignore
 
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
 
 import prodigy
 from prodigy.components.db import connect
 from prodigy.components.loaders import get_stream
 from prodigy.components.preprocess import add_tokens
+from prodigy.types import TaskType
 from prodigy.util import (
     get_labels,
     log,
@@ -60,7 +61,7 @@ def recon_ner_correct_v1(
 
     stream = _stream_from_hardest_examples(hes)
 
-    def before_db(examples):
+    def before_db(examples: List[Example]) -> List[Example]:
         for eg in examples:
             new_spans = []
             for span in eg["spans"]:
@@ -109,7 +110,6 @@ def recon_ner_correct_v1(
     recon_dataset=("Recon dataset name", "positional", None, str),
     source=("Source data to merge examples with (file path or List of examples)", "positional", None, str),
     output_dir=("Optional output directory to save dataset to", "positional", None, str),
-    exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
     # fmt: on
 )
 def recon_ner_merge_v1(
@@ -117,7 +117,6 @@ def recon_ner_merge_v1(
     recon_dataset: str,
     source: Union[str, Dataset],
     output_dir: Optional[str] = None,
-    exclude: Optional[List[str]] = None,
 ):
     """
     Stream a List of `recon.types.HardestExample` instances to prodigy
@@ -130,11 +129,11 @@ def recon_ner_merge_v1(
     else:
         dataset = source
 
-    DB = connect()
-    if dataset not in DB:
-        msg.fail(f"Can't find dataset '{dataset}'", exits=1)
+    with connect() as DB:
+        if dataset not in DB:
+            msg.fail(f"Can't find dataset '{dataset}'", exits=1)
 
-    prodigy_raw_examples = DB.get_dataset(dataset)
+        prodigy_raw_examples = DB.get_dataset(dataset)
     prodigy_examples = [Example(**eg) for eg in prodigy_raw_examples if eg["answer"] == "accept"]
     prodigy_texts_to_examples = {e.text: e for e in prodigy_examples}
 
@@ -148,14 +147,14 @@ def recon_ner_merge_v1(
 
 
 @operation("recon.prodigy.merge_examples.v1")
-def merge_examples(example, prodigy_texts_to_examples):
+def merge_examples(example: Example, prodigy_texts_to_examples: Dict[str, Example]) -> Example:
     if example.text in prodigy_texts_to_examples:
         return prodigy_texts_to_examples[example.text]
     else:
         return example
 
 
-def _stream_from_hardest_examples(hes: List[HardestExample]):
+def _stream_from_hardest_examples(hes: List[HardestExample]) -> Iterator[TaskType]:
     for he in hes:
         combined = he.reference.copy(deep=True)
         annot_spans = [

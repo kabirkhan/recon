@@ -1,9 +1,12 @@
 import pytest
+from typing import List, cast
 
+from spacy.language import Language
+from spacy.pipeline import EntityRuler
 from recon.recognizer import EntityRecognizer, SpacyEntityRecognizer
 
 
-def test_base_recognizer(test_texts):
+def test_base_recognizer(test_texts: List[str]):
     recognizer = EntityRecognizer()
 
     with pytest.raises(NotImplementedError):
@@ -12,8 +15,8 @@ def test_base_recognizer(test_texts):
         recognizer.predict(test_texts)
 
 
-def test_spacy_recognizer(nlp, test_texts):
-    ruler = nlp.add_pipe("entity_ruler", name="entity_ruler")
+def test_spacy_recognizer(nlp: Language, test_texts: List[str]):
+    ruler = cast(EntityRuler, nlp.add_pipe("entity_ruler", name="entity_ruler"))
     ruler.add_patterns(
         [
             {"label": "SKILL", "pattern": "Machine learning"},

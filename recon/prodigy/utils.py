@@ -23,22 +23,21 @@ def to_prodigy(
     from prodigy.core import connect
     from prodigy.util import set_hashes
 
-    db = connect()
-
-    if db.get_dataset(prodigy_dataset):
-        if overwrite_dataset:
-            db.drop_dataset(prodigy_dataset)
-            db.add_dataset(prodigy_dataset)
+    with connect() as db:
+        if db.get_dataset_examples(prodigy_dataset):
+            if overwrite_dataset:
+                db.drop_dataset(prodigy_dataset)
+                db.add_dataset(prodigy_dataset)
+            else:
+                raise ValueError(f"Prodigy dataset {prodigy_dataset} already exists.")
         else:
-            raise ValueError(f"Prodigy dataset {prodigy_dataset} already exists.")
-    else:
-        db.add_dataset(prodigy_dataset)
+            db.add_dataset(prodigy_dataset)
 
-    prodigy_examples = []
-    for e in examples:
-        prodigy_examples.append(set_hashes(e.dict(exclude_unset=True)))
+        prodigy_examples = []
+        for e in examples:
+            prodigy_examples.append(set_hashes(e.dict(exclude_unset=True)))
 
-    db.add_examples(prodigy_examples, [prodigy_dataset])
+        db.add_examples(prodigy_examples, [prodigy_dataset])
 
 
 def from_prodigy(prodigy_dataset: str) -> List[Example]:
@@ -56,13 +55,12 @@ def from_prodigy(prodigy_dataset: str) -> List[Example]:
 
     from prodigy.core import connect
 
-    db = connect()
-
-    examples = []
-    prodigy_examples = db.get_dataset(prodigy_dataset)
-    if not prodigy_examples:
-        raise ValueError(
-            f"Prodigy dataset with name {prodigy_dataset} does not exist. Available datasets are: \n {', '.join(db.datasets)}"
-        )
-    examples = [Example(**e) for e in prodigy_examples]
-    return examples
+    with connect() as db:
+        examples = []
+        prodigy_examples = db.get_dataset_examples(prodigy_dataset)
+        if not prodigy_examples:
+            raise ValueError(
+                f"Prodigy dataset with name {prodigy_dataset} does not exist. Available datasets are: \n {', '.join(db.datasets)}"
+            )
+        examples = [Example(**e) for e in prodigy_examples]
+        return examples

@@ -1,5 +1,7 @@
 import pytest
 
+from typing import List
+
 from recon.dataset import Dataset
 from recon.insights import get_label_disparities
 from recon.operations.corrections import (
@@ -11,7 +13,7 @@ from recon.types import Example, Span, Token
 
 
 @pytest.fixture()
-def test_examples():
+def test_examples() -> List[Example]:
     # fmt: off
     raw_examples = [
         {"text":"Have you used the new version of my model?","spans":[{"start":36,"end":41,"token_start":8,"token_end":8,"label":"SKILL"}],"_input_hash":1798863398,"_task_hash":1273875979,"tokens":[{"text":"Have","start":0,"end":4,"id":0},{"text":"you","start":5,"end":8,"id":1},{"text":"used","start":9,"end":13,"id":2},{"text":"the","start":14,"end":17,"id":3},{"text":"new","start":18,"end":21,"id":4},{"text":"version","start":22,"end":29,"id":5},{"text":"of","start":30,"end":32,"id":6},{"text":"my","start":33,"end":35,"id":7},{"text":"model","start":36,"end":41,"id":8},{"text":"?","start":41,"end":42,"id":9}],"_session_id":None,"_view_id":"ner_manual","answer":"accept"},  # noqa: E231, E501
@@ -24,7 +26,7 @@ def test_examples():
     return [Example(**example) for example in raw_examples]
 
 
-def test_rename_labels(test_examples):
+def test_rename_labels(test_examples: List[Example]):
 
     fixed_examples = []
     for e in test_examples:
@@ -36,7 +38,7 @@ def test_rename_labels(test_examples):
             assert s.label != "SKILL"
 
 
-def test_fix_annotations(test_examples):
+def test_fix_annotations(test_examples: List[Example]):
     disparities = get_label_disparities(test_examples, label1="SKILL", label2="JOB_ROLE")
     assert set(disparities.keys()) == {"model", "software development engineer"}
 

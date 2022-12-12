@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import cast
+from typing import Dict, List, cast
 
 import pytest
 
@@ -7,10 +7,10 @@ from recon.dataset import Dataset
 from recon.operations.corrections import corrections_from_dict
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
-from recon.types import Correction, OperationStatus, Stats, TransformationType
+from recon.types import Correction, Example, OperationStatus, Stats, TransformationType
 
 
-def test_dataset_initialize(example_data):
+def test_dataset_initialize(example_data: Dict[str, List[Example]]):
 
     dataset = Dataset("train")
     assert dataset.name == "train"
@@ -28,7 +28,7 @@ def test_dataset_initialize(example_data):
     assert dataset2.operations == []
 
 
-def test_dataset_commit_hash(example_data):
+def test_dataset_commit_hash(example_data: Dict[str, List[Example]]):
     train_dataset = Dataset("train", example_data["train"][:-1])
     dev_dataset = Dataset("train", example_data["dev"])
 
@@ -41,12 +41,12 @@ def test_dataset_commit_hash(example_data):
     assert hash(train_dataset) == 2389582605943205983
 
 
-def test_len(example_data):
+def test_len(example_data: Dict[str, List[Example]]):
     train_dataset = Dataset("train", example_data["train"])
     assert len(train_dataset) == len(example_data["train"])
 
 
-def test_apply(example_data):
+def test_apply(example_data: Dict[str, List[Example]]):
     train_dataset = Dataset("train", example_data["train"])
 
     ner_stats: Stats = cast(Stats, train_dataset.apply(get_ner_stats))
@@ -58,7 +58,7 @@ def test_apply(example_data):
     assert ner_stats.n_annotations_per_type == ner_stats_apply.n_annotations_per_type
 
 
-def test_apply_(example_data):
+def test_apply_(example_data: Dict[str, List[Example]]):
     train_dataset = Dataset("train", example_data["train"])
     ner_stats_pre = cast(Stats, train_dataset.apply(get_ner_stats))
 
@@ -88,7 +88,7 @@ def test_apply_(example_data):
         assert t.type == TransformationType.EXAMPLE_CHANGED
 
 
-def test_rollback(example_data):
+def test_rollback(example_data: Dict[str, List[Example]]):
     train_dataset = Dataset("train", example_data["train"])
     ner_stats_pre: Stats = cast(Stats, train_dataset.apply(get_ner_stats))
 
@@ -118,7 +118,7 @@ def test_rollback(example_data):
     assert pre_keys == rolled_back_keys
 
 
-def test_dataset_search(example_data):
+def test_dataset_search(example_data: Dict[str, List[Example]]):
     train_dataset = Dataset("train", example_data["train"])
 
     assert len(train_dataset.search("kotlin")) == 0
@@ -128,7 +128,7 @@ def test_dataset_search(example_data):
     assert len(train_dataset.search("Software", case_sensitive=False)) == 4
 
 
-def test_dataset_to_from_disk(example_data, tmp_path):
+def test_dataset_to_from_disk(example_data: Dict[str, List[Example]], tmp_path: Path):
 
     train_dataset = Dataset("train", example_data["train"])
 
@@ -175,7 +175,7 @@ def test_dataset_to_from_disk(example_data, tmp_path):
     ]
 
 
-def test_dataset_to_from_spacy(example_data, tmp_path):
+def test_dataset_to_from_spacy(example_data: Dict[str, List[Example]], tmp_path: Path):
     train_dataset = Dataset("train", example_data["train"])
     ner_stats_pre: Stats = cast(Stats, train_dataset.apply(get_ner_stats))
 

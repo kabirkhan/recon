@@ -1,12 +1,14 @@
 import shutil
 from pathlib import Path
+from typing import Dict, List
 
 from recon.corpus import Corpus
 from recon.dataset import Dataset
 from recon.stats import get_ner_stats
+from recon.types import Example
 
 
-def test_corpus_initialize(example_data):
+def test_corpus_initialize(example_data: Dict[str, List[Example]]):
 
     train_ds = Dataset("train")
     dev_ds = Dataset("dev")
@@ -35,7 +37,7 @@ def test_corpus_initialize(example_data):
     assert len(corpus_loaded.all) == 312
 
 
-def test_corpus_disk(example_data):
+def test_corpus_disk(example_data: Dict[str, List[Example]]):
     train_ds = Dataset("train", example_data["train"])
     dev_ds = Dataset("dev", example_data["dev"])
     test_ds = Dataset("test", example_data["test"])
@@ -59,12 +61,12 @@ def test_corpus_disk(example_data):
     shutil.rmtree(save_dir)
 
 
-def test_corpus_apply(example_corpus):
+def test_corpus_apply(example_corpus: Corpus):
     stats = example_corpus.apply(get_ner_stats)
     assert stats.all.n_examples == 312
 
 
-def test_corpus_apply_inplace(example_corpus_processed):
+def test_corpus_apply_inplace(example_corpus_processed: Corpus):
     assert len(example_corpus_processed.train_ds.operations) == 4
     assert len(example_corpus_processed.dev_ds.operations) == 4
     assert len(example_corpus_processed.test_ds.operations) == 4

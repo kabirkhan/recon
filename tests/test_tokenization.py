@@ -1,10 +1,11 @@
 from recon.dataset import Dataset
 from recon.operations.core import op_iter
 from recon.operations.tokenization import add_tokens
+from recon.preprocess import SpacyPreProcessor
 from recon.types import Example, Span
 
 
-def test_fix_tokenization_and_spacing(spacy_preprocessor):
+def test_fix_tokenization_and_spacing():
     example1 = Example(
         text="This is a first sentence with entity.This is anentity in the 2nd sentence.",
         spans=[
@@ -41,7 +42,7 @@ def test_fix_tokenization_and_spacing(spacy_preprocessor):
     )
 
 
-def test_add_tokens(spacy_preprocessor):
+def test_add_tokens(spacy_preprocessor: SpacyPreProcessor):
     # fmt: off
     untokenized_examples = [Example(**example) for example in [
         {"text": "Have you used the new version of my model?", "spans": [{"start": 36, "end": 41, "label": "SKILL"}]},
@@ -70,7 +71,7 @@ def test_add_tokens(spacy_preprocessor):
         assert fixed_example.tokens == tokenized_example.tokens
 
 
-def test_add_tokens_bad_example(spacy_preprocessor):
+def test_add_tokens_bad_example(spacy_preprocessor: SpacyPreProcessor):
 
     bad_example = {
         "text": "The primary outcome was spontaneous delivery before 34 weeks.face=+Italic; Resultsface=-Italic; Spontaneous delivery before 34 weeks of gestation was less frequent in the progesterone group than in the placebo group (19.2% vs. 34.4%; relative risk, 0.56; 95% confidence interval [CI], 0.36 to 0.86).",

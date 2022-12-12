@@ -1,8 +1,10 @@
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, cast
 
 import pytest
 from spacy.lang.en import English
+from spacy.language import Language
+from spacy.pipeline import EntityRuler
 
 from recon.corpus import Corpus
 from recon.loaders import read_jsonl
@@ -12,17 +14,17 @@ from recon.types import Example
 
 
 @pytest.fixture()
-def nlp():
+def nlp() -> English:
     return English()
 
 
 @pytest.fixture()
-def spacy_preprocessor(nlp):
+def spacy_preprocessor(nlp: Language) -> SpacyPreProcessor:
     return SpacyPreProcessor(nlp=nlp)
 
 
 @pytest.fixture()
-def test_texts():
+def test_texts() -> List[str]:
     return [
         "Machine learning is the most researched area of AI.",
         "My title at work is Software Engineer even theough I mostly work on AI.",
@@ -76,14 +78,14 @@ def example_corpus_processed() -> Corpus:
 
 
 @pytest.fixture()
-def recognizer(nlp, example_corpus):
+def recognizer(nlp: Language, example_corpus: Corpus) -> SpacyEntityRecognizer:
     patterns = []
 
     for e in example_corpus.all:
         for span in e.spans:
             patterns.append({"label": span.label, "pattern": span.text.lower()})
 
-    ruler = nlp.add_pipe("entity_ruler", name="entity_ruler")
+    ruler = cast(EntityRuler, nlp.add_pipe("entity_ruler", name="entity_ruler"))
     ruler.add_patterns(patterns)
     recognizer = SpacyEntityRecognizer(nlp)
     return recognizer

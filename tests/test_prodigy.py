@@ -5,7 +5,7 @@ from recon.corpus import Corpus
 prodigy = pytest.importorskip("prodigy")
 
 
-def test_corpus_to_from_prodigy(example_corpus):
+def test_corpus_to_from_prodigy(example_corpus: Corpus):
     prodigy_train_dataset, prodigy_dev_dataset, prodigy_test_dataset = example_corpus.to_prodigy(
         overwrite=True
     )
