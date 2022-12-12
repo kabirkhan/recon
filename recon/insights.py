@@ -16,9 +16,6 @@ from recon.types import (
 )
 
 
-from typing import List, DefaultDict, Set
-from collections import defaultdict
-
 def get_ents_by_label(
     data: List[Example], case_sensitive: bool = False
 ) -> DefaultDict[str, DefaultDict[str, Set[Example]]]:
@@ -36,7 +33,9 @@ def get_ents_by_label(
         DefaultDict[str, DefaultDict[str, Set[Example]]]: DefaultDict mapping
         label to sorted list of the unique spans annotated for that label.
     """
-    annotations: DefaultDict[str, DefaultDict[str, Set[Example]]] = defaultdict(lambda: defaultdict(set))
+    annotations: DefaultDict[str, DefaultDict[str, Set[Example]]] = defaultdict(
+        lambda: defaultdict(set)
+    )
     for example in data:
         for s in example.spans:
             span_text = s.text if case_sensitive else s.text.lower()
