@@ -1,8 +1,9 @@
-import pytest
 from typing import List, cast
 
+import pytest
 from spacy.language import Language
 from spacy.pipeline import EntityRuler
+
 from recon.recognizer import EntityRecognizer, SpacyEntityRecognizer
 
 

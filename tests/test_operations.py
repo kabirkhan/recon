@@ -1,6 +1,6 @@
-import pytest
-
 from typing import List
+
+import pytest
 
 from recon.dataset import Dataset
 from recon.operations import registry

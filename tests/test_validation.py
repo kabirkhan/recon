@@ -1,7 +1,6 @@
-from typing import cast, Callable, List, Tuple
+from typing import List, Tuple, cast
 
 import pytest
-
 
 from recon.corpus import Corpus
 from recon.operations.validation import filter_overlaps
