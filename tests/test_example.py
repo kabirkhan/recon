@@ -1,10 +1,13 @@
 from typing import Any, Dict
-from recon.types import Example, Span
 
+from recon.types import Example
 
 
 def test_example_init():
-    dict_data: Dict[str, Any] = {"text": "text no spans", "spans": [{"start": 0, "end": 4, "label": "TEST"}]}
+    dict_data: Dict[str, Any] = {
+        "text": "text no spans",
+        "spans": [{"start": 0, "end": 4, "label": "TEST"}],
+    }
     example = Example(**dict_data)
 
     assert example.text == "text no spans"
