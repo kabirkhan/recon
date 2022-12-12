@@ -6,7 +6,7 @@ import functools
 import inspect
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, ForwardRef, List, Optional, Tuple, Type, Union
 
 from pydantic import BaseConfig, BaseModel
 from pydantic.class_validators import Validator
@@ -25,7 +25,7 @@ from pydantic.fields import (
     UndefinedType,
 )
 from pydantic.schema import get_annotation_from_field_info
-from pydantic.typing import ForwardRef, evaluate_forwardref
+from pydantic.typing import evaluate_forwardref
 from pydantic.utils import lenient_issubclass
 
 from recon.types import OperationState

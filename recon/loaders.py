@@ -3,7 +3,7 @@ the [Prodigy](https://prodi.gy) format.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, cast
 
 import spacy
 import srsly
@@ -23,7 +23,7 @@ def read_jsonl(path: Path) -> List[Example]:
     Returns:
         List[Example]: List of examples
     """
-    data = srsly.read_jsonl(path)
+    data = cast(List[Dict[str, Any]], srsly.read_jsonl(path))
     examples = json_to_examples(data)
     return examples
 
@@ -37,7 +37,7 @@ def read_json(path: Path) -> List[Example]:
     Returns:
         List[Example]: List of examples
     """
-    data = srsly.read_json(path)
+    data = cast(List[Dict[str, Any]], srsly.read_json(path))
     examples = json_to_examples(data)
     return examples
 

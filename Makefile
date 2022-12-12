@@ -4,7 +4,6 @@ autoflake = poetry run autoflake --remove-all-unused-imports --recursive --remov
 flake8 = poetry run flake8 --ignore E501,E203,W503 recon tests
 isort = poetry run isort recon tests
 black = poetry run black -S -l 100 --target-version py39 recon tests
-mypy = poetry run mypy recon
 pyright = poetry run pyright
 
 
@@ -24,11 +23,6 @@ lint:
 	$(flake8)
 	$(isort) --check-only --df
 	$(black) --check --diff
-
-
-.PHONY: mypy
-mypy:
-	$(mypy)
 
 .PHONY: pyright
 pyright:
