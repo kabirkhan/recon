@@ -16,47 +16,37 @@ from recon.types import (
 )
 
 
+from typing import List, DefaultDict, Set
+from collections import defaultdict
+
 def get_ents_by_label(
     data: List[Example], case_sensitive: bool = False
-) -> DefaultDict[str, List[str]]:
+) -> DefaultDict[str, DefaultDict[str, Set[Example]]]:
     """Get a dictionary of unique text spans by label for your data
 
-    # TODO: Ok so this needs to return more than just a set for each label.
-
     We want to return a dictionary that maps labels to AnnotationCount objects where each
-    AnnotationCount contains the text of the annotation text, the total number of times it's mentioned (e.g. what entity_coverage does)
-    but also the examples it is in.
-
-    So maybe I can get this info from entity_coverage? IDK but this is dumb rn and not very flexible.
-
-    Maybe I should keep this function returning a set of strings for each label for compatability but I need the other way too
-    so I know what to focus on in editing and analyzing
+    AnnotationCount contains the text of the annotation text, the total number of times
+    it's mentioned (e.g. what entity_coverage does) but also the examples it is in.
 
     Args:
         data (List[Example]): List of examples
         case_sensitive (bool, optional): Consider case of text for each annotation
 
     Returns:
-        DefaultDict[str, List[str]]: DefaultDict mapping label to sorted list of the unique
-            spans annotated for that label.
+        DefaultDict[str, DefaultDict[str, Set[Example]]]: DefaultDict mapping
+        label to sorted list of the unique spans annotated for that label.
     """
-    annotations: DefaultDict[str, Set[str]] = defaultdict(set)
-    sorted_annotations: DefaultDict[str, List[str]] = defaultdict(list)
-
-    for e in data:
-        for s in e.spans:
+    annotations: DefaultDict[str, DefaultDict[str, Set[Example]]] = defaultdict(lambda: defaultdict(set))
+    for example in data:
+        for s in example.spans:
             span_text = s.text if case_sensitive else s.text.lower()
-            annotations[s.label].add(span_text)
-
-    for label, anns in annotations.items():
-        sorted_annotations[label] = sorted(anns)
-
-    return sorted_annotations
+            annotations[s.label][span_text].add(example)
+    return annotations
 
 
 def get_label_disparities(
     data: List[Example], label1: str, label2: str, case_sensitive: bool = False
-) -> Set[str]:
+) -> Dict[str, List[Example]]:
     """Identify annotated spans that have different labels in different examples
 
     Args:
@@ -66,10 +56,18 @@ def get_label_disparities(
         case_sensitive (bool, optional): Consider case of text for each annotation
 
     Returns:
-        Set[str]: Set of all unique text spans that overlap between label1 and label2
+        Dict[str, List[Example]]: Set of all unique text spans that overlap between label1 and label2
     """
     annotations = get_ents_by_label(data, case_sensitive=case_sensitive)
-    return set(annotations[label1]).intersection(set(annotations[label2]))
+    overlap = set(annotations[label1]).intersection(set(annotations[label2]))
+
+    output = defaultdict(list)
+    for ann in overlap:
+        if ann in annotations[label1]:
+            output[ann] += annotations[label1][ann]
+        if ann in annotations[label2]:
+            output[ann] += annotations[label2][ann]
+    return output
 
 
 def top_label_disparities(
