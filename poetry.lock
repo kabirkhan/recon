@@ -14,14 +14,14 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "autoflake"
-version = "2.0.0"
+version = "1.7.8"
 description = "Removes unused imports and unused variables"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
-pyflakes = ">=3.0.0"
+pyflakes = ">=1.1.0,<3"
 tomli = {version = ">=2.0.1", markers = "python_version < \"3.11\""}
 
 [[package]]
@@ -175,16 +175,16 @@ testing = ["pre-commit"]
 
 [[package]]
 name = "flake8"
-version = "2.3.0"
-description = "the modular source code checker: pep8, pyflakes and co"
+version = "5.0.4"
+description = "the modular source code checker: pep8 pyflakes and co"
 category = "dev"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6.1"
 
 [package.dependencies]
-mccabe = ">=0.2.1"
-pep8 = ">=1.5.7"
-pyflakes = ">=0.8.1"
+mccabe = ">=0.7.0,<0.8.0"
+pycodestyle = ">=2.9.0,<2.10.0"
+pyflakes = ">=2.5.0,<2.6.0"
 
 [[package]]
 name = "ghp-import"
@@ -248,7 +248,7 @@ python-versions = "*"
 
 [[package]]
 name = "isort"
-version = "5.11.0"
+version = "5.11.1"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
@@ -516,14 +516,6 @@ s3 = ["boto3"]
 test = ["pytest", "pytest-coverage", "mock", "typer-cli"]
 
 [[package]]
-name = "pep8"
-version = "1.7.1"
-description = "Python style guide checker"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "platformdirs"
 version = "2.6.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -560,6 +552,14 @@ cymem = ">=2.0.2,<2.1.0"
 murmurhash = ">=0.28.0,<1.1.0"
 
 [[package]]
+name = "pycodestyle"
+version = "2.9.1"
+description = "Python style guide checker"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "pydantic"
 version = "1.10.2"
 description = "Data validation and settings management using python type hints"
@@ -576,7 +576,7 @@ email = ["email-validator (>=1.0.3)"]
 
 [[package]]
 name = "pyflakes"
-version = "3.0.1"
+version = "2.5.0"
 description = "passive checker of Python programs"
 category = "dev"
 optional = false
@@ -1001,7 +1001,7 @@ prodigy = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">= 3.8, < 3.11"
-content-hash = "122abf69529280eb5d615f71e9486e9b4f66ebdd17c1a8dc34cecf0e0d924391"
+content-hash = "7b8a8dcc487e9ebca143def1fb9a982f5ace126f3d8b2b7ed968c0a02ed1a826"
 
 [metadata.files]
 attrs = []
@@ -1027,10 +1027,7 @@ execnet = [
     {file = "execnet-1.9.0-py2.py3-none-any.whl", hash = "sha256:a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142"},
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
 ]
-flake8 = [
-    {file = "flake8-2.3.0-py2.py3-none-any.whl", hash = "sha256:c99cc9716d6655d9c8bcb1e77632b8615bf0abd282d7abd9f5c2148cad7fc669"},
-    {file = "flake8-2.3.0.tar.gz", hash = "sha256:5ee1a43ccd0716d6061521eec6937c983efa027793013e572712c4da55c7c83e"},
-]
+flake8 = []
 ghp-import = [
     {file = "ghp-import-2.1.0.tar.gz", hash = "sha256:9c535c4c61193c2df8871222567d7fd7e5014d835f97dc7b7439069e2413d343"},
     {file = "ghp_import-2.1.0-py3-none-any.whl", hash = "sha256:8337dd7b50877f163d4c0289bc1f1c7f127550241988d568c1db512c4324a619"},
@@ -1131,16 +1128,13 @@ numpy = []
 packaging = []
 pathspec = []
 pathy = []
-pep8 = [
-    {file = "pep8-1.7.1-py2.py3-none-any.whl", hash = "sha256:b22cfae5db09833bb9bd7c8463b53e1a9c9b39f12e304a8d0bba729c501827ee"},
-    {file = "pep8-1.7.1.tar.gz", hash = "sha256:fe249b52e20498e59e0b5c5256aa52ee99fc295b26ec9eaa85776ffdb9fe6374"},
-]
 platformdirs = []
 pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
 ]
 preshed = []
+pycodestyle = []
 pydantic = []
 pyflakes = []
 pygments = []
