@@ -1,3 +1,4 @@
+from recon.augmentation import ent_label_sub  # noqa
 from recon.dataset import Dataset
 from recon.types import Example, Span
 

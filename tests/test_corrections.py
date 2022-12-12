@@ -38,7 +38,7 @@ def test_rename_labels(test_examples):
 
 def test_fix_annotations(test_examples):
     disparities = get_label_disparities(test_examples, label1="SKILL", label2="JOB_ROLE")
-    assert disparities == {"model", "software development engineer"}
+    assert set(disparities.keys()) == {"model", "software development engineer"}
 
     fixed_examples = []
     for e in test_examples:
@@ -49,7 +49,7 @@ def test_fix_annotations(test_examples):
         fixed_examples.append(example)
 
     disparities_fixed = get_label_disparities(fixed_examples, label1="SKILL", label2="JOB_ROLE")
-    assert disparities_fixed == set()
+    assert set(disparities_fixed.keys()) == set()
 
 
 def test_strip_annotations():
