@@ -30,7 +30,7 @@ def get_ents_by_label(
     So maybe I can get this info from entity_coverage? IDK but this is dumb rn and not very flexible.
 
     Maybe I should keep this function returning a set of strings for each label for compatability but I need the other way too
-    so I know what to focus on in editing and a
+    so I know what to focus on in editing and analyzing
 
     Args:
         data (List[Example]): List of examples

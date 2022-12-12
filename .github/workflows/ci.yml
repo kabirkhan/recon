@@ -57,9 +57,6 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Install library
-        run: poetry install --no-interaction
-
       - name: test
         run: |
           make test

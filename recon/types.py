@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -8,6 +9,7 @@ from spacy import displacy
 from spacy.tokens import Doc
 from spacy.util import get_words_and_spaces
 from spacy.vocab import Vocab
+from wasabi import color
 
 from recon.hashing import (
     prediction_error_hash,
@@ -15,6 +17,10 @@ from recon.hashing import (
     token_hash,
     tokenized_example_hash,
 )
+
+ANSI_LABEL = 141
+ANSI_HIGHLIGHT = 222
+ANSI_BLACK = "black"
 
 
 class Span(BaseModel):
@@ -69,7 +75,7 @@ class Example(BaseModel):
     def span_text_must_exist(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         if not values.get("formatted", False):
             # Ensure each span has a text property
-            spans = values["spans"]
+            spans = values.get("spans", [])
             for span in spans:
                 if not isinstance(span, Span):
                     if "text" not in span:
@@ -87,6 +93,14 @@ class Example(BaseModel):
             values["formatted"] = True
 
         return values
+
+    def __str__(self) -> str:
+        return f'Example: "{self.text}", {len(self.spans)} spans.'
+
+    def __repr__(self) -> str:
+        n_spans = len(self.spans)
+        spans_text = "span" if n_spans == 1 else "spans"
+        return f'Example: "{self.text}", {n_spans} {spans_text}.'
 
     def __hash__(self) -> int:
         return cast(int, tokenized_example_hash(self))
@@ -123,15 +137,52 @@ class Example(BaseModel):
         doc.ents = tuple(doc.char_span(s.start, s.end, label=s.label) for s in self.spans)
         return doc
 
-    def show(self, jupyter: Optional[bool] = None, options: Dict[str, Any] = {}) -> None:
-        """Visualize example using spaCy displacy entity renderer
+    def show(
+        self,
+        jupyter: Optional[bool] = None,
+        options: Dict[str, Any] = {},
+        highlight_color: Union[str, int] = ANSI_HIGHLIGHT,
+        label_color: Union[str, int] = ANSI_LABEL,
+    ) -> None:
+        """Visualize example using spaCy displacy entity renderer or a simple renderer
+        for console output.
 
         Args:
             jupyter (Optional[bool], optional): Run for Jupyter Interactive Environment.
             options (Dict[str, Any]): DisplaCy options to pass through to filter ent types and set colors
                 See: https://spacy.io/usage/visualizers#ent
         """
-        displacy.render(self.doc, style="ent", jupyter=jupyter, options=options)
+        if sys.stdin.isatty():
+            self.pretty_print(highlight_color, label_color)
+        else:
+            displacy.render(self.doc, style="ent", jupyter=jupyter, options=options)
+
+    def pretty_print(
+        self,
+        highlight_color: Union[str, int] = ANSI_HIGHLIGHT,
+        label_color: Union[str, int] = ANSI_LABEL,
+    ) -> None:
+        """Pretty print an Example's spans for console output.
+
+        Args:
+            highlight_color (Union[str, int], optional): ANSI color code or name. Defaults to 222 (yellowish)
+            label_color (Union[str, int], optional): ANSI color code or name. Defaults to 141 (purpleish)
+        """
+        text = self.text
+        spans = self.spans
+        result = ""
+        offset = 0
+        for span in spans:
+            label = span.label
+            start = span.start
+            end = span.end
+            result += text[offset:start]
+            result += color(f" {text[start:end]} ", ANSI_BLACK, highlight_color)
+            if label:
+                result += color(f" {label} ", ANSI_BLACK, label_color)
+            offset = end
+        result += text[offset:]
+        print(result)
 
 
 OpType = Callable[[Example, Any], Any]
