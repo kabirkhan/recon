@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 import spacy
 import srsly
@@ -116,6 +116,11 @@ class Dataset:
     @property
     def stats(self) -> Stats:
         return get_ner_stats(self.data)
+
+    @property
+    def labels(self) -> Tuple[str, ...]:
+        n_anns_per_type = get_ner_stats(self.data).n_annotations_per_type
+        return tuple(n_anns_per_type.keys())
 
     def summary(self) -> str:
         return f"Dataset\nName: {self.name}\nStats: {self.stats}"

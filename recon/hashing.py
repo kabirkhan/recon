@@ -51,8 +51,15 @@ def example_hash(example: "Example", as_int: bool = True) -> Union[str, int]:
     Returns:
         Union[str, int]: Example hash
     """
-    hash_data = (example.text,) + tuple((span_hash(span, as_int=False) for span in example.spans))
-    return _hash(hash_data, as_int=as_int)
+    hash_data = [example.text]
+    for span in example.spans:
+        hash_data += [
+            span.start,
+            span.end,
+            span.label,
+            span.text,
+        ]
+    return _hash(tuple(hash_data), as_int=as_int)
 
 
 def tokenized_example_hash(example: "Example", as_int: bool = True) -> Union[str, int]:
@@ -66,12 +73,20 @@ def tokenized_example_hash(example: "Example", as_int: bool = True) -> Union[str
         Union[str, int]: Example hash
     """
     tokens = example.tokens or []
-    hash_data = (
-        (example.text,)
-        + tuple((span_hash(span, as_int=False) for span in example.spans))
-        + tuple((token_hash(token, as_int=False) for token in tokens))
-    )
-    return _hash(hash_data, as_int=as_int)
+    hash_data = [example.text]
+    for span in example.spans:
+        hash_data += [
+            span.start,
+            span.end,
+            span.label,
+            span.text,
+            span.token_start if span.token_start else 0,
+            span.token_end if span.token_end else 0,
+        ]
+    for token in tokens:
+        hash_data += [token.text, token.start, token.end, token.id]
+
+    return _hash(tuple(hash_data), as_int=as_int)
 
 
 def dataset_hash(dataset: "Dataset", as_int: bool = True) -> Union[str, int]:
@@ -107,7 +122,7 @@ def prediction_error_hash(
 
 
 def _hash(
-    tpl: Tuple, hash_function: Callable = xxhash.xxh64, as_int: bool = True
+    tpl: Tuple, hash_function: Callable = xxhash.xxh3_64, as_int: bool = True
 ) -> Union[str, int]:
     """Deterministic hash function. The main use here is
     providing a `commit_hash` for a Dataset to compare across
