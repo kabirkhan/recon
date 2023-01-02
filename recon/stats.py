@@ -34,7 +34,8 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> Stats:
                 examples[s.label].append(e)
 
     sorted_anns_by_count = {
-        a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
+        a[0]: a[1]
+        for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
     }
 
     stats = Stats(
@@ -64,7 +65,9 @@ def get_sorted_type_counts(ner_stats: Stats) -> List[int]:
     return [t[1] for t in sorted(annotations_per_type.items(), key=lambda p: p[0])]
 
 
-def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) -> float:
+def calculate_label_distribution_similarity(
+    x: List[Example], y: List[Example]
+) -> float:
     """Calculate the similarity of the label distribution for 2 datasets.
 
     e.g. This can help you understand how well your train set models your dev and test sets.
@@ -139,7 +142,9 @@ def get_entity_coverage(
     return sorted_coverage
 
 
-def calculate_entity_coverage_similarity(x: List[Example], y: List[Example]) -> EntityCoverageStats:
+def calculate_entity_coverage_similarity(
+    x: List[Example], y: List[Example]
+) -> EntityCoverageStats:
     """Calculate how well dataset x covers the entities in dataset y.
     This function should be used to calculate how similar your train set
     annotations cover the annotations in your dev/test set
@@ -218,7 +223,9 @@ def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) ->
         seq = cast(List[int], seq)
         res = scipy_entropy(get_probs_from_counts(seq))
     else:
-        raise ValueError("Parameter seq must be a sequence of probabilites or integers.")
+        raise ValueError(
+            "Parameter seq must be a sequence of probabilites or integers."
+        )
     return float(res)
 
 

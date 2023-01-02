@@ -85,12 +85,17 @@ def from_spacy(
                 )
                 for e in doc.ents
             ],
-            tokens=[Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc],
+            tokens=[
+                Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc
+            ],
         )
 
 
 def to_spacy(
-    path: Path, data: Iterable[Example], nlp: Optional[Language] = None, lang_code: str = "en"
+    path: Path,
+    data: Iterable[Example],
+    nlp: Optional[Language] = None,
+    lang_code: str = "en",
 ) -> DocBin:
     """Save a batch of examples to disk in the .spacy DocBin format
 
@@ -113,7 +118,9 @@ def to_spacy(
             tokens = [token.text for token in example.tokens]
             words, spaces = get_words_and_spaces(tokens, example.text)
             doc = Doc(nlp.vocab, words=words, spaces=spaces)
-            doc.ents = tuple([doc.char_span(s.start, s.end, label=s.label) for s in example.spans])
+            doc.ents = tuple(
+                [doc.char_span(s.start, s.end, label=s.label) for s in example.spans]
+            )
             doc_bin.add(doc)
     doc_bin.to_disk(path)
     return doc_bin

@@ -41,7 +41,6 @@ def recon_ner_correct_v1(
     label: Optional[List[str]] = None,
     exclude: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-
     log("RECIPE: Starting recipe ner.manual", locals())
     nlp = spacy.load(spacy_model)
     labels = label  # comma-separated list or path to text file
@@ -51,7 +50,9 @@ def recon_ner_correct_v1(
             msg.fail("No --label argument set and no labels found in model", exits=1)
         msg.text(f"Using {len(labels)} labels from model: {', '.join(labels)}")
     log(f"RECIPE: Annotating with {len(labels)} labels", labels)
-    stream = get_stream(source, loader=loader, rehash=True, dedup=True, input_key="text")
+    stream = get_stream(
+        source, loader=loader, rehash=True, dedup=True, input_key="text"
+    )
     # Add "tokens" key to the tasks, either with words or characters
     stream = add_tokens(nlp, stream)
     stream = [Example(**eg) for eg in stream]
@@ -134,7 +135,9 @@ def recon_ner_merge_v1(
             msg.fail(f"Can't find dataset '{dataset}'", exits=1)
 
         prodigy_raw_examples = DB.get_dataset(dataset)
-    prodigy_examples = [Example(**eg) for eg in prodigy_raw_examples if eg["answer"] == "accept"]
+    prodigy_examples = [
+        Example(**eg) for eg in prodigy_raw_examples if eg["answer"] == "accept"
+    ]
     prodigy_texts_to_examples = {e.text: e for e in prodigy_examples}
 
     prev_len = len(dataset)
@@ -147,7 +150,9 @@ def recon_ner_merge_v1(
 
 
 @operation("recon.prodigy.merge_examples.v1")
-def merge_examples(example: Example, prodigy_texts_to_examples: Dict[str, Example]) -> Example:
+def merge_examples(
+    example: Example, prodigy_texts_to_examples: Dict[str, Example]
+) -> Example:
     if example.text in prodigy_texts_to_examples:
         return prodigy_texts_to_examples[example.text]
     else:
@@ -158,11 +163,14 @@ def _stream_from_hardest_examples(hes: List[HardestExample]) -> Iterator[TaskTyp
     for he in hes:
         combined = he.reference.copy(deep=True)
         annot_spans = [
-            Span(**span.dict(exclude={"source"}), source="ref") for span in he.reference.spans
+            Span(**span.dict(exclude={"source"}), source="ref")
+            for span in he.reference.spans
         ]
         pred_spans = [
             Span(
-                **span.dict(exclude={"source", "label"}), source="pred", label=f"{span.label}:PRED"
+                **span.dict(exclude={"source", "label"}),
+                source="pred",
+                label=f"{span.label}:PRED",
             )
             for span in he.prediction.spans
         ]

@@ -90,7 +90,9 @@ def top_label_disparities(
     for label1 in annotations.keys():
         for label2 in annotations.keys():
             if label1 != label2:
-                intersection = set(annotations[label1]).intersection(set(annotations[label2]))
+                intersection = set(annotations[label1]).intersection(
+                    set(annotations[label2])
+                )
                 n_disparities = len(intersection)
                 if n_disparities > 0:
                     if dedupe:
@@ -142,7 +144,6 @@ def top_prediction_errors(
     n_errors = 0
 
     for orig_example, pred_example, ann in zip(data, preds, anns):
-
         pred_error_example_pair = PredictionErrorExamplePair(
             original=orig_example, predicted=pred_example
         )
@@ -167,12 +168,16 @@ def top_prediction_errors(
                     text = pred_example.text[start:end]
                     false_label = fp[2]
                     errors[label][text][false_label] += 1
-                    error_examples[(text, label, false_label)].append(pred_error_example_pair)
+                    error_examples[(text, label, false_label)].append(
+                        pred_error_example_pair
+                    )
                 else:
                     start, end, false_label = fp
                     text = pred_example.text[start:end]
                     errors[NOT_LABELED][text][false_label] += 1
-                    error_examples[(text, NOT_LABELED, false_label)].append(pred_error_example_pair)
+                    error_examples[(text, NOT_LABELED, false_label)].append(
+                        pred_error_example_pair
+                    )
                 n_errors += 1
                 seen.add((start, end))
 
@@ -182,7 +187,9 @@ def top_prediction_errors(
                 if (start, end) not in seen:
                     text = pred_example.text[start:end]
                     errors[label][text][NOT_LABELED] += 1
-                    error_examples[(text, label, NOT_LABELED)].append(pred_error_example_pair)
+                    error_examples[(text, label, NOT_LABELED)].append(
+                        pred_error_example_pair
+                    )
                     n_errors += 1
 
     ranked_errors_map: Dict[Tuple[str, str, str], PredictionError] = {}
@@ -248,7 +255,6 @@ def get_hardest_examples(
     max_count = 0
     hes = []
     for pred, ref in zip(preds, examples):
-
         scorer = PRFScore()
         scorer.score_set(
             set([(s.start, s.end, s.label) for s in pred.spans]),
@@ -260,7 +266,9 @@ def get_hardest_examples(
         if total_errors > max_count:
             max_count = total_errors
 
-        he = HardestExample(reference=ref, prediction=pred, count=total_errors, score=score)
+        he = HardestExample(
+            reference=ref, prediction=pred, count=total_errors, score=score
+        )
         hes.append(he)
 
     if score_count:
@@ -289,7 +297,9 @@ def get_annotation_labels(
     Returns:
         Dict[str, Dict[str, list]]: Annotation map
     """
-    annotation_labels_map: Dict[str, Dict[str, list]] = defaultdict(lambda: defaultdict(list))
+    annotation_labels_map: Dict[str, Dict[str, list]] = defaultdict(
+        lambda: defaultdict(list)
+    )
     for e in examples:
         for s in e.spans:
             text = s.text if case_sensitive else s.text.lower()

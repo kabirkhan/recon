@@ -67,7 +67,10 @@ class PreProcessor:
 
 class SpacyPreProcessor(PreProcessor):
     def __init__(
-        self, nlp: Optional[Language] = None, name: str = "recon.spacy.v1", field: str = "doc"
+        self,
+        nlp: Optional[Language] = None,
+        name: str = "recon.spacy.v1",
+        field: str = "doc",
     ) -> None:
         super().__init__(name, field)
         self._nlp = nlp
@@ -80,7 +83,9 @@ class SpacyPreProcessor(PreProcessor):
         return self._nlp
 
     def __call__(self, data: Iterable[Example]) -> Iterable[Any]:
-        unseen_texts = (e.text for i, e in enumerate(data) if hash(e) not in self._cache)
+        unseen_texts = (
+            e.text for i, e in enumerate(data) if hash(e) not in self._cache
+        )
         seen_texts = ((i, e.text) for i, e in enumerate(data) if hash(e) in self._cache)
 
         docs = list(self.nlp.pipe(unseen_texts))

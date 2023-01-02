@@ -11,7 +11,6 @@ from recon.types import Correction, Example, OperationStatus, Stats, Transformat
 
 
 def test_dataset_initialize(example_data: Dict[str, List[Example]]):
-
     dataset = Dataset("train")
     assert dataset.name == "train"
     assert dataset.data == []
@@ -129,7 +128,6 @@ def test_dataset_search(example_data: Dict[str, List[Example]]):
 
 
 def test_dataset_to_from_disk(example_data: Dict[str, List[Example]], tmp_path: Path):
-
     train_dataset = Dataset("train", example_data["train"])
 
     assert len(train_dataset.operations) == 0
@@ -169,7 +167,9 @@ def test_dataset_to_from_disk(example_data: Dict[str, List[Example]], tmp_path: 
 
     assert op2.kwargs["corrections"] == [
         Correction(
-            annotation="software development engineer", from_labels=["ANY"], to_label="JOB_ROLE"
+            annotation="software development engineer",
+            from_labels=["ANY"],
+            to_label="JOB_ROLE",
         ).dict(),
         Correction(annotation="model", from_labels=["ANY"], to_label=None).dict(),
     ]

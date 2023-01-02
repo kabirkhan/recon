@@ -117,7 +117,11 @@ def prediction_error_hash(
     Returns:
         Union[str, int]: PredictionError hash
     """
-    hash_data = (prediction_error.text, prediction_error.true_label, prediction_error.pred_label)
+    hash_data = (
+        prediction_error.text,
+        prediction_error.true_label,
+        prediction_error.pred_label,
+    )
     return _hash(hash_data, as_int=as_int)
 
 

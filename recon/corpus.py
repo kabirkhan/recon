@@ -241,7 +241,8 @@ class Corpus:
 
         if not overwrite and data_dir.exists():
             raise ValueError(
-                "Output directory is not empty. Set overwrite=True in Corpus.to_disk to clear the directory before saving."
+                "Output directory is not empty. Set overwrite=True in Corpus.to_disk to"
+                " clear the directory before saving."
             )
 
         data_dir.mkdir(parents=True, exist_ok=True)
@@ -277,7 +278,9 @@ class Corpus:
         train_ds = Dataset("train").from_prodigy(prodigy_train_datasets)
         dev_ds = Dataset("dev").from_prodigy(prodigy_dev_datasets)
         test_ds = (
-            Dataset("test").from_prodigy(prodigy_test_datasets) if prodigy_test_datasets else None
+            Dataset("test").from_prodigy(prodigy_test_datasets)
+            if prodigy_test_datasets
+            else None
         )
 
         ds = cls(name, train_ds, dev_ds, test_ds)

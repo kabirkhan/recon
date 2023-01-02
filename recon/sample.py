@@ -31,7 +31,9 @@ def hash_example_meta(
         if field not in example.meta:
             if ignore_field_absence:
                 continue
-            raise ValueError(f"Field {field} not present in 'meta' for example {example}")
+            raise ValueError(
+                f"Field {field} not present in 'meta' for example {example}"
+            )
         meta_val = example.meta[field]
         if isinstance(meta_val, list):
             tpl += meta_val
@@ -72,7 +74,6 @@ def sample_examples(
         random.shuffle(examples)
 
     for example in examples:
-
         if top_k > 0 and sum(examples_counter.values()) >= top_k:
             break
 

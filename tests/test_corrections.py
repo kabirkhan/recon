@@ -27,7 +27,6 @@ def test_examples() -> List[Example]:
 
 
 def test_rename_labels(test_examples: List[Example]):
-
     fixed_examples = []
     for e in test_examples:
         example = rename_labels(e, {"SKILL": "skill"})
@@ -39,7 +38,9 @@ def test_rename_labels(test_examples: List[Example]):
 
 
 def test_fix_annotations(test_examples: List[Example]):
-    disparities = get_label_disparities(test_examples, label1="SKILL", label2="JOB_ROLE")
+    disparities = get_label_disparities(
+        test_examples, label1="SKILL", label2="JOB_ROLE"
+    )
     assert set(disparities.keys()) == {"model", "software development engineer"}
 
     fixed_examples = []
@@ -50,7 +51,9 @@ def test_fix_annotations(test_examples: List[Example]):
         example = fix_annotations(e.copy(deep=True), corrections)
         fixed_examples.append(example)
 
-    disparities_fixed = get_label_disparities(fixed_examples, label1="SKILL", label2="JOB_ROLE")
+    disparities_fixed = get_label_disparities(
+        fixed_examples, label1="SKILL", label2="JOB_ROLE"
+    )
     assert set(disparities_fixed.keys()) == set()
 
 
@@ -83,10 +86,27 @@ def test_strip_annotations():
 
 def test_split_sentences():
     example = Example(
-        text="This is a first sentence with entity. This is an entity in the 2nd sentence.",
+        text=(
+            "This is a first sentence with entity. This is an entity in the 2nd"
+            " sentence."
+        ),
         spans=[
-            Span(text="entity", start=30, end=36, label="ENTITY", token_start=6, token_end=7),
-            Span(text="entity", start=49, end=55, label="ENTITY", token_start=11, token_end=12),
+            Span(
+                text="entity",
+                start=30,
+                end=36,
+                label="ENTITY",
+                token_start=6,
+                token_end=7,
+            ),
+            Span(
+                text="entity",
+                start=49,
+                end=55,
+                label="ENTITY",
+                token_start=11,
+                token_end=12,
+            ),
         ],
         tokens=[
             Token(text="This", start=0, end=4, id=0),
@@ -119,7 +139,16 @@ def test_split_sentences():
 
     assert test_ds.data[0] == Example(
         text="This is a first sentence with entity.",
-        spans=[Span(text="entity", start=30, end=36, label="ENTITY", token_start=6, token_end=7)],
+        spans=[
+            Span(
+                text="entity",
+                start=30,
+                end=36,
+                label="ENTITY",
+                token_start=6,
+                token_end=7,
+            )
+        ],
         tokens=[
             Token(text="This", start=0, end=4, id=0),
             Token(text="is", start=5, end=7, id=1),
@@ -136,7 +165,16 @@ def test_split_sentences():
 
     assert test_ds.data[1] == Example(
         text="This is an entity in the 2nd sentence.",
-        spans=[Span(text="entity", start=11, end=17, label="ENTITY", token_start=3, token_end=4)],
+        spans=[
+            Span(
+                text="entity",
+                start=11,
+                end=17,
+                label="ENTITY",
+                token_start=3,
+                token_end=4,
+            )
+        ],
         tokens=[
             Token(text="This", start=0, end=4, id=0),
             Token(text="is", start=5, end=7, id=1),

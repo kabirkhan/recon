@@ -58,7 +58,10 @@ def op_iter(
         msg.info(f"\t=> Running preprocessor {processor.name}")
         processor_outputs = processor(data)
         for example, output in tqdm(
-            zip(data, processor_outputs), total=len(data), disable=(not verbose), leave=False
+            zip(data, processor_outputs),
+            total=len(data),
+            disable=(not verbose),
+            leave=False,
         ):
             preprocessed_outputs[example][processor.name] = output
             example.__setattr__(processor.field, output)
@@ -115,7 +118,9 @@ class operation:
             pre.append(preprocessor)
 
         op_registry.operations.register(self.name)(
-            Operation(self.name, pre, op, self.handles_tokens, augmentation=self.augmentation)
+            Operation(
+                self.name, pre, op, self.handles_tokens, augmentation=self.augmentation
+            )
         )
         return op
 
@@ -176,14 +181,17 @@ class Operation:
 
         def track_add_example(new_example: Example) -> None:
             state.transformations.append(
-                Transformation(example=hash(new_example), type=TransformationType.EXAMPLE_ADDED)
+                Transformation(
+                    example=hash(new_example), type=TransformationType.EXAMPLE_ADDED
+                )
             )
             dataset.example_store.add(new_example)
 
         def track_remove_example(orig_example_hash: int) -> None:
             state.transformations.append(
                 Transformation(
-                    prev_example=orig_example_hash, type=TransformationType.EXAMPLE_REMOVED
+                    prev_example=orig_example_hash,
+                    type=TransformationType.EXAMPLE_REMOVED,
                 )
             )
 
@@ -222,7 +230,9 @@ class Operation:
         errors: List[ErrorWrapper] = []
 
         if received_data:
-            values, errors = request_body_to_args(list(required_params.values()), received_data)
+            values, errors = request_body_to_args(
+                list(required_params.values()), received_data
+            )
 
         if errors:
             error_msg = (
@@ -242,7 +252,9 @@ class Operation:
             it = op_iter(dataset.data, self.pre, verbose=verbose)
             for orig_example_hash, example, preprocessed_outputs in it:
                 if preprocessed_outputs:
-                    res = self.op(example, preprocessed_outputs=preprocessed_outputs, **values)
+                    res = self.op(
+                        example, preprocessed_outputs=preprocessed_outputs, **values
+                    )
                 else:
                     res = self.op(example, **values)
 
@@ -268,8 +280,12 @@ class Operation:
 
         transformation_counts = Counter([t.type for t in state.transformations])
         state.examples_added = transformation_counts[TransformationType.EXAMPLE_ADDED]
-        state.examples_removed = transformation_counts[TransformationType.EXAMPLE_REMOVED]
-        state.examples_changed = transformation_counts[TransformationType.EXAMPLE_CHANGED]
+        state.examples_removed = transformation_counts[
+            TransformationType.EXAMPLE_REMOVED
+        ]
+        state.examples_changed = transformation_counts[
+            TransformationType.EXAMPLE_CHANGED
+        ]
         state.status = OperationStatus.COMPLETED
 
         state_copy = state.copy(deep=True)

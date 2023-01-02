@@ -104,6 +104,8 @@ def remove_overlapping_entities(sorted_spans: List[Span]) -> List[Span]:
                 current_overlapping_chain_start = current_entity_start
                 current_overlapping_chain_end = current_entity_end
 
-    spans_without_overlap.extend(select_subset_of_overlapping_chain(current_overlapping_chain))
+    spans_without_overlap.extend(
+        select_subset_of_overlapping_chain(current_overlapping_chain)
+    )
 
     return sorted(spans_without_overlap, key=lambda x: x.start)

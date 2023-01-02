@@ -130,11 +130,15 @@ class Example(BaseModel):
             Doc: Output spaCy Doc with ents set from example spans
         """
         if not self.tokens:
-            raise ValueError("Tokens are not set. Try running the recon.add_tokens.v1 operation.")
+            raise ValueError(
+                "Tokens are not set. Try running the recon.add_tokens.v1 operation."
+            )
         tokens = [token.text for token in self.tokens]
         words, spaces = get_words_and_spaces(tokens, self.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)
-        doc.ents = tuple(doc.char_span(s.start, s.end, label=s.label) for s in self.spans)
+        doc.ents = tuple(
+            doc.char_span(s.start, s.end, label=s.label) for s in self.spans
+        )
         return doc
 
     def show(
@@ -149,7 +153,8 @@ class Example(BaseModel):
 
         Args:
             jupyter (Optional[bool], optional): Run for Jupyter Interactive Environment.
-            options (Dict[str, Any]): DisplaCy options to pass through to filter ent types and set colors
+            options (Dict[str, Any]): DisplaCy options to
+                pass through to filter ent types and set colors
                 See: https://spacy.io/usage/visualizers#ent
         """
         if sys.stdin.isatty():
@@ -165,8 +170,10 @@ class Example(BaseModel):
         """Pretty print an Example's spans for console output.
 
         Args:
-            highlight_color (Union[str, int], optional): ANSI color code or name. Defaults to 222 (yellowish)
-            label_color (Union[str, int], optional): ANSI color code or name. Defaults to 141 (purpleish)
+            highlight_color (Union[str, int], optional): ANSI color code or name.
+                Defaults to 222 (yellowish)
+            label_color (Union[str, int], optional): ANSI color code or name.
+                Defaults to 141 (purpleish)
         """
         text = self.text
         spans = self.spans
@@ -209,7 +216,6 @@ class Transformation(BaseModel):
     type: TransformationType
 
 
-# fmt: off
 def add_shim(example: Example) -> None:
     return None
 
@@ -222,9 +228,11 @@ def change_shim(example_hash: int, new_example: Example) -> None:
     return None
 
 
-def track_shim(example_hash: Optional[int] = None, new_example: Optional[Example] = None) -> None:
+def track_shim(
+    example_hash: Optional[int] = None,
+    new_example: Optional[Example] = None
+) -> None:
     return None
-# fmt: on
 
 
 @dataclass
@@ -284,7 +292,12 @@ class CorpusApplyResult(BaseModel):
     all: Any
 
     def items(self) -> List[Tuple[str, Any]]:
-        return [("train", self.train), ("dev", self.dev), ("test", self.test), ("all", self.all)]
+        return [
+            ("train", self.train),
+            ("dev", self.dev),
+            ("test", self.test),
+            ("all", self.all),
+        ]
 
 
 class AnnotationCount(BaseModel):
@@ -404,7 +417,9 @@ class Outliers(BaseModel):
 
 
 class Correction(BaseModel):
-    """Container for an annotation correction, mapping an annotation from a label to a label"""
+    """Container for an annotation correction, mapping an
+    annotation from a label to a label
+    """
 
     annotation: str
     from_labels: List[str]
@@ -422,7 +437,8 @@ class Correction(BaseModel):
                     "model": ("PRODUCT", "SKILL"),
                 })
 
-                will return a list of Corrections with 1 item, correcting the text "model" from PRODUCT
+                will return a list of Corrections with 1 item,
+                correcting the text "model" from PRODUCT
                 to SKILL.
 
         Raises:
@@ -444,10 +460,14 @@ class Correction(BaseModel):
                 to_label = val[1]
             else:
                 raise ValueError(
-                    "Cannot parse corrections dict. Value must be either a str of the label "
-                    + "to change the annotation to (TO_LABEL) or a tuple of (FROM_LABEL, TO_LABEL)"
+                    "Cannot parse corrections dict. Value must be either a str of the"
+                    " label "
+                    + "to change the annotation to (TO_LABEL) or a tuple of"
+                    " (FROM_LABEL, TO_LABEL)"
                 )
-            corrections.append(cls(annotation=key, from_labels=from_labels, to_label=to_label))
+            corrections.append(
+                cls(annotation=key, from_labels=from_labels, to_label=to_label)
+            )
         return corrections
 
 

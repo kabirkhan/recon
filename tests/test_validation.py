@@ -38,7 +38,9 @@ def test_filter_overlaps():
     def get_test_example(span_offsets: List[Tuple[int, int, str]]) -> Example:
         spans = []
         for so in span_offsets:
-            spans.append(Span(text="x" * (so[1] - so[0]), start=so[0], end=so[1], label=so[2]))
+            spans.append(
+                Span(text="x" * (so[1] - so[0]), start=so[0], end=so[1], label=so[2])
+            )
         return Example(text="x" * 1500, spans=spans)
 
     def spans_to_offsets(spans: List[Span]) -> List[Tuple[int, int, str]]:

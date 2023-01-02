@@ -62,7 +62,9 @@ def is_scalar_field(field: ModelField) -> bool:
 
 
 def is_scalar_sequence_field(field: ModelField) -> bool:
-    if (field.shape in sequence_shapes) and not lenient_issubclass(field.type_, BaseModel):
+    if (field.shape in sequence_shapes) and not lenient_issubclass(
+        field.type_, BaseModel
+    ):
         if field.sub_fields is not None:
             for sub_field in field.sub_fields:
                 if not is_scalar_field(sub_field):
@@ -128,7 +130,8 @@ def create_response_field(
         return response_field(field_info=field_info)
     except RuntimeError:
         raise ValueError(
-            f"Invalid args for response field! Hint: check that {type_} is a valid pydantic field type"
+            f"Invalid args for response field! Hint: check that {type_} is a valid"
+            " pydantic field type"
         )
 
 
@@ -188,7 +191,6 @@ def request_body_to_args(
             received_body = {field.alias: received_body}
 
         for field in required_params:
-
             loc: Tuple[str, ...]
             if field_alias_omitted:
                 loc = ("body",)

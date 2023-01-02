@@ -8,7 +8,9 @@ from recon.types import Example, Span
 
 def mask_1d(length: int, prob: float = 0.5) -> np.ndarray:
     if prob < 0 or prob > 1:
-        raise ValueError(f"Prob of {prob} is not allowed. Allowed values between 0 and 1.")
+        raise ValueError(
+            f"Prob of {prob} is not allowed. Allowed values between 0 and 1."
+        )
 
     mask = np.zeros(length, dtype=int)
     mask[: np.ceil(length * prob).astype(int)] = 1
@@ -83,7 +85,6 @@ def augment_example(
     sub_prob: float = 0.5,
     **kwargs: Any,
 ) -> List[Example]:
-
     if spans is None:
         spans = example.copy(deep=True).spans
 
@@ -114,7 +115,11 @@ def augment_example(
 
 @operation("recon.augment.ent_label_sub.v1", handles_tokens=False)
 def ent_label_sub(
-    example: Example, label: str, subs: List[str], n_augs: int = 1, sub_prob: float = 0.5
+    example: Example,
+    label: str,
+    subs: List[str],
+    n_augs: int = 1,
+    sub_prob: float = 0.5,
 ) -> List[Example]:
     """Augmentation to substitute entities based on label.
     Applies a mask to the entities that have a provided label based on substitution_prob
@@ -142,7 +147,12 @@ def ent_label_sub(
         return sub
 
     return augment_example(
-        example, augmentation, span_label=label, n_augs=n_augs, sub_prob=sub_prob, subs=subs
+        example,
+        augmentation,
+        span_label=label,
+        n_augs=n_augs,
+        sub_prob=sub_prob,
+        subs=subs,
     )
 
 
@@ -153,10 +163,11 @@ def kb_expansion(
     n_augs: int = 1,
     sub_prob: float = 0.5,
 ) -> List[Example]:
-
     spans_to_aliases_map = preprocessed_outputs["recon.span_aliases.v1"]
 
-    def augmentation(span: Span, spans_to_aliases_map: Dict[int, List[str]]) -> Optional[str]:
+    def augmentation(
+        span: Span, spans_to_aliases_map: Dict[int, List[str]]
+    ) -> Optional[str]:
         sub = None
         if hash(span) in spans_to_aliases_map:
             aliases = spans_to_aliases_map[hash(span)]

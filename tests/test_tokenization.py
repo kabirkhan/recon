@@ -7,7 +7,9 @@ from recon.types import Example, Span
 
 def test_fix_tokenization_and_spacing():
     example1 = Example(
-        text="This is a first sentence with entity.This is anentity in the 2nd sentence.",
+        text=(
+            "This is a first sentence with entity.This is anentity in the 2nd sentence."
+        ),
         spans=[
             Span(text="entity", start=30, end=36, label="ENTITY"),
             Span(text="entity", start=47, end=53, label="ENTITY"),
@@ -17,7 +19,8 @@ def test_fix_tokenization_and_spacing():
     )
 
     example2 = Example(
-        text="An entityand other text", spans=[Span(text="entity", start=3, end=9, label="ENTITY")]
+        text="An entityand other text",
+        spans=[Span(text="entity", start=3, end=9, label="ENTITY")],
     )
 
     ds = Dataset("test_dataset", data=[example1, example2])
@@ -28,7 +31,10 @@ def test_fix_tokenization_and_spacing():
     assert len(ds) == 2
 
     assert ds.data[0] == Example(
-        text="This is a first sentence with entity.This is an entity in the 2nd sentence.",
+        text=(
+            "This is a first sentence with entity.This is an entity in the 2nd"
+            " sentence."
+        ),
         spans=[
             Span(text="entity", start=30, end=36, label="ENTITY"),
             Span(text="entity", start=48, end=54, label="ENTITY"),
@@ -38,7 +44,8 @@ def test_fix_tokenization_and_spacing():
     )
 
     assert ds.data[1] == Example(
-        text="An entity and other text", spans=[Span(text="entity", start=3, end=9, label="ENTITY")]
+        text="An entity and other text",
+        spans=[Span(text="entity", start=3, end=9, label="ENTITY")],
     )
 
 
@@ -63,7 +70,9 @@ def test_add_tokens(spacy_preprocessor: SpacyPreProcessor):
     for orig_example_hash, example, preprocessed_outputs in op_iter(
         untokenized_examples, pre=[spacy_preprocessor]
     ):
-        fixed_examples.append(add_tokens(example, preprocessed_outputs=preprocessed_outputs))
+        fixed_examples.append(
+            add_tokens(example, preprocessed_outputs=preprocessed_outputs)
+        )
 
     for fixed_example, tokenized_example in zip(fixed_examples, tokenized_examples):
         assert fixed_example.text == tokenized_example.text
@@ -72,9 +81,14 @@ def test_add_tokens(spacy_preprocessor: SpacyPreProcessor):
 
 
 def test_add_tokens_bad_example(spacy_preprocessor: SpacyPreProcessor):
-
     bad_example = {
-        "text": "The primary outcome was spontaneous delivery before 34 weeks.face=+Italic; Resultsface=-Italic; Spontaneous delivery before 34 weeks of gestation was less frequent in the progesterone group than in the placebo group (19.2% vs. 34.4%; relative risk, 0.56; 95% confidence interval [CI], 0.36 to 0.86).",
+        "text": (
+            "The primary outcome was spontaneous delivery before 34 weeks.face=+Italic;"
+            " Resultsface=-Italic; Spontaneous delivery before 34 weeks of gestation"
+            " was less frequent in the progesterone group than in the placebo group"
+            " (19.2% vs. 34.4%; relative risk, 0.56; 95% confidence interval [CI], 0.36"
+            " to 0.86)."
+        ),
         "spans": [
             {"text": "34 weeks", "start": 61, "end": 69, "label": "DURATION"},
             {"text": "gestation", "start": 133, "end": 145, "label": "DURATION"},

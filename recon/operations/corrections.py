@@ -62,7 +62,9 @@ def fix_annotations(
 
         if t in corrections_map:
             c = corrections_map[t]
-            if c.to_label is None and (s.label in c.from_labels or "ANY" in c.from_labels):
+            if c.to_label is None and (
+                s.label in c.from_labels or "ANY" in c.from_labels
+            ):
                 if dryrun:
                     prints.append(f"Deleting span: {s.text}")
                 else:
@@ -70,7 +72,8 @@ def fix_annotations(
             elif s.label in c.from_labels or "ANY" in c.from_labels:
                 if dryrun:
                     prints.append(
-                        f"Correction span: {s.text} from labels: {c.from_labels} to label: {c.to_label}"
+                        f"Correction span: {s.text} from labels: {c.from_labels} to"
+                        f" label: {c.to_label}"
                     )
                 else:
                     s.label = cast(str, c.to_label)
@@ -122,10 +125,14 @@ def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
             to_label = val[1]
         else:
             raise ValueError(
-                "Cannot parse corrections dict. Value must be either a str of the label "
-                + "to change the annotation to (TO_LABEL) or a tuple of (FROM_LABEL, TO_LABEL)"
+                "Cannot parse corrections dict. Value must be either a str of the"
+                " label "
+                + "to change the annotation to (TO_LABEL) or a tuple of (FROM_LABEL,"
+                " TO_LABEL)"
             )
-        corrections.append(Correction(annotation=key, from_labels=from_labels, to_label=to_label))
+        corrections.append(
+            Correction(annotation=key, from_labels=from_labels, to_label=to_label)
+        )
     return corrections
 
 
@@ -152,7 +159,10 @@ def strip_annotations(
     def fix_tokens(example: Example, span: Span) -> bool:
         fix_tokens = example.tokens and any(example.tokens)
         return bool(
-            fix_tokens and span.token_start and span.token_end and span.token_start < span.token_end
+            fix_tokens
+            and span.token_start
+            and span.token_end
+            and span.token_start < span.token_end
         )
 
     for s in example.spans:
@@ -173,7 +183,9 @@ def strip_annotations(
 
 
 @operation("recon.split_sentences.v1", pre=["recon.spacy.v1"])
-def split_sentences(example: Example, preprocessed_outputs: Dict[str, Any] = {}) -> List[Example]:
+def split_sentences(
+    example: Example, preprocessed_outputs: Dict[str, Any] = {}
+) -> List[Example]:
     """Split a single example into multiple examples by splitting the text into
     multiple sentences and resetting entity and token offsets based on offsets
     relative to sentence boundaries
