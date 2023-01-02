@@ -89,6 +89,7 @@ exclude = [
     ".venv",
     "build",
     "dist",
+    "recon/prodigy/recipes.py"
 ]
 
 # Allow unused variables when underscore-prefixed.

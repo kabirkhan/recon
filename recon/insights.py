@@ -213,9 +213,7 @@ def top_prediction_errors(
                 ranked_errors_map[pe_hash] = pe
 
     ranked_errors: List[PredictionError] = sorted(
-        list(ranked_errors_map.values()),
-        key=lambda error: error.count,
-        reverse=True
+        list(ranked_errors_map.values()), key=lambda error: error.count, reverse=True
     )
     error_texts = set()
     for re in ranked_errors:

@@ -1,9 +1,6 @@
 
 .DEFAULT_GOAL := all
-autoflake = poetry run autoflake --remove-all-unused-imports --recursive --remove-unused-variables --expand-star-imports --in-place docs/src/ recon tests --exclude=__init__.py
-flake8 = poetry run flake8 --ignore E501,E203,W503 recon tests
-isort = poetry run isort recon tests
-black = poetry run black -S -l 88 --target-version py39 --preview recon tests
+black = poetry run black -S -l 88 --target-version py39 --preview recon tests docs/src
 pyright = poetry run pyright
 ruff = poetry run ruff recon tests docs/src
 
@@ -15,15 +12,12 @@ install:
 
 .PHONY: format
 format:
-	# $(autoflake)
-	$(isort)
 	$(black)
 	$(ruff) --fix
 
 .PHONY: lint
 lint:
 	$(ruff)
-	$(isort) --check-only --df
 	$(black) --check --diff
 
 .PHONY: pyright

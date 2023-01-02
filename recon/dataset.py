@@ -198,7 +198,7 @@ class Dataset:
             *args,
             initial_state=initial_state,  # type: ignore
             verbose=self._verbose,  # type: ignore
-            **kwargs
+            **kwargs,
         )
         msg.good(f"Completed operation '{name}'")
 
@@ -390,12 +390,7 @@ class Dataset:
 
         for op_name, state in operations_to_run.items():
             op = registry.operations.get(op_name)
-            self.apply_(
-                op,
-                *state.args,
-                initial_state=state,
-                **state.kwargs
-            )
+            self.apply_(op, *state.args, initial_state=state, **state.kwargs)
 
         return self
 
