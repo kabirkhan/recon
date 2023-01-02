@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import typer
+
 from recon import Corpus
 
 

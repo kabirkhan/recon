@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import typer
+
 from recon.corpus import Corpus
 from recon.stats import get_ner_stats
 

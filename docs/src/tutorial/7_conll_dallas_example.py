@@ -1,6 +1,6 @@
 from recon import Dataset
-from recon.types import Example, Span
 from recon.operations.tokenization import *  # noqa
+from recon.types import Example, Span
 
 
 def main():

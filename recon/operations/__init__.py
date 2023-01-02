@@ -37,5 +37,5 @@ __all__ = [
     "filter_overlaps",
     "remove_overlapping_entities",
     "select_subset_of_overlapping_chain",
-    "upcase_labels"
+    "upcase_labels",
 ]
