@@ -1,3 +1,5 @@
+# type: ignore
+
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
 
 import prodigy
