@@ -47,7 +47,8 @@ def from_prodigy(prodigy_dataset: str) -> List[Example]:
         prodigy_dataset (str): Name of prodigy dataset to load from
 
     Raises:
-        ValueError: If trying to load examples from a dataset that doesn't exist in prodigy
+        ValueError: If trying to load examples from a dataset
+            that doesn't exist in prodigy
 
     Returns:
         List[Example]: List of Recon examples
@@ -60,7 +61,8 @@ def from_prodigy(prodigy_dataset: str) -> List[Example]:
         prodigy_examples = db.get_dataset_examples(prodigy_dataset)
         if not prodigy_examples:
             raise ValueError(
-                f"Prodigy dataset with name {prodigy_dataset} does not exist. Available datasets are: \n {', '.join(db.datasets)}"
+                f"Prodigy dataset with name {prodigy_dataset} does not exist. Available"
+                f" datasets are: \n {', '.join(db.datasets)}"
             )
         examples = [Example(**e) for e in prodigy_examples]
         return examples

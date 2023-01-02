@@ -12,7 +12,8 @@ def fix_tokenization_and_spacing(
     """Fix tokenization and spacing issues where there are annotation spans that
     don't fall on a token boundary. This can happen if annotations are done at the
     character level, not the token level. Often, when scraping web text it's easy to
-    get two words pushed together where one is an entity so this can fix a lot of issues.
+    get two words pushed together where one is an
+    entity so this can fix a lot of issues.
 
     Args:
         example (Example): Input Example
@@ -43,12 +44,14 @@ def fix_tokenization_and_spacing(
 
         if span.start in token_starts and span.end not in token_ends:
             # Span start aligns to token_start but end doesn't
-            # e.g. [customer][PERSONTYPE]s but should be annotated as [customers][PERSONTYPE]
+            # e.g. [customer][PERSONTYPE]s but should be annotated as
+            # [customers][PERSONTYPE]
             # tokenization_errors.append((example, span))
             # print("BAD END")
             if span.end + 1 in token_ends:
                 # Likely off by 1 annotation
-                # e.g. [customer][PERSONTYPE]s but should be annotated as [customers][PERSONTYPE]
+                # e.g. [customer][PERSONTYPE]s but should be annotated as
+                # [customers][PERSONTYPE]
                 span.end += 1
                 span.text = example.text[span.start : span.end]
                 # print("SPAN CORRECTED OFF BY 1", example.text, span)
@@ -57,16 +60,23 @@ def fix_tokenization_and_spacing(
                 span.text = example.text[span.start : span.end]
             else:
                 # Likely bad tokenization
-                # e.g. [Quadling][GPE]Country should be split to [Quadling][GPE] Country
+                # e.g. [Quadling][GPE]Country should be split to
+                # [Quadling][GPE] Country
                 for j in range(span_i + 1, len(example.spans)):
                     spans_to_increment[j] += 1
                 fe_text = example.text
 
                 split_start = span.start
-                if len(spans_to_increment) > 1 and span_i != list(spans_to_increment.keys())[0]:
+                if (
+                    len(spans_to_increment) > 1
+                    and span_i != list(spans_to_increment.keys())[0]
+                ):
                     split_start += spans_to_increment.get(span_i, 0)
                 split_end = span.end
-                if len(spans_to_increment) > 1 and span_i != list(spans_to_increment.keys())[0]:
+                if (
+                    len(spans_to_increment) > 1
+                    and span_i != list(spans_to_increment.keys())[0]
+                ):
                     split_end += spans_to_increment.get(span_i, 0)
                 new_text = f"{fe_text[:split_start]}{span.text} {fe_text[split_end:]}"
 
@@ -74,7 +84,8 @@ def fix_tokenization_and_spacing(
 
         elif span.start not in token_starts and span.end in token_ends:
             # Bad tokenization
-            # e.g. with[Raymond][PERSON] but text should be split to with [Raymond][PERSON]
+            # e.g. with[Raymond][PERSON] but text should be split to with
+            # [Raymond][PERSON]
             # print("BAD START", span.text)
             # tokenization_errors.append((example, span))
             for j in range(span_i, len(example.spans)):
@@ -83,10 +94,16 @@ def fix_tokenization_and_spacing(
             fe_text = example.text
 
             split_start = span.start
-            if len(spans_to_increment) > 1 and span_i != list(spans_to_increment.keys())[0]:
+            if (
+                len(spans_to_increment) > 1
+                and span_i != list(spans_to_increment.keys())[0]
+            ):
                 split_start += spans_to_increment.get(span_i, 0)
             split_end = span.end
-            if len(spans_to_increment) > 1 and span_i != list(spans_to_increment.keys())[0]:
+            if (
+                len(spans_to_increment) > 1
+                and span_i != list(spans_to_increment.keys())[0]
+            ):
                 split_end += spans_to_increment.get(span_i, 0)
 
             new_text = f"{fe_text[:split_start]} {span.text}{fe_text[split_end:]}"
@@ -98,7 +115,9 @@ def fix_tokenization_and_spacing(
             span.end
             # tokenization_errors.append((example, span))
 
-            # if (before >= 0 and after < len(span.text) and span[before] not in token_starts and span[before] != ' ' and span[after] not in token_ends and span[after] != ' '):
+            # if (before >= 0 and after < len(span.text) and span[before]
+            # not in token_starts and span[before] != ' ' and span[after]
+            #  not in token_ends and span[after] != ' '):
             #     fe_text = example.text
             #     new_text = f"{fe_text[:span.start]} {span.text}{fe_text[span.end:]}"
             #     spans_to_increment[span_i] += 1
@@ -119,7 +138,10 @@ def fix_tokenization_and_spacing(
 
 @operation("recon.add_tokens.v1", pre=["recon.spacy.v1"])
 def add_tokens(
-    example: Example, *, use_spacy_token_ends: bool = False, preprocessed_outputs: Dict[str, Any]
+    example: Example,
+    *,
+    use_spacy_token_ends: bool = False,
+    preprocessed_outputs: Dict[str, Any],
 ) -> Optional[Example]:
     """Add tokens to each Example
 

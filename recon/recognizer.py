@@ -69,7 +69,12 @@ class EntityRecognizer:
         table_data = []
         for label, scores in sorted(sc.ents_per_type.items(), key=lambda tup: tup[0]):
             table_data.append(
-                (label, f"{scores['p']:.3f}", f"{scores['r']:.3f}", f"{scores['f']:.3f}")
+                (
+                    label,
+                    f"{scores['p']:.3f}",
+                    f"{scores['r']:.3f}",
+                    f"{scores['f']:.3f}",
+                )
             )
         header = ("Label", "Precision", "Recall", "F-Score")
         msg.table(table_data, header=header, divider=True)
@@ -126,7 +131,10 @@ class SpacyEntityRecognizer(EntityRecognizer):
                     )
                     for e in doc.ents
                 ],
-                tokens=[Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc],
+                tokens=[
+                    Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i)
+                    for t in doc
+                ],
             )
 
     def _evaluate(self, data: List[Example]) -> Scores:

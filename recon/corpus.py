@@ -34,7 +34,8 @@ class Corpus:
             name (str): Name of the Corpus
             train (Dataset): Dataset containing examples for **train** set
             dev (Dataset): Dataset containing examples for **dev** set
-            test (Optional[Dataset]): Optional Dataset containing examples for **test** set
+            test (Optional[Dataset]): Optional Dataset containing examples
+                for **test** set
             example_store (Optional[ExampleStore]): Optional ExampleStore
         """
         self._name = name
@@ -150,10 +151,12 @@ class Corpus:
 
         Args:
             func (Callable[[List[Example], Any, Any], Any]):
-                Function from an existing recon module that can operate on a List of examples
+                Function from an existing recon module that can
+                operate on a List of examples
 
         Returns:
-            CorpusApplyResult: CorpusApplyResult mapping dataset name to return type of func Callable
+            CorpusApplyResult: CorpusApplyResult mapping dataset
+                name to return type of func Callable
         """
 
         return CorpusApplyResult(
@@ -201,9 +204,12 @@ class Corpus:
 
         Args:
             data_dir (Path): directory to load from.
-            train_name (str, optional): Name of train data under data_dir. Defaults to train.
-            dev_name (str, optional): Name of dev data under data_dir. Defaults to dev.
-            test_name (str, optional): Name of test data under data_dir. Defaults to test.
+            train_name (str, optional): Name of train data under data_dir.
+                Defaults to train.
+            dev_name (str, optional): Name of dev data under data_dir.
+                Defaults to dev.
+            test_name (str, optional): Name of test data under data_dir.
+                Defaults to test.
         """
         data_dir = ensure_path(data_dir)
 
@@ -241,7 +247,8 @@ class Corpus:
 
         if not overwrite and data_dir.exists():
             raise ValueError(
-                "Output directory is not empty. Set overwrite=True in Corpus.to_disk to clear the directory before saving."
+                "Output directory is not empty. Set overwrite=True in Corpus.to_disk to"
+                " clear the directory before saving."
             )
 
         data_dir.mkdir(parents=True, exist_ok=True)
@@ -267,9 +274,12 @@ class Corpus:
 
         Args:
             name: Corpus name
-            prodigy_train_datasets (List[str]): Prodigy datasets to load as Recon train dataset
-            prodigy_dev_datasets (List[str]): Prodigy datasets to load as Recon dev dataset
-            prodigy_test_datasets (Optional[List[str]]): Prodigy datasets to load as Recon test dataset
+            prodigy_train_datasets (List[str]): Prodigy datasets to load
+                as Recon train dataset
+            prodigy_dev_datasets (List[str]): Prodigy datasets to load as
+                Recon dev dataset
+            prodigy_test_datasets (Optional[List[str]]): Prodigy datasets to load as
+                Recon test dataset
 
         Returns:
             Corpus: Corpus initialized from prodigy datasets
@@ -277,7 +287,9 @@ class Corpus:
         train_ds = Dataset("train").from_prodigy(prodigy_train_datasets)
         dev_ds = Dataset("dev").from_prodigy(prodigy_dev_datasets)
         test_ds = (
-            Dataset("test").from_prodigy(prodigy_test_datasets) if prodigy_test_datasets else None
+            Dataset("test").from_prodigy(prodigy_test_datasets)
+            if prodigy_test_datasets
+            else None
         )
 
         ds = cls(name, train_ds, dev_ds, test_ds)

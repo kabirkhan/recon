@@ -1,6 +1,16 @@
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
 
 import spacy
 import srsly
@@ -58,7 +68,8 @@ class Dataset:
             annotations added
             annotations corrected
 
-            for annotations deleted/added/corrected, include mapping from old Example hash to new Example hash
+            for annotations deleted/added/corrected, include mapping from old
+            Example hash to new Example hash
             that can be decoded for display later
 
     All operations are serializable in the to_disk and from_disk methods.
@@ -148,7 +159,8 @@ class Dataset:
 
         Args:
             func (Callable[[List[Example], Any], Any]):
-                Function from an existing recon module that can operate on a List of examples
+                Function from an existing recon module that can operate
+                on a List of examples
 
         Returns:
             Result of running func on List of examples
@@ -175,11 +187,19 @@ class Dataset:
 
         name = getattr(operation, "name", None)
         if not name:
-            raise ValueError("This function is not an operation since it does not have a name.")
+            raise ValueError(
+                "This function is not an operation since it does not have a name."
+            )
 
         msg = Printer(no_print=not self._verbose)
         msg.text(f"=> Applying operation '{name}' to dataset '{self.name}'")
-        result: OperationResult = operation(self, *args, initial_state=initial_state, verbose=self._verbose, **kwargs)  # type: ignore
+        result: OperationResult = operation(
+            self,
+            *args,
+            initial_state=initial_state,  # type: ignore
+            verbose=self._verbose,  # type: ignore
+            **kwargs,
+        )
         msg.good(f"Completed operation '{name}'")
 
         self._operations.append(result.state)
@@ -222,7 +242,8 @@ class Dataset:
                 initial_state = op
             else:
                 raise ValueError(
-                    "Operation is not resolvable. Must be a name for a registered operation or an instance of OperationState."
+                    "Operation is not resolvable. Must be a name for a registered"
+                    " operation or an instance of OperationState."
                 )
 
             operation = registry.operations.get(op_name)
@@ -248,10 +269,13 @@ class Dataset:
         """
 
         if n < 1:
-            raise ValueError(f"Cannot rollback dataset: provided n: ({n}) must be 1 or higher.")
+            raise ValueError(
+                f"Cannot rollback dataset: provided n: ({n}) must be 1 or higher."
+            )
         elif n > len(self.operations):
             raise ValueError(
-                f"Cannot rollback dataset: provided n ({n}) is larger than the total number of dataset operations."
+                f"Cannot rollback dataset: provided n ({n}) is larger than the total"
+                " number of dataset operations."
             )
 
         store = self.example_store
@@ -277,11 +301,13 @@ class Dataset:
             del self._example_store._map[e]  # type: ignore
 
     def search(self, search_query: str, case_sensitive: bool = True) -> List[Example]:
-        """Naive search method to quickly identify examples matching the provided substring
+        """Naive search method to quickly identify examples
+        matching the provided substring
 
         Args:
             search_query (str): Substring to search each example for
-            case_sensitive (bool, optional): Consider case of search query and example text
+            case_sensitive (bool, optional): Consider case of search
+                query and example text
 
         Returns:
             List[Example]: Matched examples
@@ -297,7 +323,8 @@ class Dataset:
         return out_examples
 
     def set_example_store(self, example_store: ExampleStore) -> None:
-        """Overwrite the the internal ExampleStore. You probably don't want to call this.
+        """Overwrite the the internal ExampleStore.
+        You probably don't want to call this.
         Used by the Corpus to ensure the ExampleStore of each dataset is complete.
 
         Args:
@@ -311,14 +338,16 @@ class Dataset:
 
         Args:
             path (Path): path to load from
-            loader_func (Callable, optional): Callable that reads a file and returns a List of examples.
+            loader_func (Callable, optional): Callable that reads a file and
+                returns a List of examples.
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         path = ensure_path(path)
         state = None
         if (path / ".recon" / self.name).exists():
             state = cast(
-                Dict[str, Any], srsly.read_json(path / ".recon" / self.name / "state.json")
+                Dict[str, Any],
+                srsly.read_json(path / ".recon" / self.name / "state.json"),
             )
             state = DatasetOperationsState(**state)
             self._operations = state.operations
@@ -361,12 +390,15 @@ class Dataset:
 
         for op_name, state in operations_to_run.items():
             op = registry.operations.get(op_name)
-            self.apply_(op, *state.args, initial_state=state, **state.kwargs)  # type: ignore
+            self.apply_(op, *state.args, initial_state=state, **state.kwargs)
 
         return self
 
     def to_disk(
-        self, output_dir: Union[str, Path], overwrite: bool = False, save_examples: bool = True
+        self,
+        output_dir: Union[str, Path],
+        overwrite: bool = False,
+        save_examples: bool = True,
     ) -> None:
         """Save Corpus to Disk
 
@@ -380,7 +412,8 @@ class Dataset:
         state_dir = output_dir / ".recon" / self.name
         if not overwrite and output_dir.exists():
             raise ValueError(
-                "Output directory is not empty. Set overwrite=True in Dataset.to_disk to clear the directory before saving."
+                "Output directory is not empty. Set overwrite=True in Dataset.to_disk"
+                " to clear the directory before saving."
             )
 
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -388,7 +421,10 @@ class Dataset:
             state_dir.mkdir(parents=True, exist_ok=True)
 
         state = DatasetOperationsState(
-            name=self.name, commit=self.commit_hash, size=len(self), operations=self.operations
+            name=self.name,
+            commit=self.commit_hash,
+            size=len(self),
+            operations=self.operations,
         )
         srsly.write_json(state_dir / "state.json", state.dict())
 
@@ -396,12 +432,14 @@ class Dataset:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
 
         srsly.write_jsonl(
-            output_dir / f"{self.name}.jsonl", [e.dict(exclude_unset=True) for e in self.data]
+            output_dir / f"{self.name}.jsonl",
+            [e.dict(exclude_unset=True) for e in self.data],
         )
 
     def from_prodigy(self, prodigy_datasets: List[str]) -> "Dataset":
-        """Need to have from_prodigy accept multiple datasets as a list of str so Prodigy
-        can stay separate and new annotation sessions can happen often. Basically prodigy db-merge
+        """Need to have from_prodigy accept multiple datasets as a
+        list of str so Prodigy can stay separate and new annotation
+        sessions can happen often. Basically prodigy db-merge
 
         Need to save to only 1 prodigy dataset though for consistency
 
@@ -420,7 +458,9 @@ class Dataset:
         self._data = data
         return self
 
-    def to_prodigy(self, prodigy_dataset: Optional[str] = None, overwrite: bool = True) -> str:
+    def to_prodigy(
+        self, prodigy_dataset: Optional[str] = None, overwrite: bool = True
+    ) -> str:
         """Save examples to prodigy dataset
 
         Args:
@@ -482,10 +522,17 @@ class Dataset:
             tokens = e[tokens_prop]
             doc = Doc(nlp.vocab, words=tokens, spaces=[True] * len(tokens), ents=tags)
             spans = [
-                Span(text=ent.text, start=ent.start_char, end=ent.end_char, label=ent.label_)
+                Span(
+                    text=ent.text,
+                    start=ent.start_char,
+                    end=ent.end_char,
+                    label=ent.label_,
+                )
                 for ent in doc.ents
             ]
-            tokens = [Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc]
+            tokens = [
+                Token(text=t.text, start=t.idx, end=t.idx + len(t), id=t.i) for t in doc
+            ]
             examples.append(Example(text=doc.text, spans=spans, tokens=tokens))
         self._data = examples
         return self

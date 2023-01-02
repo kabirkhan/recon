@@ -1,5 +1,7 @@
-"""Utils for running operations and resolving parameters dynamically. The utilties for resolving parameters dynamically are
-based on the functionality from FastAPI's process of resolving route params and request bodies to Pydantic Models"""
+"""Utils for running operations and resolving parameters dynamically.
+The utilties for resolving parameters dynamically are
+based on the functionality from FastAPI's process of resolving
+route params and request bodies to Pydantic Models"""
 
 
 import functools
@@ -62,7 +64,9 @@ def is_scalar_field(field: ModelField) -> bool:
 
 
 def is_scalar_sequence_field(field: ModelField) -> bool:
-    if (field.shape in sequence_shapes) and not lenient_issubclass(field.type_, BaseModel):
+    if (field.shape in sequence_shapes) and not lenient_issubclass(
+        field.type_, BaseModel
+    ):
         if field.sub_fields is not None:
             for sub_field in field.sub_fields:
                 if not is_scalar_field(sub_field):
@@ -128,7 +132,8 @@ def create_response_field(
         return response_field(field_info=field_info)
     except RuntimeError:
         raise ValueError(
-            f"Invalid args for response field! Hint: check that {type_} is a valid pydantic field type"
+            f"Invalid args for response field! Hint: check that {type_} is a valid"
+            " pydantic field type"
         )
 
 
@@ -188,7 +193,6 @@ def request_body_to_args(
             received_body = {field.alias: received_body}
 
         for field in required_params:
-
             loc: Tuple[str, ...]
             if field_alias_omitted:
                 loc = ("body",)
@@ -229,7 +233,8 @@ def get_required_operation_params(op: Callable) -> Dict[str, ModelField]:
     """Get required typed parameters for an operation
 
     Based on logic for JSON resolution to Pydantic types implemented by FastAPI
-    Reference: https://github.com/tiangolo/fastapi/blob/master/fastapi/dependencies/utils.py
+    Reference:
+        https://github.com/tiangolo/fastapi/blob/master/fastapi/dependencies/utils.py
 
     Args:
         op (Callable): Inner Callable of a recon operation
@@ -266,9 +271,10 @@ def get_received_operation_data(
     """Resolve serialized args and kwargs data of an operation to their Pydantic types
 
     Args:
-        required_params (Dict[str, ModelField]): Mapping of field name to Pydantic ModelField for
-            required parameters of the callable
-        state (OperationState): Operation state including serialized args and kwargs data
+        required_params (Dict[str, ModelField]): Mapping of field name to
+            Pydantic ModelField for required parameters of the callable
+        state (OperationState): Operation state including
+            serialized args and kwargs data
 
     Returns:
         Dict[str, Any]: Kwargs mapping of deserialized params to pass to the operation

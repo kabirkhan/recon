@@ -34,7 +34,8 @@ def get_ner_stats(data: List[Example], return_examples: bool = False) -> Stats:
                 examples[s.label].append(e)
 
     sorted_anns_by_count = {
-        a[0]: a[1] for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
+        a[0]: a[1]
+        for a in sorted(annotations_per_type.items(), key=lambda x: x[1], reverse=True)
     }
 
     stats = Stats(
@@ -64,12 +65,15 @@ def get_sorted_type_counts(ner_stats: Stats) -> List[int]:
     return [t[1] for t in sorted(annotations_per_type.items(), key=lambda p: p[0])]
 
 
-def calculate_label_distribution_similarity(x: List[Example], y: List[Example]) -> float:
+def calculate_label_distribution_similarity(
+    x: List[Example], y: List[Example]
+) -> float:
     """Calculate the similarity of the label distribution for 2 datasets.
 
-    e.g. This can help you understand how well your train set models your dev and test sets.
-    Empircally you want a similarity over **0.8** when comparing your train set to each of your
-    dev and test sets.
+    e.g. This can help you understand how well your train
+    set models your dev and test sets.
+    Empircally you want a similarity over **0.8**
+    when comparing your train set to each of your dev and test sets.
 
         calculate_label_distribution_similarity(corpus.train, corpus.dev)
         # 98.57
@@ -108,14 +112,16 @@ def get_entity_coverage(
 
     Args:
         data (List[Example]): List of examples
-        sep (str, optional): Separator used in coverage map, only change if || exists in your text
-            or label.
+        sep (str, optional): Separator used in coverage map, only change if
+            || exists in your text or label.
         case_sensitive (bool, optional): Consider case of text for each annotation
-        return_examples (bool, optional): Return Examples that contain the entity label annotation.
+        return_examples (bool, optional): Return Examples that contain the
+            entity label annotation.
 
     Returns:
-        List[EntityCoverage]: Sorted List of EntityCoverage objects containing the text, label, count, and
-            an optional list of examples where that text/label annotation exists.
+        List[EntityCoverage]: Sorted List of EntityCoverage objects
+            containing the text, label, count, and an optional list of examples
+            where that text/label annotation exists.
     """
     coverage_map: DefaultDict[str, int] = defaultdict(int)
     examples_map: DefaultDict[str, List[Example]] = defaultdict(list)
@@ -139,14 +145,17 @@ def get_entity_coverage(
     return sorted_coverage
 
 
-def calculate_entity_coverage_similarity(x: List[Example], y: List[Example]) -> EntityCoverageStats:
+def calculate_entity_coverage_similarity(
+    x: List[Example], y: List[Example]
+) -> EntityCoverageStats:
     """Calculate how well dataset x covers the entities in dataset y.
     This function should be used to calculate how similar your train set
     annotations cover the annotations in your dev/test set
 
     Args:
         x (List[Example]): Dataset to compare coverage to (usually corpus.train)
-        y (List[Example]): Dataset to evaluate coverage for (usually corpus.dev or corpus.test)
+        y (List[Example]): Dataset to evaluate coverage for
+            (usually corpus.dev or corpus.test)
 
     Returns:
         EntityCoverageStats: Stats with
@@ -218,7 +227,9 @@ def _entropy(seq: Union[List[int], List[float]], total: Optional[int] = None) ->
         seq = cast(List[int], seq)
         res = scipy_entropy(get_probs_from_counts(seq))
     else:
-        raise ValueError("Parameter seq must be a sequence of probabilites or integers.")
+        raise ValueError(
+            "Parameter seq must be a sequence of probabilites or integers."
+        )
     return float(res)
 
 

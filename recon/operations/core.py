@@ -13,11 +13,11 @@ from typing import (
     Union,
 )
 
+import catalogue
 from pydantic.error_wrappers import ErrorWrapper
 from tqdm import tqdm
 from wasabi import Printer
 
-from recon.operations import registry as op_registry
 from recon.operations.utils import (
     get_received_operation_data,
     get_required_operation_params,
@@ -36,6 +36,13 @@ from recon.types import (
 
 if TYPE_CHECKING:
     from recon import Dataset
+
+
+class registry:
+    operations = catalogue.create("recon", "operations", entry_points=True)
+    operation_factories = catalogue.create(
+        "recon", "operation_factories", entry_points=True
+    )
 
 
 def op_iter(
@@ -58,7 +65,10 @@ def op_iter(
         msg.info(f"\t=> Running preprocessor {processor.name}")
         processor_outputs = processor(data)
         for example, output in tqdm(
-            zip(data, processor_outputs), total=len(data), disable=(not verbose), leave=False
+            zip(data, processor_outputs),
+            total=len(data),
+            disable=(not verbose),
+            leave=False,
         ):
             preprocessed_outputs[example][processor.name] = output
             example.__setattr__(processor.field, output)
@@ -114,8 +124,10 @@ class operation:
             assert isinstance(preprocessor, PreProcessor)
             pre.append(preprocessor)
 
-        op_registry.operations.register(self.name)(
-            Operation(self.name, pre, op, self.handles_tokens, augmentation=self.augmentation)
+        registry.operations.register(self.name)(
+            Operation(
+                self.name, pre, op, self.handles_tokens, augmentation=self.augmentation
+            )
         )
         return op
 
@@ -176,14 +188,17 @@ class Operation:
 
         def track_add_example(new_example: Example) -> None:
             state.transformations.append(
-                Transformation(example=hash(new_example), type=TransformationType.EXAMPLE_ADDED)
+                Transformation(
+                    example=hash(new_example), type=TransformationType.EXAMPLE_ADDED
+                )
             )
             dataset.example_store.add(new_example)
 
         def track_remove_example(orig_example_hash: int) -> None:
             state.transformations.append(
                 Transformation(
-                    prev_example=orig_example_hash, type=TransformationType.EXAMPLE_REMOVED
+                    prev_example=orig_example_hash,
+                    type=TransformationType.EXAMPLE_REMOVED,
                 )
             )
 
@@ -207,7 +222,8 @@ class Operation:
             warnings.warn(
                 # fmt: off
                 "This dataset seems to have preset tokens. "
-                f"Operation: {self.name} is not currently capable of handling tokens and you will "
+                F"Operation: {self.name} is not currently capable of "
+                "handling tokens and you will "
                 "need to reset tokenization after this operation. "
                 "Applying the `recon.add_tokens.v1` operation after this "
                 "operation is complete will get you back to a clean state."
@@ -222,7 +238,9 @@ class Operation:
         errors: List[ErrorWrapper] = []
 
         if received_data:
-            values, errors = request_body_to_args(list(required_params.values()), received_data)
+            values, errors = request_body_to_args(
+                list(required_params.values()), received_data
+            )
 
         if errors:
             error_msg = (
@@ -242,7 +260,9 @@ class Operation:
             it = op_iter(dataset.data, self.pre, verbose=verbose)
             for orig_example_hash, example, preprocessed_outputs in it:
                 if preprocessed_outputs:
-                    res = self.op(example, preprocessed_outputs=preprocessed_outputs, **values)
+                    res = self.op(
+                        example, preprocessed_outputs=preprocessed_outputs, **values
+                    )
                 else:
                     res = self.op(example, **values)
 
@@ -268,8 +288,12 @@ class Operation:
 
         transformation_counts = Counter([t.type for t in state.transformations])
         state.examples_added = transformation_counts[TransformationType.EXAMPLE_ADDED]
-        state.examples_removed = transformation_counts[TransformationType.EXAMPLE_REMOVED]
-        state.examples_changed = transformation_counts[TransformationType.EXAMPLE_CHANGED]
+        state.examples_removed = transformation_counts[
+            TransformationType.EXAMPLE_REMOVED
+        ]
+        state.examples_changed = transformation_counts[
+            TransformationType.EXAMPLE_CHANGED
+        ]
         state.status = OperationStatus.COMPLETED
 
         state_copy = state.copy(deep=True)
@@ -277,4 +301,4 @@ class Operation:
         return OperationResult(data=new_data, state=state_copy)
 
     def register(self) -> None:
-        op_registry.operations.register(self.name)(self)
+        registry.operations.register(self.name)(self)

@@ -5,7 +5,6 @@ from recon.stats import get_entity_coverage
 
 
 def main():
-
     # Load the Conll Corpus
     corpus = Corpus.from_disk("./examples/data/conll2003", "conll2003")
 

@@ -6,9 +6,11 @@ prodigy = pytest.importorskip("prodigy")
 
 
 def test_corpus_to_from_prodigy(example_corpus: Corpus):
-    prodigy_train_dataset, prodigy_dev_dataset, prodigy_test_dataset = example_corpus.to_prodigy(
-        overwrite=True
-    )
+    (
+        prodigy_train_dataset,
+        prodigy_dev_dataset,
+        prodigy_test_dataset,
+    ) = example_corpus.to_prodigy(overwrite=True)
     name = example_corpus.name
 
     corpus_loaded = Corpus.from_prodigy(

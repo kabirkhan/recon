@@ -1,17 +1,14 @@
-# isort:skip_file
 # type: ignore
 # -*- coding: utf-8 -*-
-import typer
 from pathlib import Path
 
-from recon.corpus import Corpus
-from recon.stats import (
-    get_ner_stats,
-)
+import typer
+import uvicorn
+from fastapi import FastAPI
 from wasabi import Printer
 
-from fastapi import FastAPI
-import uvicorn
+from recon.corpus import Corpus
+from recon.stats import get_ner_stats
 
 app = FastAPI()
 
@@ -50,7 +47,11 @@ def dashboard(data_dir: Path) -> None:
     #     "https://cdn.jsdelivr.net/npm/uikit@3.3.7/dist/js/uikit-icons.min.js"
     # ]
 
-    # app = dash.Dash(__name__, external_stylesheets=external_stylesheets, external_scripts=external_scripts)
+    # app = dash.Dash(
+    #     __name__,
+    #     external_stylesheets=external_stylesheets,
+    #     external_scripts=external_scripts
+    # )
 
     # def generate_bar_chart_stats(id: str, ner_stats: Stats, name: str = None):
     #     return dcc.Graph(

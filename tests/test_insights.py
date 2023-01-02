@@ -7,7 +7,9 @@ from recon.insights import (
 from recon.recognizer import SpacyEntityRecognizer
 
 
-def test_top_label_disparities(example_corpus: Corpus, example_corpus_processed: Corpus):
+def test_top_label_disparities(
+    example_corpus: Corpus, example_corpus_processed: Corpus
+):
     top_disparities = top_label_disparities(example_corpus.all)
     assert len(top_disparities) == 8
 
@@ -18,17 +20,23 @@ def test_top_label_disparities(example_corpus: Corpus, example_corpus_processed:
     top_disparities_processed = top_label_disparities(example_corpus_processed.all)
     assert len(top_disparities_processed) == 2
 
-    top_disparities_processed = top_label_disparities(example_corpus_processed.all, dedupe=True)
+    top_disparities_processed = top_label_disparities(
+        example_corpus_processed.all, dedupe=True
+    )
     assert len(top_disparities_processed) == 1
     assert top_disparities_processed[0].count == 2
 
 
-def test_top_prediction_errors(recognizer: SpacyEntityRecognizer, example_corpus: Corpus):
+def test_top_prediction_errors(
+    recognizer: SpacyEntityRecognizer, example_corpus: Corpus
+):
     pred_errors = top_prediction_errors(recognizer, example_corpus.test)
     assert len(pred_errors) == 67
 
 
-def test_get_hardest_examples(recognizer: SpacyEntityRecognizer, example_corpus: Corpus):
+def test_get_hardest_examples(
+    recognizer: SpacyEntityRecognizer, example_corpus: Corpus
+):
     hardest_examples = get_hardest_examples(recognizer, example_corpus.test)
 
     hardest_examples_no_count = get_hardest_examples(
@@ -36,5 +44,7 @@ def test_get_hardest_examples(recognizer: SpacyEntityRecognizer, example_corpus:
     )
 
     assert len(hardest_examples) == len(example_corpus.test)
-    assert hardest_examples[0].reference.text.startswith("Some of the free Apache Tomcat")
+    assert hardest_examples[0].reference.text.startswith(
+        "Some of the free Apache Tomcat"
+    )
     assert hardest_examples_no_count[0].reference.text.startswith("Visual Basic was")

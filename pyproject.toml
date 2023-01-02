@@ -58,6 +58,7 @@ mkdocs-material = "*"
 markdown-include = ">= 0.5.1, < 0.6.0"
 mkdocstrings-python = "*"
 pyright = "^1.1.272"
+ruff = "^0.0.192"
 
 [tool.poetry.extras]
 jupyter = ["jupyterlab >= 3.0", "ipywidgets"]
@@ -72,23 +73,33 @@ recon = "recon.cli:app"
 "recon.ner_correct" = "recon:prodigy_recipes.recon_ner_correct_v1"
 "recon.ner_merge" = "recon:prodigy_recipes.recon_ner_merge_v1"
 
-[tool.black]
-line-length = 100
-target-version = ['py39']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.venv
-  | docker
-)/
-'''
-
-[tool.isort]
-profile = "black"
-known_first_party = ["recon"]
-
 [tool.pyright]
 include = ["recon"]
 reportInvalidStringEscapeSequence = false
 reportMissingImports = false
+
+[tool.ruff]
+line-length = 88
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "build",
+    "dist",
+    "recon/prodigy/recipes.py"
+]
+
+extend-select = ["I001"]
+src = ["recon", "tests", "docs/src"]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.10.
+target-version = "py310"
+
+[tool.ruff.isort]
+known-first-party = ["recon"]

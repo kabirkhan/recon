@@ -9,7 +9,6 @@ from recon.types import Example
 
 
 def test_corpus_initialize(example_data: Dict[str, List[Example]]):
-
     train_ds = Dataset("train")
     dev_ds = Dataset("dev")
 

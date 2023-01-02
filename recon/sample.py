@@ -12,9 +12,10 @@ def hash_example_meta(
 
     Args:
         example (Example): Input Example
-        fields (List[str]): Meta fields to use in hash. Defaults to all availabile fields.
-        ignore_field_absence (bool, optional): Determines behavior of when a field does not exist
-            in an example's meta property
+        fields (List[str]): Meta fields to use in hash.
+            Defaults to all availabile fields.
+        ignore_field_absence (bool, optional): Determines behavior of when
+            a field does not exist in an example's meta property
 
     Raises:
         ValueError: If a field passed to fields does not exist in an example's meta
@@ -31,7 +32,9 @@ def hash_example_meta(
         if field not in example.meta:
             if ignore_field_absence:
                 continue
-            raise ValueError(f"Field {field} not present in 'meta' for example {example}")
+            raise ValueError(
+                f"Field {field} not present in 'meta' for example {example}"
+            )
         meta_val = example.meta[field]
         if isinstance(meta_val, list):
             tpl += meta_val
@@ -54,10 +57,12 @@ def sample_examples(
 
     Args:
         examples (List[Example]): Examples to sample from
-        meta_filters (Dict[str, List[str]], optional): Values to filter out of sampled set for each meta field.
-        fields (List[str], optional): Meta fields to use in hash. Defaults to all availabile fields.
-        ignore_field_absence (bool, optional): Determines behavior of when a field does not exist
-            in an example's meta property.
+        meta_filters (Dict[str, List[str]], optional): Values to filter
+            out of sampled set for each meta field.
+        fields (List[str], optional): Meta fields to use in hash.
+            Defaults to all availabile fields.
+        ignore_field_absence (bool, optional): Determines behavior
+            of when a field does not exist in an example's meta property.
         top_k_per_hash (int, optional): Number of examples to include per meta hash.
         top_k (int, optional): Total number of examples to sample from.
 
@@ -72,7 +77,6 @@ def sample_examples(
         random.shuffle(examples)
 
     for example in examples:
-
         if top_k > 0 and sum(examples_counter.values()) >= top_k:
             break
 
