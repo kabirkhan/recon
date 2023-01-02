@@ -215,7 +215,8 @@ class Operation:
             warnings.warn(
                 # fmt: off
                 "This dataset seems to have preset tokens. "
-                f"Operation: {self.name} is not currently capable of handling tokens and you will "
+                F"Operation: {self.name} is not currently capable of "
+                "handling tokens and you will "
                 "need to reset tokenization after this operation. "
                 "Applying the `recon.add_tokens.v1` operation after this "
                 "operation is complete will get you back to a clean state."

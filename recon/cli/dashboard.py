@@ -50,7 +50,11 @@ def dashboard(data_dir: Path) -> None:
     #     "https://cdn.jsdelivr.net/npm/uikit@3.3.7/dist/js/uikit-icons.min.js"
     # ]
 
-    # app = dash.Dash(__name__, external_stylesheets=external_stylesheets, external_scripts=external_scripts)
+    # app = dash.Dash(
+    #     __name__,
+    #     external_stylesheets=external_stylesheets,
+    #     external_scripts=external_scripts
+    # )
 
     # def generate_bar_chart_stats(id: str, ner_stats: Stats, name: str = None):
     #     return dcc.Graph(

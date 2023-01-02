@@ -62,7 +62,8 @@ def from_spacy(
     Args:
         path (Path): Path to data
         nlp (Language, optional): Spacy Language object.
-        lang_code (str, optional): Language code to create a blank spacy model with if nlp is not provided.
+        lang_code (str, optional): Language code to create a
+            blank spacy model with if nlp is not provided.
 
     Yields:
         Iterable[Example]: List of typed Examples
@@ -103,7 +104,8 @@ def to_spacy(
         path (Path): Path to data
         data (Iterable[Example]): Input Examples
         nlp (Language, optional): Spacy Language object.
-        lang_code (str, optional): Language code to create a blank spacy model with if nlp is not provided.
+        lang_code (str, optional): Language code to create a blank
+            spacy model with if nlp is not provided.
 
     Returns:
         DocBin: Spacy DocBin with stored example data.

@@ -38,8 +38,9 @@ def filter_overlaps(example: Example) -> Example:
 
 def select_subset_of_overlapping_chain(chain: List[Span]) -> List[Span]:
     """
-    Select the subset of entities in an overlapping chain to return by greedily choosing the
-    longest entity in the chain until there are no entities remaining
+    Select the subset of entities in an overlapping chain to
+    return by greedily choosing the longest entity in the chain
+    until there are no entities remaining
     """
     sorted_chain = sorted(chain, key=lambda s: s.end - s.start, reverse=True)
     selections_from_chain: List[Span] = []

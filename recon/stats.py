@@ -70,9 +70,10 @@ def calculate_label_distribution_similarity(
 ) -> float:
     """Calculate the similarity of the label distribution for 2 datasets.
 
-    e.g. This can help you understand how well your train set models your dev and test sets.
-    Empircally you want a similarity over **0.8** when comparing your train set to each of your
-    dev and test sets.
+    e.g. This can help you understand how well your train
+    set models your dev and test sets.
+    Empircally you want a similarity over **0.8**
+    when comparing your train set to each of your dev and test sets.
 
         calculate_label_distribution_similarity(corpus.train, corpus.dev)
         # 98.57
@@ -111,14 +112,16 @@ def get_entity_coverage(
 
     Args:
         data (List[Example]): List of examples
-        sep (str, optional): Separator used in coverage map, only change if || exists in your text
-            or label.
+        sep (str, optional): Separator used in coverage map, only change if
+            || exists in your text or label.
         case_sensitive (bool, optional): Consider case of text for each annotation
-        return_examples (bool, optional): Return Examples that contain the entity label annotation.
+        return_examples (bool, optional): Return Examples that contain the
+            entity label annotation.
 
     Returns:
-        List[EntityCoverage]: Sorted List of EntityCoverage objects containing the text, label, count, and
-            an optional list of examples where that text/label annotation exists.
+        List[EntityCoverage]: Sorted List of EntityCoverage objects
+            containing the text, label, count, and an optional list of examples
+            where that text/label annotation exists.
     """
     coverage_map: DefaultDict[str, int] = defaultdict(int)
     examples_map: DefaultDict[str, List[Example]] = defaultdict(list)
@@ -151,7 +154,8 @@ def calculate_entity_coverage_similarity(
 
     Args:
         x (List[Example]): Dataset to compare coverage to (usually corpus.train)
-        y (List[Example]): Dataset to evaluate coverage for (usually corpus.dev or corpus.test)
+        y (List[Example]): Dataset to evaluate coverage for
+            (usually corpus.dev or corpus.test)
 
     Returns:
         EntityCoverageStats: Stats with

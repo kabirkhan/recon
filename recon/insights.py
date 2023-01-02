@@ -21,9 +21,10 @@ def get_ents_by_label(
 ) -> DefaultDict[str, DefaultDict[str, Set[Example]]]:
     """Get a dictionary of unique text spans by label for your data
 
-    We want to return a dictionary that maps labels to AnnotationCount objects where each
-    AnnotationCount contains the text of the annotation text, the total number of times
-    it's mentioned (e.g. what entity_coverage does) but also the examples it is in.
+    We want to return a dictionary that maps labels to AnnotationCount
+    objects where each AnnotationCount contains the text of the annotation text,
+    the total number of times it's mentioned (e.g. what entity_coverage does)
+    but also the examples it is in.
 
     Args:
         data (List[Example]): List of examples
@@ -55,7 +56,8 @@ def get_label_disparities(
         case_sensitive (bool, optional): Consider case of text for each annotation
 
     Returns:
-        Dict[str, List[Example]]: Set of all unique text spans that overlap between label1 and label2
+        Dict[str, List[Example]]: Set of all unique text spans that
+            overlap between label1 and label2
     """
     annotations = get_ents_by_label(data, case_sensitive=case_sensitive)
     overlap = set(annotations[label1]).intersection(set(annotations[label2]))
@@ -78,12 +80,13 @@ def top_label_disparities(
     Args:
         data (List[Example]): Input List of examples
         case_sensitive (bool, optional): Consider case of text for each annotation
-        dedupe (bool, optional): Whether to deduplicate for table view vs confusion matrix.
-            False by default for easy confusion matrix display.
+        dedupe (bool, optional): Whether to deduplicate for table
+            view vs confusion matrix. False by default for easy
+            confusion matrix display.
 
     Returns:
-        List[LabelDisparity]: List of LabelDisparity objects for each label pair combination
-            sorted by the number of disparities between them.
+        List[LabelDisparity]: List of LabelDisparity objects for each
+            label pair combination sorted by the number of disparities between them.
     """
     annotations = get_ents_by_label(data, case_sensitive=case_sensitive)
     label_disparities = {}
@@ -126,11 +129,12 @@ def top_prediction_errors(
         exclude_fp (bool, optional): Flag to exclude False Positive errors.
         exclude_fn (bool, optional): Flag to exclude False Negative errors.
         verbose (bool, optional): Show verbose output.
-        return_examples (bool, optional): Return Examples that contain the entity label annotation.
+        return_examples (bool, optional): Return Examples that
+            contain the entity label annotation.
 
     Returns:
-        List[PredictionError]: List of Prediction Errors your model is making, sorted by the
-            spans your model has the most trouble with.
+        List[PredictionError]: List of Prediction Errors your model is making,
+            sorted by the spans your model has the most trouble with.
     """
     labels = labels or recognizer.labels
     texts = (e.text for e in data)
@@ -209,7 +213,9 @@ def top_prediction_errors(
                 ranked_errors_map[pe_hash] = pe
 
     ranked_errors: List[PredictionError] = sorted(
-        list(ranked_errors_map.values()), key=lambda error: error.count, reverse=True  # type: ignore
+        list(ranked_errors_map.values()),
+        key=lambda error: error.count,
+        reverse=True
     )
     error_texts = set()
     for re in ranked_errors:
@@ -238,14 +244,16 @@ def get_hardest_examples(
     score_count: bool = True,
     normalize_scores: bool = True,
 ) -> List[HardestExample]:
-    """Get hardest examples for a recognizer to predict on and sort by difficulty with the goal
-    of quickly identifying the biggest holes in a model / annotated data.
+    """Get hardest examples for a recognizer to predict on and sort by
+    difficulty with the goal of quickly identifying the biggest holes
+    in a model / annotated data.
 
     Args:
         recognizer (EntityRecognizer): EntityRecognizer to test predictions for
         examples (List[Example]): Set of input examples
         score_count (bool): Adjust score by total number of errors
-        normalize_scores (bool): Scale scores to range [0, 1] adjusted by total number of errors
+        normalize_scores (bool): Scale scores to range [0, 1] adjusted by
+            total number of errors
 
     Returns:
         List[HardestExample]: HardestExamples sorted by difficulty (hardest first)
@@ -287,8 +295,9 @@ def get_hardest_examples(
 def get_annotation_labels(
     examples: List[Example], case_sensitive: bool = False
 ) -> Dict[str, Dict[str, list]]:
-    """Constructs a map of each annotation in the list of examples to each label that annotation
-    has and references all examples associated with that label.
+    """Constructs a map of each annotation in the list of examples
+    to each label that annotation has and references all examples
+    associated with that label.
 
     Args:
         examples (List[Example]): Input examples
