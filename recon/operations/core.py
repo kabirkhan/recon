@@ -13,11 +13,11 @@ from typing import (
     Union,
 )
 
+import catalogue
 from pydantic.error_wrappers import ErrorWrapper
 from tqdm import tqdm
 from wasabi import Printer
 
-from recon.operations import registry as op_registry
 from recon.operations.utils import (
     get_received_operation_data,
     get_required_operation_params,
@@ -36,6 +36,13 @@ from recon.types import (
 
 if TYPE_CHECKING:
     from recon import Dataset
+
+
+class registry:
+    operations = catalogue.create("recon", "operations", entry_points=True)
+    operation_factories = catalogue.create(
+        "recon", "operation_factories", entry_points=True
+    )
 
 
 def op_iter(
@@ -117,7 +124,7 @@ class operation:
             assert isinstance(preprocessor, PreProcessor)
             pre.append(preprocessor)
 
-        op_registry.operations.register(self.name)(
+        registry.operations.register(self.name)(
             Operation(
                 self.name, pre, op, self.handles_tokens, augmentation=self.augmentation
             )
@@ -294,4 +301,4 @@ class Operation:
         return OperationResult(data=new_data, state=state_copy)
 
     def register(self) -> None:
-        op_registry.operations.register(self.name)(self)
+        registry.operations.register(self.name)(self)

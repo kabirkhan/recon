@@ -1,6 +1,4 @@
-import catalogue
-
-from .core import Operation, operation
+from .core import Operation, operation, registry
 from .corrections import (
     corrections_from_dict,
     fix_annotations,
@@ -16,14 +14,6 @@ from .validation import (
     upcase_labels,
 )
 
-
-class registry:
-    operations = catalogue.create("recon", "operations", entry_points=True)
-    operation_factories = catalogue.create(
-        "recon", "operation_factories", entry_points=True
-    )
-
-
 __all__ = [
     "corrections_from_dict",
     "fix_annotations",
@@ -38,4 +28,5 @@ __all__ = [
     "remove_overlapping_entities",
     "select_subset_of_overlapping_chain",
     "upcase_labels",
+    "registry",
 ]
