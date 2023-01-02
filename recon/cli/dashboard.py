@@ -1,17 +1,14 @@
-# isort:skip_file
 # type: ignore
 # -*- coding: utf-8 -*-
-import typer
 from pathlib import Path
 
-from recon.corpus import Corpus
-from recon.stats import (
-    get_ner_stats,
-)
+import typer
+import uvicorn
+from fastapi import FastAPI
 from wasabi import Printer
 
-from fastapi import FastAPI
-import uvicorn
+from recon.corpus import Corpus
+from recon.stats import get_ner_stats
 
 app = FastAPI()
 

@@ -4,7 +4,7 @@ from typing import Dict, List, cast
 import pytest
 
 from recon.dataset import Dataset
-from recon.operations.corrections import corrections_from_dict
+from recon.operations import *  # noqa
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import Correction, Example, OperationStatus, Stats, TransformationType
@@ -15,7 +15,7 @@ def test_dataset_initialize(example_data: Dict[str, List[Example]]):
     assert dataset.name == "train"
     assert dataset.data == []
     assert dataset.example_store._map == {}
-    assert dataset.commit_hash == "d18f9b6611eb8e16"
+    assert dataset.commit_hash == "f77b5babe973a588"
     assert dataset.operations == []
 
     store = ExampleStore()
@@ -23,7 +23,7 @@ def test_dataset_initialize(example_data: Dict[str, List[Example]]):
     assert dataset2.name == "dev"
     assert dataset2.data == example_data["dev"]
     assert dataset2.example_store == store
-    assert dataset2.commit_hash == "6253c7cdc08bcbca"
+    assert dataset2.commit_hash == "38e4d473a730eeda"
     assert dataset2.operations == []
 
 
@@ -37,7 +37,7 @@ def test_dataset_commit_hash(example_data: Dict[str, List[Example]]):
     train_dataset.data.append(example_data["train"][-1])
 
     assert train_dataset.commit_hash != train_commit
-    assert hash(train_dataset) == 2389582605943205983
+    assert hash(train_dataset) == 4565895994400721087
 
 
 def test_len(example_data: Dict[str, List[Example]]):
