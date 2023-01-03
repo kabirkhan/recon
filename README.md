@@ -9,7 +9,8 @@
     <img src="https://img.shields.io/pypi/v/reconner?style=for-the-badge" alt="PyPi Package version">
 </a>
 <a href="https://github.com/kabirkhan/recon/actions/workflows/ci.yml" target="_blank">
-    <img alt="GitHub Actions Build badge" src="https://img.shields.io/github/workflow/status/kabirkhan/recon/CI?style=for-the-badge">
+    <img alt="GitHub Actions Build badge" src="https://img.shields.io/github/actions/workflow/status/kabirkhan/recon/.github/workflows/ci.yml?branch=main&style=for-the-badge">
+
 </a>
 <a href="https://codecov.io/gh/kabirkhan/recon" rel="nofollow">
   <img alt="Codecov badge" src="https://img.shields.io/codecov/c/gh/kabirkhan/recon?style=for-the-badge" style="max-width:100%;">
