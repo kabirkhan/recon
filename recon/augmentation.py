@@ -90,7 +90,7 @@ def augment_example(
 
     augmented_examples = {example}
 
-    for i in range(n_augs):
+    for _ in range(n_augs):
         example = example.copy(deep=True)
         if span_label:
             spans = [s for s in spans if s.label == span_label]
@@ -132,8 +132,10 @@ def ent_label_sub(
             e.g. PERSON or LOCATION
         subs (List[str]): List of substitutions
             e.g. list of names if label is PERSON
-        n_augs (int, optional): Maximum number of augmentated examples to create per example.
-        sub_prob (float, optional): Probability from 0-1 inclusive of how many of the spans to replace
+        n_augs (int, optional): Maximum number of augmentated examples to
+            create per example.
+        sub_prob (float, optional): Probability from 0-1
+            inclusive of how many of the spans to replace
 
     Returns:
         List[Example]: List of augmented examples including the original.
@@ -187,70 +189,3 @@ def kb_expansion(
         sub_prob=sub_prob,
         spans_to_aliases_map=spans_to_aliases_map,
     )
-
-
-# def get_synonym(word, pos=None):
-#     """Get synonym for word given its part-of-speech (pos)."""
-#     synsets = wn.synsets(word, pos=pos)
-#     # Return None if wordnet has no synsets (synonym sets) for this word and pos.
-#     if synsets:
-#         print(synsets[0])
-#         words = [lemma.name() for lemma in synsets[0].lemmas()]
-#         if words[0].lower() != word.lower():  # Skip if synonym is same as word.
-#             # Multi word synonyms in wordnet use '_' as a separator e.g. reckon_with. Replace it with space.
-#             return words[0].replace("_", " ")
-
-
-# @operation("recon.augment.replace_pos_with_synonym.v1", pre=[spacy_pre])
-# def replace_pos_with_synonym(example: Example, pos: str, synonym_f: Callable[[str], str] = get_synonym, preprocessed_outputs={}, n_augs: int = 1):
-
-#     pos_map = {
-#         "VERB": "v",
-#         "NOUN": "n",
-#         "ADJ": "a"
-#     }
-
-#     if pos not in pos_map:
-#         raise ValueError(f"Argument `pos` of {pos} not in {''.join(pos_map.keys())}")
-
-#     doc = example.data.doc
-#     span_starts = [s.start for s in example.spans]
-
-#     # Get indices of verb tokens in sentence.
-#     pos_idxs = [i for i, token in enumerate(doc) if token.pos_ == pos and token.idx not in span_starts]
-#     tokens = [doc[idx] for idx in pos_idxs]
-#     spans = [Span(text=token.text, start=token.idx, end=token.idx + len(token.text), label="") for token in tokens]
-
-#     def augmentation(span: Span, synonym_f: Callable[[str], str] = synonym_f) -> Optional[str]:
-#         return synonym_f(span.text)
-
-#     return augment_example(
-#         example,
-#         augmentation,
-#         spans=spans,
-#         n_augs=n_augs,
-#         sub_prob=sub_prob,
-#         spans_to_aliases_map=spans_to_aliases_map,
-#     )
-
-#     for i in range(n_augs):
-#         example = example.copy(deep=True)
-
-#         if pos_idxs:
-#             # Pick random verb idx to replace.
-#             idx = np.random.choice(pos_idxs)
-#             token = doc[idx]
-#             synonym = get_synonyms(token.text, pos="v")
-#             synonym = "enjoy"
-#             print(synonym)
-
-
-#             # If there's a valid verb synonym, replace it. Otherwise, return None.
-#             if synonym:
-#                 curr_span = Span(text=token.text, start=token.idx, end=token.idx + len(token.text), label="")
-#                 span_subs = {curr_span: synonym}
-#                 example = substitute_spans(example, span_subs)
-#                 if example not in augmented_examples:
-#                     augmented_examples.add(example)
-
-#     return list(augmented_examples)

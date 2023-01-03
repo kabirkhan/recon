@@ -229,8 +229,7 @@ def change_shim(example_hash: int, new_example: Example) -> None:
 
 
 def track_shim(
-    example_hash: Optional[int] = None,
-    new_example: Optional[Example] = None
+    example_hash: Optional[int] = None, new_example: Optional[Example] = None
 ) -> None:
     return None
 

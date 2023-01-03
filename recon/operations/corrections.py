@@ -40,10 +40,12 @@ def fix_annotations(
 
     Args:
         example (Example): Input Example
-        corrections (Dict[str, str]): Dictionary of corrections mapping entity text to a new label.
+        corrections (Dict[str, str]): Dictionary of corrections mapping
+            entity text to a new label.
             If the value is set to None, the annotation will be removed
         case_sensitive (bool, optional): Consider case of text for each correction
-        dryrun (bool, optional): Treat corrections as a dryrun and just print all changes to be made
+        dryrun (bool, optional): Treat corrections as a dryrun
+            and just print all changes to be made
 
     Returns:
         Example: Example with fixed annotations
@@ -96,7 +98,8 @@ def fix_annotations(
 def corrections_from_dict(corrections_dict: Dict[str, Any]) -> List[Correction]:
     """Create a list of Correction objects from a simpler config for
     corrections using a Dict representation mapping keys to either the label to
-    convert to or a tuple of (from_label, to_label) pairings or (List[from_labels], to_label)
+    convert to or a tuple of (from_label, to_label) pairings or
+    (List[from_labels], to_label)
     pairings if you want to convert as subset of labels at a time
 
     Args:

@@ -68,7 +68,8 @@ class Dataset:
             annotations added
             annotations corrected
 
-            for annotations deleted/added/corrected, include mapping from old Example hash to new Example hash
+            for annotations deleted/added/corrected, include mapping from old
+            Example hash to new Example hash
             that can be decoded for display later
 
     All operations are serializable in the to_disk and from_disk methods.
@@ -158,7 +159,8 @@ class Dataset:
 
         Args:
             func (Callable[[List[Example], Any], Any]):
-                Function from an existing recon module that can operate on a List of examples
+                Function from an existing recon module that can operate
+                on a List of examples
 
         Returns:
             Result of running func on List of examples
@@ -191,7 +193,13 @@ class Dataset:
 
         msg = Printer(no_print=not self._verbose)
         msg.text(f"=> Applying operation '{name}' to dataset '{self.name}'")
-        result: OperationResult = operation(self, *args, initial_state=initial_state, verbose=self._verbose, **kwargs)  # type: ignore
+        result: OperationResult = operation(
+            self,
+            *args,
+            initial_state=initial_state,  # type: ignore
+            verbose=self._verbose,  # type: ignore
+            **kwargs,
+        )
         msg.good(f"Completed operation '{name}'")
 
         self._operations.append(result.state)
@@ -293,11 +301,13 @@ class Dataset:
             del self._example_store._map[e]  # type: ignore
 
     def search(self, search_query: str, case_sensitive: bool = True) -> List[Example]:
-        """Naive search method to quickly identify examples matching the provided substring
+        """Naive search method to quickly identify examples
+        matching the provided substring
 
         Args:
             search_query (str): Substring to search each example for
-            case_sensitive (bool, optional): Consider case of search query and example text
+            case_sensitive (bool, optional): Consider case of search
+                query and example text
 
         Returns:
             List[Example]: Matched examples
@@ -313,7 +323,8 @@ class Dataset:
         return out_examples
 
     def set_example_store(self, example_store: ExampleStore) -> None:
-        """Overwrite the the internal ExampleStore. You probably don't want to call this.
+        """Overwrite the the internal ExampleStore.
+        You probably don't want to call this.
         Used by the Corpus to ensure the ExampleStore of each dataset is complete.
 
         Args:
@@ -327,7 +338,8 @@ class Dataset:
 
         Args:
             path (Path): path to load from
-            loader_func (Callable, optional): Callable that reads a file and returns a List of examples.
+            loader_func (Callable, optional): Callable that reads a file and
+                returns a List of examples.
                 Defaults to [read_jsonl][recon.loaders.read_jsonl]
         """
         path = ensure_path(path)
@@ -378,7 +390,7 @@ class Dataset:
 
         for op_name, state in operations_to_run.items():
             op = registry.operations.get(op_name)
-            self.apply_(op, *state.args, initial_state=state, **state.kwargs)  # type: ignore
+            self.apply_(op, *state.args, initial_state=state, **state.kwargs)
 
         return self
 
@@ -425,8 +437,9 @@ class Dataset:
         )
 
     def from_prodigy(self, prodigy_datasets: List[str]) -> "Dataset":
-        """Need to have from_prodigy accept multiple datasets as a list of str so Prodigy
-        can stay separate and new annotation sessions can happen often. Basically prodigy db-merge
+        """Need to have from_prodigy accept multiple datasets as a
+        list of str so Prodigy can stay separate and new annotation
+        sessions can happen often. Basically prodigy db-merge
 
         Need to save to only 1 prodigy dataset though for consistency
 

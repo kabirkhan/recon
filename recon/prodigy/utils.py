@@ -47,7 +47,8 @@ def from_prodigy(prodigy_dataset: str) -> List[Example]:
         prodigy_dataset (str): Name of prodigy dataset to load from
 
     Raises:
-        ValueError: If trying to load examples from a dataset that doesn't exist in prodigy
+        ValueError: If trying to load examples from a dataset
+            that doesn't exist in prodigy
 
     Returns:
         List[Example]: List of Recon examples

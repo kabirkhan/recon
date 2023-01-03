@@ -1,5 +1,7 @@
-"""Utils for running operations and resolving parameters dynamically. The utilties for resolving parameters dynamically are
-based on the functionality from FastAPI's process of resolving route params and request bodies to Pydantic Models"""
+"""Utils for running operations and resolving parameters dynamically.
+The utilties for resolving parameters dynamically are
+based on the functionality from FastAPI's process of resolving
+route params and request bodies to Pydantic Models"""
 
 
 import functools
@@ -231,7 +233,8 @@ def get_required_operation_params(op: Callable) -> Dict[str, ModelField]:
     """Get required typed parameters for an operation
 
     Based on logic for JSON resolution to Pydantic types implemented by FastAPI
-    Reference: https://github.com/tiangolo/fastapi/blob/master/fastapi/dependencies/utils.py
+    Reference:
+        https://github.com/tiangolo/fastapi/blob/master/fastapi/dependencies/utils.py
 
     Args:
         op (Callable): Inner Callable of a recon operation
@@ -268,9 +271,10 @@ def get_received_operation_data(
     """Resolve serialized args and kwargs data of an operation to their Pydantic types
 
     Args:
-        required_params (Dict[str, ModelField]): Mapping of field name to Pydantic ModelField for
-            required parameters of the callable
-        state (OperationState): Operation state including serialized args and kwargs data
+        required_params (Dict[str, ModelField]): Mapping of field name to
+            Pydantic ModelField for required parameters of the callable
+        state (OperationState): Operation state including
+            serialized args and kwargs data
 
     Returns:
         Dict[str, Any]: Kwargs mapping of deserialized params to pass to the operation

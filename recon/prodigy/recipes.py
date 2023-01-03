@@ -1,4 +1,3 @@
-# isort:skip_file
 # type: ignore
 
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
