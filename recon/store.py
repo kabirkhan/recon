@@ -58,10 +58,8 @@ class ExampleStore:
         examples = srsly.read_jsonl(path)
         for e in examples:
             e = cast(Dict[str, Any], e)
-            example_hash = e["example_hash"]
             raw_example = e["example"]
             example = Example(**raw_example)
-            assert hash(example) == example_hash
             self.add(example)
 
         return self

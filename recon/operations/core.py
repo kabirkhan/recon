@@ -248,6 +248,8 @@ class Operation:
                 + "with provided args and kwargs values. "
             )
             for err in errors:
+                if isinstance(err, list):
+                    err = err[0]
                 error_msg += str(err.exc)
                 print(values)
             raise ValueError(error_msg)

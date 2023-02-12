@@ -377,7 +377,7 @@ class Dataset:
             )
 
             for op in self._operations:
-                op._status = OperationStatus.NOT_STARTED
+                op.status = OperationStatus.NOT_STARTED
 
         operations_to_run: Dict[str, OperationState] = {}
         for op in self._operations:

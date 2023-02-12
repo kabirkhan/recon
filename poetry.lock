@@ -131,7 +131,7 @@ srsly = ">=2.4.0,<3.0.0"
 
 [[package]]
 name = "coverage"
-version = "7.0.0"
+version = "7.1.0"
 description = "Code coverage measurement for Python"
 category = "dev"
 optional = false
@@ -702,6 +702,14 @@ python-versions = ">=3.6"
 pyyaml = "*"
 
 [[package]]
+name = "radicli"
+version = "0.0.3"
+description = "Radically lightweight command-line interfaces"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[[package]]
 name = "requests"
 version = "2.28.1"
 description = "Python HTTP for Humans."
@@ -1009,7 +1017,7 @@ prodigy = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">= 3.8, < 3.11"
-content-hash = "665731cf37e4f52959f3e923f8bc8dbe18110bc22ef7033cf0508b9fe5178d5d"
+content-hash = "70f1aff144a39358a27fbc1c90bf6f2f7468837e895cbbd86b4261c7c4a9091d"
 
 [metadata.files]
 attrs = []
@@ -1194,6 +1202,7 @@ pyyaml-env-tag = [
     {file = "pyyaml_env_tag-0.1-py3-none-any.whl", hash = "sha256:af31106dec8a4d68c60207c1886031cbf839b68aa7abccdb19868200532c2069"},
     {file = "pyyaml_env_tag-0.1.tar.gz", hash = "sha256:70092675bda14fdec33b31ba77e7543de9ddc88f2e5b99160396572d11525bdb"},
 ]
+radicli = []
 requests = []
 ruff = []
 scipy = [

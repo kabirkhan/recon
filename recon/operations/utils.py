@@ -187,7 +187,7 @@ def request_body_to_args(
     if required_params:
         field = required_params[0]
         field_info = field.field_info
-        embed = getattr(field_info, "embed", None)
+        embed = getattr(field_info, "embed", True)
         field_alias_omitted = len(required_params) == 1 and not embed
         if field_alias_omitted:
             received_body = {field.alias: received_body}
@@ -214,7 +214,6 @@ def request_body_to_args(
                 continue
 
             v_, errors_ = field.validate(value, values, loc=loc)
-
             if isinstance(errors_, ErrorWrapper):
                 errors.append(errors_)
             elif isinstance(errors_, list):

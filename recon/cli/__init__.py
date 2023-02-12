@@ -1,30 +1,11 @@
-# flake8: noqa
+from ._util import cli, setup_cli
 
-import typer
-
-from recon.cli.stats import stats
-
-app = typer.Typer(no_args_is_help=True)
+from .stats import stats
 
 
-commands = [stats]
-for command in commands:
-    app.command(no_args_is_help=True)(command)
-
-
-@app.callback()
-def main() -> None:
-    """
-    \b
-     _____    ______    _____    ____    _   _
-    |  __ \  |  ____|  / ____|  / __ \  | \ | |
-    | |__) | | |__    | |      | |  | | |  \| |
-    |  _  /  |  __|   | |      | |  | | | . ` |
-    | | \ \  | |____  | |____  | |__| | | |\  |
-    |_|  \_\ |______|  \_____|  \____/  |_| \_|
-    """
-    pass
+def main():
+    cli.run()
 
 
 if __name__ == "__main__":
-    app()
+    main()

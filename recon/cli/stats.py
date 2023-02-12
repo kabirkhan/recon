@@ -3,12 +3,19 @@ from typing import cast
 
 from wasabi import Printer
 
+from radicli import Arg, ExistingDirPath
+
+from ._util import cli
 from recon.corpus import Corpus
 from recon.stats import calculate_label_distribution_similarity, get_ner_stats
 from recon.types import Stats
 
 
-def stats(data_dir: Path) -> None:
+@cli.command(
+    "stats",
+    data_dir=Arg(help="Path to corpus folder to print stats for"),
+)
+def stats(data_dir: ExistingDirPath) -> None:
     """Calculate statistics on a Corpus
 
     Args:
