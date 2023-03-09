@@ -2,7 +2,8 @@
 The utilties for resolving parameters dynamically are
 based on the functionality from FastAPI's process of resolving
 route params and request bodies to Pydantic Models"""
-
+from pathlib import Path
+from typing import Union
 
 import functools
 import inspect
@@ -294,3 +295,17 @@ def get_received_operation_data(
             received_data[param_field.name] = arg
 
     return received_data
+
+
+def ensure_path(path: Union[str, Path]) -> Path:
+    """Ensure string is converted to a Path.
+
+    Args:
+        path (Union[str, Path]): str or path. If string, it's converted to Path.
+    Returns:
+        Path: Pathlib Path object for the provided input
+    """
+    if isinstance(path, str):
+        return Path(path)
+    else:
+        return path

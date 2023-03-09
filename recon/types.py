@@ -2,7 +2,8 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Callable, Dict, Iterable, List, Optional, Protocol, Tuple, Union, cast
+from typing_extensions import ParamSpec
 
 from pydantic import BaseModel, Extra, root_validator
 from spacy import displacy
@@ -17,6 +18,8 @@ from recon.hashing import (
     token_hash,
     tokenized_example_hash,
 )
+_OpParams = ParamSpec("_OpParams")
+
 
 ANSI_LABEL = 141
 ANSI_HIGHLIGHT = 222
@@ -192,10 +195,18 @@ class Example(BaseModel):
         print(result)
 
 
-OpType = Callable[[Example, Any], Any]
-BatchOpType = Callable[[List[Example], Any], Any]
-ApplyType = Union[str, BatchOpType]
-ApplyInPlaceType = Union[str, BatchOpType]
+class OperationProtocol(Protocol[_OpParams]):
+    def __call__(
+        self, example: Example, *args: _OpParams.args, **kwargs: _OpParams.kwargs
+    ) -> Union[Example, Iterable[Example], None]:
+        ...
+
+
+class ApplyProtocol(Protocol[_OpParams]):
+    def __call__(
+        self, examples: List[Example], *args: _OpParams.args, **kwargs: _OpParams.kwargs
+    ) -> Any:
+        ...
 
 
 class Entity(BaseModel):

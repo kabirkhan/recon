@@ -4,8 +4,7 @@ from typing import Dict, List, cast
 import pytest
 
 from recon.dataset import Dataset
-from recon.operations import *  # noqa
-from recon.operations.corrections import corrections_from_dict
+from recon.corrections import corrections_from_dict
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import Correction, Example, OperationStatus, Stats, TransformationType

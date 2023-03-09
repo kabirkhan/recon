@@ -2,7 +2,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 
-from recon.operations.core import operation
+from recon.operations import operation
 from recon.types import Example, Span
 
 

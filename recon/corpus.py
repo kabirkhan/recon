@@ -12,7 +12,7 @@ from recon.types import (
     OperationResult,
     OperationState,
 )
-from recon.utils import ensure_path
+from recon.util import ensure_path
 
 
 class Corpus:
@@ -141,7 +141,7 @@ class Corpus:
     def print_summary(self) -> None:
         print(self.summary())
 
-    def __str(self) -> str:
+    def __str__(self) -> str:
         return self.summary()
 
     def apply(
