@@ -297,9 +297,7 @@ class Operation:
             TransformationType.EXAMPLE_CHANGED
         ]
         state.status = OperationStatus.COMPLETED
-
         state_copy = state.copy(deep=True)
-        state = OperationState(name=self.name)
         return OperationResult(data=new_data, state=state_copy)
 
     def register(self) -> None:

@@ -224,11 +224,6 @@ class Dataset:
                 args = []
                 kwargs = {}
                 initial_state = None
-            elif isinstance(op, Operation):
-                op_name = op.name
-                args = op.args
-                kwargs = op.kwargs
-                initial_state = op
             else:
                 raise ValueError(
                     "Operation is not resolvable. Must be a name for a registered"

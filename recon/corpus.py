@@ -4,13 +4,13 @@ from typing import Any, Callable, List, Optional, Tuple, Union
 import srsly
 
 from recon.dataset import Dataset
+from recon.operations import Operation
 from recon.store import ExampleStore
 from recon.types import (
     CorpusApplyResult,
     CorpusMeta,
     Example,
-    OperationResult,
-    OperationState,
+    StatsProtocol,
 )
 from recon.util import ensure_path
 
@@ -145,14 +145,16 @@ class Corpus:
         return self.summary()
 
     def apply(
-        self, func: Callable[[List[Example], Any], Any], *args: Any, **kwargs: Any
+        self, func: Union[str, StatsProtocol], *args: Any, **kwargs: Any
     ) -> CorpusApplyResult:
         """Apply a function to all datasets
 
         Args:
-            func (Callable[[List[Example], Any, Any], Any]):
-                Function from an existing recon module that can
-                operate on a List of examples
+            func (Union[str, StatsProtocol]):
+                Function that operates on a list of examples and returns
+                some result. Useful for running the same stats operation
+                for each dataset. If a str is provided, a function is resolved
+                from the stat functions registry
 
         Returns:
             CorpusApplyResult: CorpusApplyResult mapping dataset
@@ -167,19 +169,20 @@ class Corpus:
         )
 
     def apply_(
-        self, operation: Callable[[Any], OperationResult], *args: Any, **kwargs: Any
+        self, operation: Union[str, Operation], *args: Any, **kwargs: Any
     ) -> None:
-        """Apply a function to all data inplace.
+        """Apply an operation to each Dataset via `Dataset.apply_`
 
         Args:
-            operation (Callable[[Any], OperationResult]): Any operation that
-                changes data in place. See recon.operations.registry.operations
+            operation (Union[str, Operation]): An Operation to modify the
+                Dataset with.
+            Defers to `Dataset.apply_`
         """
         self._train.apply_(operation, *args, **kwargs)
         self._dev.apply_(operation, *args, **kwargs)
         self._test.apply_(operation, *args, **kwargs)
 
-    def pipe_(self, operations: List[Union[str, OperationState]]) -> None:
+    def pipe_(self, operations: List[Union[str, Operation]]) -> None:
         """Run a sequence of operations on each dataset.
         Calls Dataset.pipe_ for each dataset
 
