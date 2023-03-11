@@ -1,30 +1,12 @@
 import warnings
 from collections import Counter, defaultdict
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Protocol,
-    Tuple,
-    Union,
-)
-from typing_extensions import ParamSpec
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple, Union
 
 import catalogue
 from pydantic.error_wrappers import ErrorWrapper
 from tqdm import tqdm
 from wasabi import Printer
 
-from recon.util import (
-    get_received_operation_data,
-    get_required_operation_params,
-    request_body_to_args,
-)
 from recon.preprocess import PreProcessor
 from recon.preprocess import registry as pre_registry
 from recon.types import (
@@ -35,6 +17,11 @@ from recon.types import (
     OperationStatus,
     Transformation,
     TransformationType,
+)
+from recon.util import (
+    get_received_operation_data,
+    get_required_operation_params,
+    request_body_to_args,
 )
 
 if TYPE_CHECKING:
@@ -84,8 +71,10 @@ class operation:
     """Decorator for a Recon Operation. An Operation is python function that Recon
     uses will map over each example in a dataset, tracking changes made to examples
     by hash so dataset changes can back.
-    An operation has 1 required positional argument called "example" with the "recon.types.Example"
-    type. Any other arguments are allowed and can be provided by passing them to `Dataset.apply_`
+    An operation has 1 required positional argument called "example" with the
+    "recon.types.Example" type.
+    Any other arguments are allowed and can be provided by
+    passing them to `Dataset.apply_`
 
     Example operation:
 
@@ -94,6 +83,7 @@ class operation:
     def rename_labels(example: Example, *, my_kwarg1: str, my_kwarg2: str)
     ```
     """
+
     def __init__(
         self,
         name: str,
@@ -115,9 +105,7 @@ class operation:
         self.factory = factory
         self.augmentation = augmentation
 
-    def __call__(
-        self, op: OperationProtocol
-    ) -> OperationProtocol:
+    def __call__(self, op: OperationProtocol) -> OperationProtocol:
         """Decorator for an operation.
         The first arg to the op callable needs to be a example.
         Recon will take care of applying it to a full Dataset

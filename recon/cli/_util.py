@@ -2,6 +2,7 @@ from radicli import Radicli
 
 cli = Radicli()
 
+
 def setup_cli():
     cli.run()
 

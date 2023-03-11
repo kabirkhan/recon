@@ -2,7 +2,18 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, Iterable, List, Optional, Protocol, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Protocol,
+    Tuple,
+    Union,
+    cast,
+)
 from typing_extensions import ParamSpec
 
 from pydantic import BaseModel, Extra, root_validator
@@ -18,6 +29,7 @@ from recon.hashing import (
     token_hash,
     tokenized_example_hash,
 )
+
 _OpParams = ParamSpec("_OpParams")
 
 
@@ -202,9 +214,9 @@ class OperationProtocol(Protocol[_OpParams]):
         ...
 
 
-class ApplyProtocol(Protocol[_OpParams]):
+class StatsProtocol(Protocol[_OpParams]):
     def __call__(
-        self, examples: List[Example], *args: _OpParams.args, **kwargs: _OpParams.kwargs
+        self, data: List[Example], *args: _OpParams.args, **kwargs: _OpParams.kwargs
     ) -> Any:
         ...
 
@@ -356,11 +368,31 @@ class PredictionError(BaseModel):
         return cast(str, prediction_error_hash(self, as_int=False))
 
 
-class HardestExample(BaseModel):
+class ExampleDiff(BaseModel):
     reference: Example
     prediction: Example
     count: int
     score: float
+
+    def show(self, label_suffix: str = "PRED"):
+        combined = self.reference.copy(deep=True)
+        pred_spans = []
+        for s in self.prediction.spans:
+            span = s.copy(deep=True)
+            span.label = f"{s.label}:{label_suffix}"
+            pred_spans.append(span)
+        combined.spans = sorted(combined.spans + pred_spans, key=lambda s: s.start)
+        assert combined.tokens is not None
+        tokens = [token.text for token in combined.tokens]
+        words, spaces = get_words_and_spaces(tokens, combined.text)
+        doc = Doc(Vocab(), words=words, spaces=spaces)
+        doc.spans["ref"] = [
+            doc.char_span(s.start, s.end, label=s.label) for s in combined.spans
+        ]
+        displacy.render(doc, style="span", jupyter=True, options={"spans_key": "ref"})
+
+
+HardestExample = ExampleDiff
 
 
 class LabelDisparity(BaseModel):

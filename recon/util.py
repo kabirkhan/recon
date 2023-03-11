@@ -2,13 +2,11 @@
 The utilties for resolving parameters dynamically are
 based on the functionality from FastAPI's process of resolving
 route params and request bodies to Pydantic Models"""
-from pathlib import Path
-from typing import Union
-
 import functools
 import inspect
 from collections import OrderedDict
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Callable, Dict, ForwardRef, List, Optional, Tuple, Type, Union
 
 from pydantic import BaseConfig, BaseModel

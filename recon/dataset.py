@@ -1,16 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, cast
 
 import spacy
 import srsly
@@ -19,17 +9,17 @@ from wasabi import Printer
 
 from recon.hashing import dataset_hash
 from recon.loaders import from_spacy, read_jsonl, to_spacy
-from recon.operations import registry, Operation
+from recon.operations import Operation, registry
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import (
-    StatsProtocol,
     DatasetOperationsState,
     Example,
     OperationState,
     OperationStatus,
     Span,
     Stats,
+    StatsProtocol,
     Token,
     TransformationType,
 )
@@ -188,9 +178,7 @@ class Dataset:
                 operation = registered_op
 
         if not isinstance(operation, Operation):
-            raise TypeError(
-                "This is not a valid Operation."
-            )
+            raise TypeError("This is not a valid Operation.")
 
         msg = Printer(no_print=not self._verbose)
         msg.text(f"=> Applying operation '{operation.name}' to dataset '{self.name}'")
