@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Union, cast
 import srsly
 
 from recon.types import Example
-from recon.utils import ensure_path
+from recon.util import ensure_path
 
 
 class ExampleStore:

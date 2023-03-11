@@ -1,6 +1,6 @@
 from typing import List
 
-from recon.operations.core import operation
+from recon.operations import operation
 from recon.types import Example, Span
 
 

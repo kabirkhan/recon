@@ -2,7 +2,20 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Protocol,
+    Tuple,
+    Union,
+    TYPE_CHECKING,
+    cast,
+)
+from typing_extensions import ParamSpec
 
 from pydantic import BaseModel, Extra, root_validator
 from spacy import displacy
@@ -17,6 +30,12 @@ from recon.hashing import (
     token_hash,
     tokenized_example_hash,
 )
+
+if TYPE_CHECKING:
+    from pydantic.typing import ReprArgs
+
+_OpParams = ParamSpec("_OpParams")
+
 
 ANSI_LABEL = 141
 ANSI_HIGHLIGHT = 222
@@ -192,10 +211,18 @@ class Example(BaseModel):
         print(result)
 
 
-OpType = Callable[[Example, Any], Any]
-BatchOpType = Callable[[List[Example], Any], Any]
-ApplyType = Union[str, BatchOpType]
-ApplyInPlaceType = Union[str, BatchOpType]
+class OperationProtocol(Protocol[_OpParams]):
+    def __call__(
+        self, example: Example, *args: _OpParams.args, **kwargs: _OpParams.kwargs
+    ) -> Union[Example, Iterable[Example], None]:
+        ...
+
+
+class StatsProtocol(Protocol[_OpParams]):
+    def __call__(
+        self, data: List[Example], *args: _OpParams.args, **kwargs: _OpParams.kwargs
+    ) -> Any:
+        ...
 
 
 class Entity(BaseModel):
@@ -304,6 +331,9 @@ class AnnotationCount(BaseModel):
     count: int
     examples: List[Example]
 
+    def __repr_args__(self) -> 'ReprArgs':
+        return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
+
 
 class PredictionErrorExamplePair(BaseModel):
     """Dataclass representation of original Example in a PredictionError
@@ -344,12 +374,35 @@ class PredictionError(BaseModel):
     def hash(self) -> str:
         return cast(str, prediction_error_hash(self, as_int=False))
 
+    def __repr_args__(self) -> 'ReprArgs':
+        return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
-class HardestExample(BaseModel):
+
+class ExampleDiff(BaseModel):
     reference: Example
     prediction: Example
     count: int
     score: float
+
+    def show(self, label_suffix: str = "PRED"):
+        combined = self.reference.copy(deep=True)
+        pred_spans = []
+        for s in self.prediction.spans:
+            span = s.copy(deep=True)
+            span.label = f"{s.label}:{label_suffix}"
+            pred_spans.append(span)
+        combined.spans = sorted(combined.spans + pred_spans, key=lambda s: s.start)
+        assert combined.tokens is not None
+        tokens = [token.text for token in combined.tokens]
+        words, spaces = get_words_and_spaces(tokens, combined.text)
+        doc = Doc(Vocab(), words=words, spaces=spaces)
+        doc.spans["ref"] = [
+            doc.char_span(s.start, s.end, label=s.label) for s in combined.spans
+        ]
+        displacy.render(doc, style="span", jupyter=True, options={"spans_key": "ref"})
+
+
+HardestExample = ExampleDiff
 
 
 class LabelDisparity(BaseModel):
@@ -399,6 +452,9 @@ class EntityCoverage(BaseModel):
 
     def __hash__(self) -> int:
         return hash((self.text, self.label))
+
+    def __repr_args__(self) -> 'ReprArgs':
+        return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
 class EntityCoverageStats(BaseModel):

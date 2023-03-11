@@ -16,7 +16,7 @@ import spacy
 from wasabi import msg
 from recon.dataset import Dataset
 from recon.insights import get_hardest_examples
-from recon.operations.core import operation
+from recon.core import operation
 from recon.recognizer import SpacyEntityRecognizer
 from recon.types import Example, HardestExample, Span
 

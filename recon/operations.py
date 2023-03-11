@@ -1,37 +1,27 @@
 import warnings
 from collections import Counter, defaultdict
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple, Union
 
 import catalogue
 from pydantic.error_wrappers import ErrorWrapper
 from tqdm import tqdm
 from wasabi import Printer
 
-from recon.operations.utils import (
-    get_received_operation_data,
-    get_required_operation_params,
-    request_body_to_args,
-)
 from recon.preprocess import PreProcessor
 from recon.preprocess import registry as pre_registry
 from recon.types import (
     Example,
+    OperationProtocol,
     OperationResult,
     OperationState,
     OperationStatus,
     Transformation,
     TransformationType,
+)
+from recon.util import (
+    get_received_operation_data,
+    get_required_operation_params,
+    request_body_to_args,
 )
 
 if TYPE_CHECKING:
@@ -78,6 +68,22 @@ def op_iter(
 
 
 class operation:
+    """Decorator for a Recon Operation. An Operation is python function that Recon
+    uses will map over each example in a dataset, tracking changes made to examples
+    by hash so dataset changes can back.
+    An operation has 1 required positional argument called "example" with the
+    "recon.types.Example" type.
+    Any other arguments are allowed and can be provided by
+    passing them to `Dataset.apply_`
+
+    Example operation:
+
+    ```
+    @operation("my_custom_operation")
+    def rename_labels(example: Example, *, my_kwarg1: str, my_kwarg2: str)
+    ```
+    """
+
     def __init__(
         self,
         name: str,
@@ -99,22 +105,16 @@ class operation:
         self.factory = factory
         self.augmentation = augmentation
 
-    def __call__(
-        self, op: Callable[..., Union[Example, Iterable[Example], None]]
-    ) -> Callable[..., Union[Example, Iterable[Example], None]]:
+    def __call__(self, op: OperationProtocol) -> OperationProtocol:
         """Decorator for an operation.
-        The first arg to the op callable needs to be an Example.
-
-        e.g. @operation("recon.some_name", batch=True)
-
-        Or it should operate on a single example and
-        recon will take care of applying it to a full Dataset
+        The first arg to the op callable needs to be a example.
+        Recon will take care of applying it to a full Dataset
 
         Args:
-            op (Op): First arg is callable to decorate
+            op (Op): First arg is the function to decorate
 
         Returns:
-            Op: Original operation callable
+            Op: The original function
         """
         pre: List[PreProcessor] = []
 
@@ -140,7 +140,7 @@ class Operation:
         self,
         name: str,
         pre: List[PreProcessor],
-        op: Callable,
+        op: OperationProtocol,
         handles_tokens: bool,
         augmentation: bool,
     ):
@@ -297,9 +297,7 @@ class Operation:
             TransformationType.EXAMPLE_CHANGED
         ]
         state.status = OperationStatus.COMPLETED
-
         state_copy = state.copy(deep=True)
-        state = OperationState(name=self.name)
         return OperationResult(data=new_data, state=state_copy)
 
     def register(self) -> None:

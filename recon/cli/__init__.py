@@ -1,6 +1,4 @@
-from ._util import cli, setup_cli
-
-from .stats import stats
+from ._util import cli
 
 
 def main():

@@ -1,16 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, cast
 
 import spacy
 import srsly
@@ -19,22 +9,21 @@ from wasabi import Printer
 
 from recon.hashing import dataset_hash
 from recon.loaders import from_spacy, read_jsonl, to_spacy
-from recon.operations import registry
+from recon.operations import Operation, registry
 from recon.stats import get_ner_stats
 from recon.store import ExampleStore
 from recon.types import (
-    ApplyType,
     DatasetOperationsState,
     Example,
-    OperationResult,
     OperationState,
     OperationStatus,
     Span,
     Stats,
+    StatsProtocol,
     Token,
     TransformationType,
 )
-from recon.utils import ensure_path
+from recon.util import ensure_path
 
 if TYPE_CHECKING:
     try:
@@ -154,7 +143,7 @@ class Dataset:
                 return e
         raise KeyError(f"Example with hash {example_hash} does not exist")
 
-    def apply(self, func: ApplyType, *args: Any, **kwargs: Any) -> Any:
+    def apply(self, func: Union[str, StatsProtocol], *args: Any, **kwargs: Any) -> Any:
         """Apply a function to the dataset
 
         Args:
@@ -165,11 +154,14 @@ class Dataset:
         Returns:
             Result of running func on List of examples
         """
-        return func(self.data, *args, **kwargs)  # type: ignore
+        if isinstance(func, str):
+            func = registry.operations.get(func)
+        assert callable(func)
+        return func(self.data, *args, **kwargs)
 
     def apply_(
         self,
-        operation: Union[str, Callable[[Any], OperationResult]],
+        operation: Union[str, Operation],
         *args: Any,
         initial_state: Optional[OperationState] = None,
         **kwargs: Any,
@@ -181,26 +173,23 @@ class Dataset:
                 changes data in place. See recon.operations.registry.operations
         """
         if isinstance(operation, str):
-            operation = registry.operations.get(operation)
-            if operation:
-                operation = cast(Callable, operation)
+            registered_op = registry.operations.get(operation)
+            if registered_op:
+                operation = registered_op
 
-        name = getattr(operation, "name", None)
-        if not name:
-            raise ValueError(
-                "This function is not an operation since it does not have a name."
-            )
+        if not isinstance(operation, Operation):
+            raise TypeError("This is not a valid Operation.")
 
         msg = Printer(no_print=not self._verbose)
-        msg.text(f"=> Applying operation '{name}' to dataset '{self.name}'")
-        result: OperationResult = operation(
+        msg.text(f"=> Applying operation '{operation.name}' to dataset '{self.name}'")
+        result = operation(
             self,
             *args,
-            initial_state=initial_state,  # type: ignore
-            verbose=self._verbose,  # type: ignore
+            initial_state=initial_state,
+            verbose=self._verbose,
             **kwargs,
         )
-        msg.good(f"Completed operation '{name}'")
+        msg.good(f"Completed operation '{operation.name}'")
 
         self._operations.append(result.state)
         dataset_changed = any(
@@ -213,20 +202,20 @@ class Dataset:
         if dataset_changed:
             self._data = result.data
 
-    def pipe_(self, operations: List[Union[str, OperationState]]) -> None:
+    def pipe_(self, operations: List[Union[str, Operation]]) -> None:
         """Run a sequence of operations on dataset data.
         Internally calls Dataset.apply_ and will resolve named
         operations in registry.operations
 
         Args:
-            operations (List[Union[str, OperationState]]): List of operations
+            operations (List[Union[str, Operation]]): List of operations
         """
 
         msg = Printer(no_print=not self._verbose)
         msg.text(f"Applying pipeline of operations inplace to Dataset: {self.name}")
 
         for op in operations:
-            op_name = op.name if isinstance(op, OperationState) else op
+            op_name = op.name if isinstance(op, Operation) else op
             msg.text(f"|_ {op_name}")
 
         for op in operations:
@@ -235,11 +224,6 @@ class Dataset:
                 args = []
                 kwargs = {}
                 initial_state = None
-            elif isinstance(op, OperationState):
-                op_name = op.name
-                args = op.args
-                kwargs = op.kwargs
-                initial_state = op
             else:
                 raise ValueError(
                     "Operation is not resolvable. Must be a name for a registered"

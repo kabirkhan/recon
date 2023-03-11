@@ -3,9 +3,9 @@ from typing import List, Tuple, cast
 import pytest
 
 from recon.corpus import Corpus
-from recon.operations.validation import filter_overlaps
 from recon.stats import get_ner_stats
 from recon.types import Example, Span, Stats
+from recon.validation import filter_overlaps
 
 
 @pytest.fixture()

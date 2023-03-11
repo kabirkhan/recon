@@ -5,7 +5,7 @@ from typing import Any, Dict, List, cast
 from spacy.tokens import Span as SpacySpan
 from wasabi import msg
 
-from recon.operations.core import operation
+from recon.operations import operation
 from recon.types import Correction, Example, Span, Token
 
 

@@ -1,14 +1,13 @@
-from pathlib import Path
 from typing import cast
 
+from radicli import Arg, ExistingDirPath
 from wasabi import Printer
 
-from radicli import Arg, ExistingDirPath
-
-from ._util import cli
 from recon.corpus import Corpus
 from recon.stats import calculate_label_distribution_similarity, get_ner_stats
 from recon.types import Stats
+
+from ._util import cli
 
 
 @cli.command(
