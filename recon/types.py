@@ -12,6 +12,7 @@ from typing import (
     Protocol,
     Tuple,
     Union,
+    TYPE_CHECKING,
     cast,
 )
 from typing_extensions import ParamSpec
@@ -29,6 +30,9 @@ from recon.hashing import (
     token_hash,
     tokenized_example_hash,
 )
+
+if TYPE_CHECKING:
+    from pydantic.typing import ReprArgs
 
 _OpParams = ParamSpec("_OpParams")
 
@@ -327,6 +331,9 @@ class AnnotationCount(BaseModel):
     count: int
     examples: List[Example]
 
+    def __repr_args__(self) -> 'ReprArgs':
+        return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
+
 
 class PredictionErrorExamplePair(BaseModel):
     """Dataclass representation of original Example in a PredictionError
@@ -366,6 +373,9 @@ class PredictionError(BaseModel):
     @property
     def hash(self) -> str:
         return cast(str, prediction_error_hash(self, as_int=False))
+
+    def __repr_args__(self) -> 'ReprArgs':
+        return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
 class ExampleDiff(BaseModel):
@@ -442,6 +452,9 @@ class EntityCoverage(BaseModel):
 
     def __hash__(self) -> int:
         return hash((self.text, self.label))
+
+    def __repr_args__(self) -> 'ReprArgs':
+        return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
 class EntityCoverageStats(BaseModel):
