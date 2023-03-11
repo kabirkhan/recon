@@ -9,7 +9,7 @@ from recon.constants import NOT_LABELED
 from recon.recognizer import EntityRecognizer
 from recon.types import (
     Example,
-    HardestExample,
+    ExampleDiff,
     LabelDisparity,
     PredictionError,
     PredictionErrorExamplePair,
@@ -241,7 +241,7 @@ def get_hardest_examples(
     examples: List[Example],
     score_count: bool = True,
     normalize_scores: bool = True,
-) -> List[HardestExample]:
+) -> List[ExampleDiff]:
     """Get hardest examples for a recognizer to predict on and sort by
     difficulty with the goal of quickly identifying the biggest holes
     in a model / annotated data.
@@ -272,7 +272,7 @@ def get_hardest_examples(
         if total_errors > max_count:
             max_count = total_errors
 
-        he = HardestExample(
+        he = ExampleDiff(
             reference=ref, prediction=pred, count=total_errors, score=score
         )
         hes.append(he)

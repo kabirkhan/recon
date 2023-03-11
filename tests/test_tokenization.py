@@ -1,7 +1,7 @@
 from recon.dataset import Dataset
 from recon.operations import op_iter
-from recon.tokenization import add_tokens
 from recon.preprocess import SpacyPreProcessor
+from recon.tokenization import add_tokens
 from recon.types import Example, Span
 
 

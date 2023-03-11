@@ -3,7 +3,7 @@ from typing import List
 import pytest
 
 from recon.dataset import Dataset
-from recon.operations import registry, Operation, operation
+from recon.operations import Operation, operation, registry
 from recon.types import Example, Span
 
 
