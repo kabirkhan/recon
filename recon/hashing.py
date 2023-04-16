@@ -1,5 +1,4 @@
-from typing import TYPE_CHECKING, Callable, Tuple, Union
-
+from typing import TYPE_CHECKING, Callable, Tuple, Union, Type
 import xxhash
 
 if TYPE_CHECKING:
@@ -7,28 +6,26 @@ if TYPE_CHECKING:
     from recon.types import Example, PredictionError, Span, Token
 
 
-def token_hash(token: "Token", as_int: bool = True) -> Union[str, int]:
+def token_hash(token: "Token") -> int:
     """Hash of Token type
 
     Args:
         token (Token): Token to hash
-        as_int (bool, optional): Encode hash as int
 
     Returns:
-        Union[str, int]: Token hash
+        str: Token hash
     """
-    return _hash((token.text, token.start, token.end, token.id), as_int=as_int)
+    return _hash((token.text, token.start, token.end, token.id))
 
 
-def span_hash(span: "Span", as_int: bool = True) -> Union[str, int]:
+def span_hash(span: "Span") -> int:
     """Hash of Span type
 
     Args:
         span (Span): Span to hash
-        as_int (bool, optional): Encode hash as int
 
     Returns:
-        Union[str, int]: Span hash
+        str: Span hash
     """
     hash_data = (
         span.start,
@@ -38,18 +35,17 @@ def span_hash(span: "Span", as_int: bool = True) -> Union[str, int]:
         span.token_start if span.token_start else 0,
         span.token_end if span.token_end else 0,
     )
-    return _hash(hash_data, as_int=as_int)
+    return _hash(hash_data)
 
 
-def example_hash(example: "Example", as_int: bool = True) -> Union[str, int]:
+def example_hash(example: "Example") -> int:
     """Hash of Example type
 
     Args:
         example (Example): Example to hash
-        as_int (bool, optional): Encode hash as int
 
     Returns:
-        Union[str, int]: Example hash
+        str: Example hash
     """
     hash_data = [example.text]
     for span in example.spans:
@@ -59,18 +55,17 @@ def example_hash(example: "Example", as_int: bool = True) -> Union[str, int]:
             span.label,
             span.text,
         ]
-    return _hash(tuple(hash_data), as_int=as_int)
+    return _hash(tuple(hash_data))
 
 
-def tokenized_example_hash(example: "Example", as_int: bool = True) -> Union[str, int]:
+def tokenized_example_hash(example: "Example") -> int:
     """Hash of Example type including token data
 
     Args:
         example (Example): Example to hash
-        as_int (bool, optional): Encode hash as int
 
     Returns:
-        Union[str, int]: Example hash
+        str: Example hash
     """
     tokens = example.tokens or []
     hash_data = [example.text]
@@ -86,48 +81,46 @@ def tokenized_example_hash(example: "Example", as_int: bool = True) -> Union[str
     for token in tokens:
         hash_data += [token.text, token.start, token.end, token.id]
 
-    return _hash(tuple(hash_data), as_int=as_int)
+    return _hash(tuple(hash_data))
 
 
-def dataset_hash(dataset: "Dataset", as_int: bool = True) -> Union[str, int]:
+def dataset_hash(dataset: "Dataset") -> int:
     """Hash of Dataset
 
     Args:
         dataset (Dataset): Dataset to hash
-        as_int (bool, optional): Encode hash as int
 
     Returns:
-        Union[str, int]: Dataset hash
+        str: Dataset hash
     """
     hash_data = (dataset.name,) + tuple(
-        (example_hash(example, as_int=False) for example in dataset.data)
+        (example_hash(example) for example in dataset.data)
     )
-    return _hash(hash_data, as_int=as_int)
+    return _hash(hash_data)
 
 
 def prediction_error_hash(
-    prediction_error: "PredictionError", as_int: bool = True
-) -> Union[str, int]:
+    prediction_error: "PredictionError"
+) -> int:
     """Hash of PredictionError
 
     Args:
         prediction_error (PredictionError): PredictionError to hash
-        as_int (bool, optional): Encode hash as int
 
     Returns:
-        Union[str, int]: PredictionError hash
+        str: PredictionError hash
     """
     hash_data = (
         prediction_error.text,
         prediction_error.true_label,
         prediction_error.pred_label,
     )
-    return _hash(hash_data, as_int=as_int)
+    return _hash(hash_data)
 
 
 def _hash(
-    tpl: Tuple, hash_function: Callable = xxhash.xxh3_64, as_int: bool = True
-) -> Union[str, int]:
+    tpl: Tuple, hash_function: Callable = xxhash.xxh3_64
+) -> int:
     """Deterministic hash function. The main use here is
     providing a `commit_hash` for a Dataset to compare across
     saves/loads and ensure that operations are re-run if the hash
@@ -137,16 +130,17 @@ def _hash(
         tpl (Tuple): Tuple of data to hash
         hash_function (Callable, hashlib.sha1): Hash function from
             python hashlib. Defaults to sha1 (same as git)
-        as_int (bool, optional): Encode hash as int
 
     Returns:
-        Union[str, int]: Deterministic hash using tpl data
+        str: Deterministic hash using tpl data
     """
     m = hash_function()
-    for e in tpl:
-        if isinstance(e, str):
-            e_bytes = e.encode("utf-8")
+    for item in tpl:
+        if isinstance(item, str):
+            item_data = item.encode("utf-8")
+        elif isinstance(item, int):
+            item_data = str(item).encode("utf-8")
         else:
-            e_bytes = bytes(e)
-        m.update(e_bytes)
-    return m.intdigest() if as_int else m.hexdigest()
+            item_data = bytes(item)
+        m.update(item_data)
+    return m.intdigest()

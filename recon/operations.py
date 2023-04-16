@@ -64,7 +64,7 @@ def op_iter(
             example.__setattr__(processor.field, output)
 
     for example in data:
-        yield hash(example), example.copy(deep=True), preprocessed_outputs[example]
+        yield hash(example), example, preprocessed_outputs[example]
 
 
 class operation:
@@ -277,7 +277,7 @@ class Operation:
                         if hash(new_example) == orig_example_hash:
                             old_example_present = True
                         else:
-                            track_add_example(new_example)
+                            track_add_example(new_example.copy(deep=True))
                     if not old_example_present:
                         track_remove_example(orig_example_hash)
                 else:
@@ -297,8 +297,7 @@ class Operation:
             TransformationType.EXAMPLE_CHANGED
         ]
         state.status = OperationStatus.COMPLETED
-        state_copy = state.copy(deep=True)
-        return OperationResult(data=new_data, state=state_copy)
+        return OperationResult(data=new_data, state=state)
 
     def register(self) -> None:
         registry.operations.register(self.name)(self)

@@ -23,10 +23,7 @@ def test_ent_label_substitution():
         sub_prob=1.0,
     )
 
-    assert len(ds) == 2
-
-    assert ds.data[0] == example
-    assert ds.data[1] == Example(
+    expected_augmentation = Example(
         text=(
             "This is a first sentence with new entity. This is an new entity in the 2nd"
             " sentence."
@@ -36,3 +33,7 @@ def test_ent_label_substitution():
             Span(text="new entity", start=53, end=63, label="ENTITY"),
         ],
     )
+
+    assert len(ds) == 2
+    assert example in ds.data
+    assert expected_augmentation in ds.data
