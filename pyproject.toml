@@ -61,11 +61,15 @@ mkdocstrings-python = "*"
 pyright = "^1.1.272"
 ruff = "^0.0.192"
 
+jupyterlab = { version = ">=3.0", optional = true }
+datasets = { version = ">= 2.0, <3.0", optional = true }
+seaborn = { version = ">= 0.9, <1.0", optional = true }
+
 [tool.poetry.extras]
-jupyter = ["jupyterlab >= 3.0", "ipywidgets"]
-hf = ["datasets >= 2.0, <3.0"]
-plot = ["seaborn >= 0.9, <1.0"]
-prodigy = ["prodigy >= 1.11, < 1.12"]
+jupyter = ["jupyterlab", "ipywidgets"]
+hf = ["datasets"]
+plot = ["seaborn"]
+prodigy = ["prodigy"]
 
 [tool.poetry.scripts]
 recon = "recon.cli:main"
@@ -76,8 +80,9 @@ recon = "recon.cli:main"
 
 [tool.pyright]
 include = ["recon", "tests", "docs/src"]
-# reportInvalidStringEscapeSequence = false
-# reportMissingImports = false
+reportInvalidStringEscapeSequence = false
+reportMissingImports = false
+useLibraryCodeForTypes = true
 
 [tool.ruff]
 line-length = 88
