@@ -100,9 +100,7 @@ def dataset_hash(dataset: "Dataset") -> int:
     return _hash(hash_data)
 
 
-def prediction_error_hash(
-    prediction_error: "PredictionError"
-) -> int:
+def prediction_error_hash(prediction_error: "PredictionError") -> int:
     """Hash of PredictionError
 
     Args:
@@ -119,9 +117,7 @@ def prediction_error_hash(
     return _hash(hash_data)
 
 
-def _hash(
-    tpl: Tuple, hash_function: Callable = xxhash.xxh3_64
-) -> int:
+def _hash(tpl: Tuple, hash_function: Callable = xxhash.xxh3_64) -> int:
     """Deterministic hash function. The main use here is
     providing a `commit_hash` for a Dataset to compare across
     saves/loads and ensure that operations are re-run if the hash
