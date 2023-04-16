@@ -13,7 +13,6 @@ from typing import (
     Protocol,
     Tuple,
     Union,
-    cast,
 )
 from typing_extensions import ParamSpec
 
@@ -24,12 +23,7 @@ from spacy.util import get_words_and_spaces
 from spacy.vocab import Vocab
 from wasabi import color
 
-from recon.hashing import (
-    prediction_error_hash,
-    span_hash,
-    token_hash,
-    example_hash,
-)
+from recon.hashing import example_hash, prediction_error_hash, span_hash, token_hash
 
 if TYPE_CHECKING:
     from pydantic.typing import ReprArgs

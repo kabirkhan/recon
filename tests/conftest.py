@@ -6,15 +6,15 @@ from spacy.lang.en import English
 from spacy.language import Language
 from spacy.pipeline import EntityRuler
 
-from recon.corrections import *
-from recon.preprocess import *
-from recon.tokenization import *
-from recon.validation import *
 from recon.corpus import Corpus
+from recon.corrections import *  # noqa: F401, F403
 from recon.loaders import read_jsonl
 from recon.preprocess import SpacyPreProcessor
+from recon.preprocess import *  # noqa: F401, F403
 from recon.recognizer import SpacyEntityRecognizer
+from recon.tokenization import *  # noqa: F401, F403
 from recon.types import Example
+from recon.validation import *  # noqa: F401, F403
 
 
 @pytest.fixture()
