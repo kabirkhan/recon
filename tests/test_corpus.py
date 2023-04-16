@@ -2,6 +2,7 @@ import shutil
 from pathlib import Path
 from typing import Dict, List
 
+from recon.operations import *
 from recon.corpus import Corpus
 from recon.dataset import Dataset
 from recon.stats import get_ner_stats
