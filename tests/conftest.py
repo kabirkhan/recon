@@ -10,7 +10,6 @@ from recon.corpus import Corpus
 from recon.corrections import *  # noqa: F401, F403
 from recon.loaders import read_jsonl
 from recon.preprocess import SpacyPreProcessor
-from recon.preprocess import *  # noqa: F401, F403
 from recon.recognizer import SpacyEntityRecognizer
 from recon.tokenization import *  # noqa: F401, F403
 from recon.types import Example
