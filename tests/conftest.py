@@ -6,6 +6,10 @@ from spacy.lang.en import English
 from spacy.language import Language
 from spacy.pipeline import EntityRuler
 
+from recon.corrections import *
+from recon.preprocess import *
+from recon.tokenization import *
+from recon.validation import *
 from recon.corpus import Corpus
 from recon.loaders import read_jsonl
 from recon.preprocess import SpacyPreProcessor
@@ -31,7 +35,7 @@ def test_texts() -> List[str]:
     ]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def example_data() -> Dict[str, List[Example]]:
     """Fixture to load example train/dev/test data that has inconsistencies.
 
@@ -46,7 +50,7 @@ def example_data() -> Dict[str, List[Example]]:
     }
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def example_corpus() -> Corpus:
     """Fixture to load example train/dev/test data that has inconsistencies.
 
@@ -57,7 +61,7 @@ def example_corpus() -> Corpus:
     return Corpus.from_disk(base_path, name="test_corpus")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def example_corpus_processed() -> Corpus:
     """Fixture to load example train/dev/test data that has inconsistencies.
 

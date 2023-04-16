@@ -96,10 +96,14 @@ class Dataset:
         return self._name
 
     @property
-    def commit_hash(self) -> str:
-        """String representation of internal hash
-        that can be used to mark a checkpoint in a dataset."""
-        return cast(str, dataset_hash(self, as_int=False))
+    def hash(self) -> int:
+        """Internal hash can be used to mark a checkpoint in a dataset."""
+        return self.commit_hash
+
+    @property
+    def commit_hash(self) -> int:
+        """Internal hash can be used to mark a checkpoint in a dataset."""
+        return dataset_hash(self)
 
     @property
     def data(self) -> List[Example]:
@@ -132,7 +136,7 @@ class Dataset:
         return self.summary()
 
     def __hash__(self) -> int:
-        return cast(int, dataset_hash(self))
+        return self.commit_hash
 
     def __len__(self) -> int:
         return len(self.data)

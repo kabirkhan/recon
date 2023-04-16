@@ -15,7 +15,7 @@ def test_dataset_initialize(example_data: Dict[str, List[Example]]):
     assert dataset.name == "train"
     assert dataset.data == []
     assert dataset.example_store._map == {}
-    assert dataset.commit_hash == "f77b5babe973a588"
+    assert dataset.commit_hash == 17832947943417816456
     assert dataset.operations == []
 
     store = ExampleStore()
@@ -23,7 +23,7 @@ def test_dataset_initialize(example_data: Dict[str, List[Example]]):
     assert dataset2.name == "dev"
     assert dataset2.data == example_data["dev"]
     assert dataset2.example_store == store
-    assert dataset2.commit_hash == "38e4d473a730eeda"
+    assert dataset2.commit_hash == 13155558785603486975
     assert dataset2.operations == []
 
 
@@ -37,7 +37,7 @@ def test_dataset_commit_hash(example_data: Dict[str, List[Example]]):
     train_dataset.data.append(example_data["train"][-1])
 
     assert train_dataset.commit_hash != train_commit
-    assert hash(train_dataset) == 4565895994400721087
+    assert hash(train_dataset) == 4129752577878698003
 
 
 def test_len(example_data: Dict[str, List[Example]]):

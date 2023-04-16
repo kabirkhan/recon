@@ -28,7 +28,7 @@ from recon.hashing import (
     prediction_error_hash,
     span_hash,
     token_hash,
-    tokenized_example_hash,
+    example_hash,
 )
 
 if TYPE_CHECKING:
@@ -55,11 +55,11 @@ class Span(BaseModel):
     source: Optional[str] = None
 
     def __hash__(self) -> int:
-        return cast(int, span_hash(self))
+        return self.hash
 
     @property
-    def hash(self) -> str:
-        return cast(str, span_hash(self, as_int=False))
+    def hash(self) -> int:
+        return span_hash(self)
 
 
 class Token(BaseModel):
@@ -71,11 +71,11 @@ class Token(BaseModel):
     id: int
 
     def __hash__(self) -> int:
-        return cast(int, token_hash(self))
+        return self.hash
 
     @property
-    def hash(self) -> str:
-        return cast(str, token_hash(self, as_int=False))
+    def hash(self) -> int:
+        return token_hash(self)
 
 
 class Example(BaseModel):
@@ -122,7 +122,7 @@ class Example(BaseModel):
         return f'Example: "{self.text}", {n_spans} {spans_text}.'
 
     def __hash__(self) -> int:
-        return cast(int, tokenized_example_hash(self))
+        return self.hash
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Example):
@@ -138,8 +138,8 @@ class Example(BaseModel):
         return res
 
     @property
-    def hash(self) -> str:
-        return cast(str, tokenized_example_hash(self, as_int=False))
+    def hash(self) -> int:
+        return example_hash(self)
 
     @property
     def doc(self) -> Doc:
@@ -291,7 +291,7 @@ class OperationState(BaseModel):
 
 class DatasetOperationsState(BaseModel):
     name: str
-    commit: str
+    commit: int
     size: int
     operations: List[OperationState]
 
@@ -307,7 +307,7 @@ class CorpusMeta(BaseModel):
 
 
 class OperationResult(BaseModel):
-    data: Any
+    data: List[Example]
     state: OperationState
 
 
@@ -368,11 +368,11 @@ class PredictionError(BaseModel):
     examples: Optional[List[PredictionErrorExamplePair]] = []
 
     def __hash__(self) -> int:
-        return cast(int, prediction_error_hash(self))
+        return self.hash
 
     @property
-    def hash(self) -> str:
-        return cast(str, prediction_error_hash(self, as_int=False))
+    def hash(self) -> int:
+        return prediction_error_hash(self)
 
     def __repr_args__(self) -> 'ReprArgs':
         return [arg for arg in super().__repr_args__() if arg[0] != "examples"]

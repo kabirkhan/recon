@@ -11,7 +11,7 @@ class ExampleStore:
     def __init__(self, examples: List[Example] = []):
         self._map: Dict[int, Example] = {}
         for e in examples:
-            self.add(e)
+            self.add(e.copy(deep=True))
 
     def __getitem__(self, example_hash: int) -> Example:
         return self._map[example_hash]
@@ -43,7 +43,8 @@ class ExampleStore:
             example (Example): example to add
         """
         example_hash = hash(example)
-        self._map[example_hash] = example
+        if example_hash not in self:
+            self._map[example_hash] = example.copy(deep=True)
 
     def from_disk(self, path: Union[str, Path]) -> "ExampleStore":
         """Load store from disk

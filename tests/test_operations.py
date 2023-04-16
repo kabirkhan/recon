@@ -48,7 +48,7 @@ def test_change_operation(ds: Dataset):
     assert len(ds.operations) == 2
 
     assert ds.operations[1].name == "change_annotation"
-    assert len(ds.example_store) == 3
+    assert len(ds.example_store) == 2
 
     assert len(ds) == 1
 
@@ -71,7 +71,7 @@ def test_add_operation(ds: Dataset):
     assert len(ds.operations) == 2
 
     assert ds.operations[1].name == "add_and_change_example"
-    assert len(ds.example_store) == 4
+    assert len(ds.example_store) == 3
 
     assert len(ds) == 2
 
@@ -89,7 +89,7 @@ def test_remove_operation(ds: Dataset):
     assert len(ds.operations) == 2
 
     assert ds.operations[1].name == "remove_example"
-    assert len(ds.example_store) == 2
+    assert len(ds.example_store) == 1
 
     assert len(ds) == 0
 
