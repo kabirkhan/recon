@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -12,7 +13,6 @@ from typing import (
     Protocol,
     Tuple,
     Union,
-    TYPE_CHECKING,
     cast,
 )
 from typing_extensions import ParamSpec

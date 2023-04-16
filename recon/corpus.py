@@ -1,17 +1,12 @@
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import srsly
 
 from recon.dataset import Dataset
 from recon.operations import Operation
 from recon.store import ExampleStore
-from recon.types import (
-    CorpusApplyResult,
-    CorpusMeta,
-    Example,
-    StatsProtocol,
-)
+from recon.types import CorpusApplyResult, CorpusMeta, Example, StatsProtocol
 from recon.util import ensure_path
 
 

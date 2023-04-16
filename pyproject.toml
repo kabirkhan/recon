@@ -58,8 +58,8 @@ mkdocs = "*"
 mkdocs-material = "*"
 markdown-include = ">= 0.5.1, < 0.6.0"
 mkdocstrings-python = "*"
-pyright = "^1.1.272"
-ruff = "^0.0.192"
+pyright = "^1.1.303"
+ruff = "^0.0.261"
 
 jupyterlab = { version = ">=3.0", optional = true }
 datasets = { version = ">= 2.0, <3.0", optional = true }

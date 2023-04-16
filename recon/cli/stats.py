@@ -37,7 +37,7 @@ def stats(data_dir: ExistingDirPath) -> None:
                 }
             )
             msg.info(f"Labels in {ds}")
-            msg.text(sorted_labels)
+            msg.text(", ".join(sorted_labels))
 
             msg.info("N Annotations per Label")
             msg.table(ner_stats.n_annotations_per_type)
