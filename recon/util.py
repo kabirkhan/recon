@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any
 
+
 def ensure_path(path: Any) -> Path:
     """Ensure string is converted to a Path.
 

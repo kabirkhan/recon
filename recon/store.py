@@ -74,6 +74,8 @@ class ExampleStore:
         path = ensure_path(path)
         examples = []
         for example_hash, example in self._map.items():
-            examples.append({"example_hash": example_hash, "example": example.model_dump()})
+            examples.append(
+                {"example_hash": example_hash, "example": example.model_dump()}
+            )
 
         srsly.write_jsonl(path, examples)

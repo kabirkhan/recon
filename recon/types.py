@@ -2,7 +2,6 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from types import SimpleNamespace
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -17,7 +16,7 @@ from typing import (
 )
 from typing_extensions import ParamSpec
 
-from pydantic import BaseModel, model_validator, field_validator
+from pydantic import BaseModel, field_validator, model_validator
 from spacy import displacy
 from spacy.tokens import Doc
 from spacy.util import get_words_and_spaces

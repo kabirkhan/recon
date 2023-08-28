@@ -60,7 +60,7 @@ def test_strip_annotations():
             Span(text="- entity", start=11, end=19, label="ENTITY"),
             Span(text="entity.", start=34, end=41, label="ENTITY"),
         ],
-        meta={}
+        meta={},
     )
 
     ds = Dataset("test_dataset", data=[example])
@@ -74,7 +74,7 @@ def test_strip_annotations():
             Span(text="entity", start=13, end=19, label="ENTITY"),
             Span(text="entity", start=34, end=40, label="ENTITY"),
         ],
-        meta={}
+        meta={},
     )
 
 
@@ -121,7 +121,7 @@ def test_split_sentences():
             Token(text="sentence", start=67, end=75, id=15),
             Token(text=".", start=75, end=76, id=16),
         ],
-        meta={}
+        meta={},
     )
     test_ds = Dataset("test_dataset", data=[example])
     assert len(test_ds) == 1
@@ -152,7 +152,7 @@ def test_split_sentences():
             Token(text="entity", start=30, end=36, id=6),
             Token(text=".", start=36, end=37, id=7),
         ],
-        meta={}
+        meta={},
     )
 
     assert test_ds.data[1] == Example(
@@ -178,5 +178,5 @@ def test_split_sentences():
             Token(text="sentence", start=29, end=37, id=7),
             Token(text=".", start=37, end=38, id=8),
         ],
-        meta={}
+        meta={},
     )

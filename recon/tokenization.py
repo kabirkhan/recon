@@ -1,4 +1,3 @@
-from collections import defaultdict
 from typing import Any, Dict, Optional
 
 from recon.operations import operation

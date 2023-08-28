@@ -1,3 +1,4 @@
+import inspect
 import warnings
 from collections import Counter, defaultdict
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple, Union
@@ -5,8 +6,6 @@ from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple, Un
 import catalogue
 from tqdm import tqdm
 from wasabi import Printer
-
-import inspect
 
 from recon.preprocess import PreProcessor
 from recon.preprocess import registry as pre_registry
