@@ -160,19 +160,19 @@ def merge_examples(
 
 def _stream_from_hardest_examples(hes: List[HardestExample]) -> Iterator[TaskType]:
     for he in hes:
-        combined = he.reference.copy(deep=True)
+        combined = he.reference.model_copy(deep=True)
         annot_spans = [
-            Span(**span.dict(exclude={"source"}), source="ref")
+            Span(**span.model_dump(exclude={"source"}), source="ref")
             for span in he.reference.spans
         ]
         pred_spans = [
             Span(
-                **span.dict(exclude={"source", "label"}),
+                **span.model_dump(exclude={"source", "label"}),
                 source="pred",
                 label=f"{span.label}:PRED",
             )
             for span in he.prediction.spans
         ]
         combined.spans = sorted(annot_spans + pred_spans, key=lambda s: s.start)
-        task = combined.dict()
+        task = combined.model_dump()
         yield task

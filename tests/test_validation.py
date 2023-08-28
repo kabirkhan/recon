@@ -58,7 +58,7 @@ def test_filter_overlaps():
     result = cast(Example, filter_overlaps(get_test_example(test_entities)))
     assert spans_to_offsets(result.spans) == [(4, 10, "ENTITY")]
 
-    test_entities = [(0, 5, "ENTITY"), (0, 5, "ENTITY")]
+    test_entities: List[Tuple[int, int, str]] = [(0, 5, "ENTITY"), (0, 5, "ENTITY")]
     result = cast(Example, filter_overlaps(get_test_example(test_entities)))
     assert spans_to_offsets(result.spans) == [(0, 5, "ENTITY")]
 

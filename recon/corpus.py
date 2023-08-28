@@ -213,7 +213,7 @@ class Corpus:
 
         corpus_meta_path = data_dir / ".recon" / "meta.json"
         if corpus_meta_path.exists():
-            corpus_meta = CorpusMeta.parse_file(corpus_meta_path)
+            corpus_meta = CorpusMeta.model_validate(srsly.read_json(corpus_meta_path))
             name = corpus_meta.name
 
         example_store_path = data_dir / ".recon" / "example_store.jsonl"
@@ -253,7 +253,7 @@ class Corpus:
         if not state_dir.exists():
             state_dir.mkdir(parents=True, exist_ok=True)
 
-        srsly.write_json(corpus_meta_path, CorpusMeta(name=self.name).dict())
+        srsly.write_json(corpus_meta_path, CorpusMeta(name=self.name).model_dump())
         self._train.to_disk(data_dir, overwrite=overwrite, save_examples=False)
         self._dev.to_disk(data_dir, overwrite=overwrite, save_examples=False)
         if self._test:

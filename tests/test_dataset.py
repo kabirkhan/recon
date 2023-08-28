@@ -145,7 +145,7 @@ def test_dataset_to_from_disk(example_data: Dict[str, List[Example]], tmp_path: 
         {"software development engineer": "JOB_ROLE", "model": None}
     )
     assert len(corrections) == 2
-    train_dataset.apply_("recon.fix_annotations.v1", corrections)
+    train_dataset.apply_("recon.fix_annotations.v1", corrections=corrections)
 
     train_dataset.to_disk(tmp_path, overwrite=True)
     train_dataset_loaded_2 = Dataset("train").from_disk(tmp_path)
@@ -164,15 +164,16 @@ def test_dataset_to_from_disk(example_data: Dict[str, List[Example]], tmp_path: 
         assert t.type == TransformationType.EXAMPLE_CHANGED
 
     op2 = train_dataset_loaded_2.operations[1]
-
-    assert op2.kwargs["corrections"] == [
+    expected = [
         Correction(
             annotation="software development engineer",
             from_labels=["ANY"],
             to_label="JOB_ROLE",
-        ).dict(),
-        Correction(annotation="model", from_labels=["ANY"], to_label=None).dict(),
+        ),
+        Correction(annotation="model", from_labels=["ANY"], to_label=None),
     ]
+    op2_corrections = [Correction(**c) for c in op2.kwargs["corrections"]]
+    assert op2_corrections == expected
 
 
 def test_dataset_to_from_spacy(example_data: Dict[str, List[Example]], tmp_path: Path):

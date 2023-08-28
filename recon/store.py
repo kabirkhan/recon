@@ -11,7 +11,7 @@ class ExampleStore:
     def __init__(self, examples: List[Example] = []):
         self._map: Dict[int, Example] = {}
         for e in examples:
-            self.add(e.copy(deep=True))
+            self.add(e.model_copy(deep=True))
 
     def __getitem__(self, example_hash: int) -> Example:
         return self._map[example_hash]
@@ -44,7 +44,7 @@ class ExampleStore:
         """
         example_hash = hash(example)
         if example_hash not in self:
-            self._map[example_hash] = example.copy(deep=True)
+            self._map[example_hash] = example.model_copy(deep=True)
 
     def from_disk(self, path: Union[str, Path]) -> "ExampleStore":
         """Load store from disk
@@ -74,6 +74,8 @@ class ExampleStore:
         path = ensure_path(path)
         examples = []
         for example_hash, example in self._map.items():
-            examples.append({"example_hash": example_hash, "example": example.dict()})
+            examples.append(
+                {"example_hash": example_hash, "example": example.model_dump()}
+            )
 
         srsly.write_jsonl(path, examples)

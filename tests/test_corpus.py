@@ -66,6 +66,6 @@ def test_corpus_apply(example_corpus: Corpus):
 
 
 def test_corpus_apply_inplace(example_corpus_processed: Corpus):
-    assert len(example_corpus_processed.train_ds.operations) == 4
-    assert len(example_corpus_processed.dev_ds.operations) == 4
-    assert len(example_corpus_processed.test_ds.operations) == 4
+    assert len(example_corpus_processed.train_ds.operations) == 3
+    assert len(example_corpus_processed.dev_ds.operations) == 3
+    assert len(example_corpus_processed.test_ds.operations) == 3

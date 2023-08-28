@@ -159,15 +159,6 @@ def strip_annotations(
 
     preprocessed_outputs["recon.spacy.v1"]
 
-    def fix_tokens(example: Example, span: Span) -> bool:
-        fix_tokens = example.tokens and any(example.tokens)
-        return bool(
-            fix_tokens
-            and span.token_start
-            and span.token_end
-            and span.token_start < span.token_end
-        )
-
     for s in example.spans:
         for ch in strip_chars:
             if s.text.startswith(ch):

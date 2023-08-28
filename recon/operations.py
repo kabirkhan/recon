@@ -1,9 +1,9 @@
+import inspect
 import warnings
 from collections import Counter, defaultdict
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple, Union
 
 import catalogue
-from pydantic.error_wrappers import ErrorWrapper
 from tqdm import tqdm
 from wasabi import Printer
 
@@ -17,11 +17,6 @@ from recon.types import (
     OperationStatus,
     Transformation,
     TransformationType,
-)
-from recon.util import (
-    get_received_operation_data,
-    get_required_operation_params,
-    request_body_to_args,
 )
 
 if TYPE_CHECKING:
@@ -61,8 +56,6 @@ def op_iter(
             leave=False,
         ):
             preprocessed_outputs[example][processor.name] = output
-            example.__setattr__(processor.field, output)
-
     for example in data:
         yield hash(example), example, preprocessed_outputs[example]
 
@@ -178,7 +171,7 @@ class Operation:
         """
         if not initial_state:
             initial_state = OperationState(name=self.name)
-        state = initial_state.copy(deep=True)
+        state = initial_state.model_copy(deep=True)
 
         if state.status == OperationStatus.NOT_STARTED:
             state.status = OperationStatus.IN_PROGRESS
@@ -231,43 +224,19 @@ class Operation:
             )
             state.status = OperationStatus.NEEDS_TOKENIZATION
 
-        required_params = get_required_operation_params(self.op)
-        received_data = get_received_operation_data(required_params, state)
-
-        values: Dict[str, Any] = {}
-        errors: List[ErrorWrapper] = []
-
-        if received_data:
-            values, errors = request_body_to_args(
-                list(required_params.values()), received_data
-            )
-
-        if errors:
-            error_msg = (
-                f"Validation error while trying to call operation: {self.name} "
-                + "with provided args and kwargs values. "
-            )
-            for err in errors:
-                if isinstance(err, list):
-                    err = err[0]
-                error_msg += str(err.exc)
-                print(values)
-            raise ValueError(error_msg)
-
-        state.args = ()
-        state.kwargs = values
+        sig = inspect.signature(self.op)
+        tmp_example = dataset.data[0].model_copy(deep=True)
+        bound_args = sig.bind_partial(tmp_example, *state.args, **state.kwargs)
+        bound_args.apply_defaults()
+        del bound_args.arguments["example"]
 
         new_data = []
         with tqdm(total=len(dataset), disable=(not verbose)) as pbar:
             it = op_iter(dataset.data, self.pre, verbose=verbose)
             for orig_example_hash, example, preprocessed_outputs in it:
-                if preprocessed_outputs:
-                    res = self.op(
-                        example, preprocessed_outputs=preprocessed_outputs, **values
-                    )
-                else:
-                    res = self.op(example, **values)
-
+                if "preprocessed_outputs" in sig.parameters:
+                    bound_args.arguments["preprocessed_outputs"] = preprocessed_outputs
+                res = self.op(example, *bound_args.args, **bound_args.kwargs)
                 if res is None:
                     track_remove_example(orig_example_hash)
                 elif isinstance(res, list):
@@ -277,7 +246,7 @@ class Operation:
                         if hash(new_example) == orig_example_hash:
                             old_example_present = True
                         else:
-                            track_add_example(new_example.copy(deep=True))
+                            track_add_example(new_example.model_copy(deep=True))
                     if not old_example_present:
                         track_remove_example(orig_example_hash)
                 else:
