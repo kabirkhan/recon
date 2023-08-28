@@ -414,14 +414,14 @@ class Dataset:
             size=len(self),
             operations=self.operations,
         )
-        srsly.write_json(state_dir / "state.json", state.dict())
+        srsly.write_json(state_dir / "state.json", state.model_dump())
 
         if save_examples:
             self.example_store.to_disk(state_dir / "example_store.jsonl")
 
         srsly.write_jsonl(
             output_dir / f"{self.name}.jsonl",
-            [e.dict(exclude_unset=True) for e in self.data],
+            [e.model_dump(exclude_unset=True) for e in self.data],
         )
 
     def from_prodigy(self, prodigy_datasets: List[str]) -> "Dataset":

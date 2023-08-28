@@ -86,12 +86,12 @@ def augment_example(
     **kwargs: Any,
 ) -> List[Example]:
     if spans is None:
-        spans = example.copy(deep=True).spans
+        spans = example.model_copy(deep=True).spans
 
     augmented_examples = {example}
 
     for _ in range(n_augs):
-        example = example.copy(deep=True)
+        example = example.model_copy(deep=True)
         if span_label:
             spans = [s for s in spans if s.label == span_label]
         mask = mask_1d(len(spans), prob=sub_prob)

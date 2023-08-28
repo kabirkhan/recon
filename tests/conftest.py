@@ -71,7 +71,6 @@ def example_corpus_processed() -> Corpus:
     corpus = Corpus.from_disk(base_path, name="test_corpus")
     corpus.pipe_(
         [
-            "recon.fix_tokenization_and_spacing.v1",
             "recon.add_tokens.v1",
             "recon.upcase_labels.v1",
             "recon.filter_overlaps.v1",

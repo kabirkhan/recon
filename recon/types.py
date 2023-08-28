@@ -2,6 +2,7 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from types import SimpleNamespace
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -16,7 +17,7 @@ from typing import (
 )
 from typing_extensions import ParamSpec
 
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel, model_validator, field_validator
 from spacy import displacy
 from spacy.tokens import Doc
 from spacy.util import get_words_and_spaces
@@ -79,33 +80,27 @@ class Example(BaseModel):
     spans: List[Span]
     tokens: Optional[List[Token]] = None
     meta: Dict[str, Any] = {}
-    formatted: bool = False
 
-    class Config:
-        extra = Extra.allow
+    @model_validator(mode="before")
+    @classmethod
+    def span_text_exists(cls, data: Any) -> Any:
+        spans = data.get("spans", [])
+        for span in spans:
+            if not isinstance(span, dict):
+                continue
+            if "text" not in span:
+                start, end = span["start"], span["end"]
+                span["text"] = data["text"][start:end]
+        data["spans"] = spans
+        return data
 
-    @root_validator(pre=True)
-    def span_text_must_exist(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not values.get("formatted", False):
-            # Ensure each span has a text property
-            spans = values.get("spans", [])
-            for span in spans:
-                if not isinstance(span, Span):
-                    if "text" not in span:
-                        start, end = span["start"], span["end"]
-                        span["text"] = values["text"][start:end]
-
-            # Ensure the meta has a source property
-            # if something that's not a dict is passed in
-            meta = values.get("meta", {})
-            if isinstance(meta, list) or isinstance(meta, str):
-                meta = {"source": meta}
-
-            values["spans"] = spans
-            values["meta"] = meta
-            values["formatted"] = True
-
-        return values
+    @field_validator("meta", mode="before")
+    def validate_meta(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        # Ensure the meta has a source property
+        # if something that's not a dict is passed in
+        if isinstance(v, list) or isinstance(v, str):
+            return {"source": v}
+        return v
 
     def __str__(self) -> str:
         return f'Example: "{self.text}", {len(self.spans)} spans.'
@@ -117,19 +112,6 @@ class Example(BaseModel):
 
     def __hash__(self) -> int:
         return self.hash
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, Example):
-            return self.dict() == other.dict()
-        return False
-
-    def dict(self, **kwargs: Any) -> Dict:
-        res = super().dict(**kwargs)
-        keys = list(res.keys())
-        for k in keys:
-            if k not in self.schema()["properties"].keys():
-                del res[k]
-        return res
 
     @property
     def hash(self) -> int:
@@ -382,7 +364,7 @@ class ExampleDiff(BaseModel):
         combined = self.reference.copy(deep=True)
         pred_spans = []
         for s in self.prediction.spans:
-            span = s.copy(deep=True)
+            span = s.model_copy(deep=True)
             span.label = f"{s.label}:{label_suffix}"
             pred_spans.append(span)
         combined.spans = sorted(combined.spans + pred_spans, key=lambda s: s.start)
