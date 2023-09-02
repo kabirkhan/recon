@@ -4,7 +4,7 @@ requires = ["poetry-core>=1.0.0"]
 
 [tool.poetry]
 name = "reconner"
-version = "0.14.0"
+version = "0.13.0"
 description = "Recon NER, Debug and correct annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data."
 packages = [
     { include = "recon" }
@@ -35,13 +35,13 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">= 3.8, < 3.12"
+python = ">= 3.8, < 3.11"
 click-completion = "*"
 colorama = "*"
 numpy = ">= 1.20.0"
 pydantic = ">= 2.0, <3.0"
 spacy = ">= 3.2.0, < 4.0"
-scipy = ">= 1.7.0, < 2.0"
+scipy = ">= 1.7.0, < 1.9"
 xxhash = ">= 3.0.0, < 4.0"
 radicli = ">0.0.8, <0.1"
 
