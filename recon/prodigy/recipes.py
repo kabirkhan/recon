@@ -80,7 +80,6 @@ def recon_ner_correct_v1(
             "lang": nlp.lang,
             "labels": labels,
             "exclude_by": "input",
-            "force_stream_order": True,
             "overlapping_spans": True,
             "blocks": [
                 {"view_id": "spans_manual", "overlapping_spans": True},
@@ -125,27 +124,24 @@ def recon_ner_merge_v1(
     """
     log("RECIPE: Starting recipe recon.ner_merge", locals())
     if isinstance(source, str):
-        dataset = Dataset(recon_dataset).from_disk(source)
+        recon_ds = Dataset(recon_dataset).from_disk(source)
     else:
-        dataset = source
-
-    with connect() as DB:
-        if dataset not in DB:
-            msg.fail(f"Can't find dataset '{dataset}'", exits=1)
-
-        prodigy_raw_examples = DB.get_dataset(dataset)
+        recon_ds = source
+    DB = connect()
+    if dataset not in DB:
+        msg.fail(f"Can't find dataset '{dataset}'", exits=1)
+    prodigy_raw_examples = DB.get_dataset(dataset)
     prodigy_examples = [
         Example(**eg) for eg in prodigy_raw_examples if eg["answer"] == "accept"
     ]
     prodigy_texts_to_examples = {e.text: e for e in prodigy_examples}
-
-    prev_len = len(dataset)
-    dataset.apply_("recon.prodigy.merge_examples", prodigy_texts_to_examples)
-    assert len(dataset) == prev_len
+    prev_len = len(recon_ds)
+    recon_ds.apply_("recon.prodigy.merge_examples", prodigy_texts_to_examples)
+    assert len(recon_ds) == prev_len
 
     if output_dir:
         log(f"RECIPE: Fixing {len(prodigy_examples)} examples in data")
-        dataset.to_disk(output_dir)
+        recon_ds.to_disk(output_dir)
 
 
 @operation("recon.prodigy.merge_examples.v1")
