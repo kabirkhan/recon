@@ -130,9 +130,7 @@ class Example(BaseModel):
         tokens = [token.text for token in self.tokens]
         words, spaces = get_words_and_spaces(tokens, self.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)
-        doc.ents = tuple(
-            doc.char_span(s.start, s.end, label=s.label) for s in self.spans
-        )
+        doc.set_ents([doc.char_span(s.start, s.end, label=s.label) for s in self.spans])
         return doc
 
     def show(

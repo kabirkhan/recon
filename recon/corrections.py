@@ -207,8 +207,7 @@ def split_sentences(
             if token:
                 span = SpacySpan(doc, token.i, token.i + 1, label=ent.label)
         ents.append(span)
-
-    doc.ents = ents
+    doc.set_ents(ents)
 
     for sent in doc.sents:
         sent_doc = sent.as_doc()
