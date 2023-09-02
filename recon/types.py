@@ -405,7 +405,7 @@ class Stats(BaseModel):
     examples_with_type: Optional[Dict[str, Example]] = None
 
     def __str__(self) -> str:
-        return self.json(indent=4, exclude_unset=True)
+        return self.model_dump_json(indent=4, exclude_unset=True)
 
 
 class EntityCoverage(BaseModel):
