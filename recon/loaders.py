@@ -120,7 +120,9 @@ def to_spacy(
             tokens = [token.text for token in example.tokens]
             words, spaces = get_words_and_spaces(tokens, example.text)
             doc = Doc(nlp.vocab, words=words, spaces=spaces)
-            doc.set_ents([doc.char_span(s.start, s.end, label=s.label) for s in example.spans])
+            doc.set_ents(
+                [doc.char_span(s.start, s.end, label=s.label) for s in example.spans]
+            )
             doc_bin.add(doc)
     doc_bin.to_disk(path)
     return doc_bin
