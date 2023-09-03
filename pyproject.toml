@@ -4,7 +4,7 @@ requires = ["poetry-core>=1.0.0", "setuptools"]
 
 [tool.poetry]
 name = "reconner"
-version = "0.14.0"
+version = "0.14.1"
 description = "Recon NER, Debug and correct annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data."
 packages = [
     { include = "recon" }
