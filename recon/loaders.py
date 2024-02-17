@@ -8,7 +8,8 @@ from typing import Any, Dict, Iterable, List, Optional, cast
 import spacy
 import srsly
 from spacy.language import Language
-from spacy.tokens import Doc, DocBin, Span as SpacySpan
+from spacy.tokens import Doc, DocBin
+from spacy.tokens import Span as SpacySpan
 from spacy.util import get_words_and_spaces
 
 from recon.types import Example, Span, Token

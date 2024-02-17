@@ -19,7 +19,8 @@ from typing_extensions import ParamSpec
 
 from pydantic import BaseModel, field_validator, model_validator
 from spacy import displacy
-from spacy.tokens import Doc, Span as SpacySpan
+from spacy.tokens import Doc
+from spacy.tokens import Span as SpacySpan
 from spacy.util import get_words_and_spaces
 from spacy.vocab import Vocab
 from wasabi import color
