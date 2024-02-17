@@ -25,7 +25,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: uv pip install -r ./requirements-dev.txt
+        run: |
+          uv venv .venv
+          source .venv/bin/activate
+          uv pip install -r ./requirements-dev.txt
 
       - name: Lint
         run: |
@@ -67,7 +70,10 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Install dependencies
-        run: uv pip install -r ./requirements-dev.txt
+        run: |
+          uv venv .venv
+          source .venv/bin/activate
+          uv pip install -r ./requirements-dev.txt
 
       - name: test
         run: |
