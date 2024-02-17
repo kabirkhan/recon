@@ -13,25 +13,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: 'poetry'
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: uv pip install ./requirements-dev.txt
 
       - name: Lint
-        run: make lint
+        run: |
+          ruff recon tests docs/src
+          black recon tests docs/src --check
 
       - name: Pyright
-        run: make pyright
+        run: pyright
 
   test:
     name: test py${{ matrix.python }} on ${{ matrix.os }}
@@ -54,23 +55,22 @@ jobs:
             os: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
-          cache: 'poetry'
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: uv pip install ./requirements-dev.txt
 
       - name: test
         run: |
-          make test
+          pytest tests -n 2
 
   deploy:
     needs: test
@@ -79,8 +79,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install twine
+        run: pipx install twine
 
       - name: Set up python
         uses: actions/setup-python@v4
