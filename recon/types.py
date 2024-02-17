@@ -304,7 +304,7 @@ class AnnotationCount(BaseModel):
     count: int
     examples: List[Example]
 
-    def __repr_args__(self) -> 'ReprArgs':
+    def __repr_args__(self) -> "ReprArgs":
         return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
@@ -347,7 +347,7 @@ class PredictionError(BaseModel):
     def hash(self) -> int:
         return prediction_error_hash(self)
 
-    def __repr_args__(self) -> 'ReprArgs':
+    def __repr_args__(self) -> "ReprArgs":
         return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
@@ -426,7 +426,7 @@ class EntityCoverage(BaseModel):
     def __hash__(self) -> int:
         return hash((self.text, self.label))
 
-    def __repr_args__(self) -> 'ReprArgs':
+    def __repr_args__(self) -> "ReprArgs":
         return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
@@ -489,8 +489,7 @@ class Correction(BaseModel):
             else:
                 raise ValueError(
                     "Cannot parse corrections dict. Value must be either a str of the"
-                    " label "
-                    + "to change the annotation to (TO_LABEL) or a tuple of"
+                    " label " + "to change the annotation to (TO_LABEL) or a tuple of"
                     " (FROM_LABEL, TO_LABEL)"
                 )
             corrections.append(
