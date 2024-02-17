@@ -32,11 +32,14 @@ jobs:
 
       - name: Lint
         run: |
+          source .venv/bin/activate
           ruff recon tests docs/src
           black recon tests docs/src --check
 
       - name: Pyright
-        run: pyright
+        run: |
+          source .venv/bin/activate
+          pyright
 
   test:
     name: test py${{ matrix.python }} on ${{ matrix.os }}
@@ -77,6 +80,7 @@ jobs:
 
       - name: test
         run: |
+          source .venv/bin/activate
           pytest tests -n 2
 
   deploy:
