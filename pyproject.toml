@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "reconner"
-version = "0.14.1"
+version = "0.15.0"
 description = "Recon NER, Debug and correct annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data."
 authors = [{ name = "Kabir Khan", email = "kabirkhan1137@outlook.com" }]
 readme = "README.md"
