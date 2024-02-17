@@ -13,12 +13,13 @@ from typing import (
     Protocol,
     Tuple,
     Union,
+    cast,
 )
 from typing_extensions import ParamSpec
 
 from pydantic import BaseModel, field_validator, model_validator
 from spacy import displacy
-from spacy.tokens import Doc
+from spacy.tokens import Doc, Span as SpacySpan
 from spacy.util import get_words_and_spaces
 from spacy.vocab import Vocab
 from wasabi import color
@@ -130,7 +131,9 @@ class Example(BaseModel):
         tokens = [token.text for token in self.tokens]
         words, spaces = get_words_and_spaces(tokens, self.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)
-        doc.set_ents([doc.char_span(s.start, s.end, label=s.label) for s in self.spans])
+        spans = [doc.char_span(s.start, s.end, label=s.label) for s in self.spans]
+
+        doc.set_ents(cast(List[SpacySpan], spans))
         return doc
 
     def show(
@@ -369,9 +372,10 @@ class ExampleDiff(BaseModel):
         tokens = [token.text for token in combined.tokens]
         words, spaces = get_words_and_spaces(tokens, combined.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)
-        doc.spans["ref"] = [
+        ref_spans = [
             doc.char_span(s.start, s.end, label=s.label) for s in combined.spans
         ]
+        doc.spans["ref"] = cast(List[SpacySpan], ref_spans)
         displacy.render(doc, style="span", jupyter=True, options={"spans_key": "ref"})
 
 

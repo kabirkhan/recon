@@ -8,7 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional, cast
 import spacy
 import srsly
 from spacy.language import Language
-from spacy.tokens import Doc, DocBin
+from spacy.tokens import Doc, DocBin, Span as SpacySpan
 from spacy.util import get_words_and_spaces
 
 from recon.types import Example, Span, Token
@@ -120,9 +120,10 @@ def to_spacy(
             tokens = [token.text for token in example.tokens]
             words, spaces = get_words_and_spaces(tokens, example.text)
             doc = Doc(nlp.vocab, words=words, spaces=spaces)
-            doc.set_ents(
-                [doc.char_span(s.start, s.end, label=s.label) for s in example.spans]
-            )
+            spacy_spans = [
+                doc.char_span(s.start, s.end, label=s.label) for s in example.spans
+            ]
+            doc.set_ents(cast(List[SpacySpan], spacy_spans))
             doc_bin.add(doc)
     doc_bin.to_disk(path)
     return doc_bin
