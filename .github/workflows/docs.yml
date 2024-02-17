@@ -14,18 +14,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: curl -sSL https://install.python-poetry.org | python3 -
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
-          # cache: 'poetry'
+          python-version: '3.11'
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: |
+          uv venv .venv
+          source .venv/bin/activate
+          uv pip install -r ./requirements-dev.txt
 
-      # - name: Deploy Docs
-      #   run: |
-      #     poetry run python -m mkdocs gh-deploy --force
+      - name: Deploy Docs
+        run: |
+          source .venv/bin/activate
+          python -m mkdocs gh-deploy --force
