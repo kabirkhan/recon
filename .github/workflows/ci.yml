@@ -34,7 +34,7 @@ jobs:
         run: |
           source .venv/bin/activate
           ruff recon tests docs/src
-          black recon tests docs/src --check
+          ruff format recon tests docs/src --check
 
       - name: Pyright
         run: |
@@ -84,7 +84,7 @@ jobs:
     if: "success() && startsWith(github.ref, 'refs/tags/')"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install twine
         run: pipx install twine
@@ -93,14 +93,14 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: 'poetry'
 
       - name: Build
         run: |
-          poetry build
+          python -m build
 
       - name: Publish
         run: |
-          poetry publish
+          twine publish ./dist/*
         env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}

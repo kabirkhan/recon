@@ -44,6 +44,7 @@ homepage = "https://kabirkhan.github.io/recon"
 
 [project.optional-dependencies]
 dev = [
+    "hatchling >= 1.21, <2.0",
     "pytest",
     "pytest-cov",
     "pytest-xdist",
