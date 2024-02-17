@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - hatchling/uv
     tags:
       - 'v*'
   pull_request: {}
@@ -13,25 +14,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: 'poetry'
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: |
+          uv venv .venv
+          source .venv/bin/activate
+          uv pip install -r ./requirements-dev.txt
 
       - name: Lint
-        run: make lint
+        run: |
+          source .venv/bin/activate
+          ruff recon tests docs/src
+          ruff format recon tests docs/src --check
 
       - name: Pyright
-        run: make pyright
+        run: |
+          source .venv/bin/activate
+          pyright
 
   test:
     name: test py${{ matrix.python }} on ${{ matrix.os }}
@@ -40,8 +48,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - python: '3.8'
-            os: windows-latest
           - python: '3.9'
             os: macos-latest
           - python: '3.10'
@@ -49,51 +55,52 @@ jobs:
           - python: '3.11'
             os: ubuntu-latest
           - python: '3.11'
-            os: windows-latest
-          - python: '3.11'
             os: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
-          cache: 'poetry'
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: |
+          uv venv .venv
+          source .venv/bin/activate
+          uv pip install -r ./requirements-dev.txt
 
       - name: test
         run: |
-          make test
+          source .venv/bin/activate
+          pytest tests -n 2
 
   deploy:
     needs: test
     if: "success() && startsWith(github.ref, 'refs/tags/')"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install twine
+        run: pipx install twine
 
       - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: 'poetry'
 
       - name: Build
         run: |
-          poetry build
+          python -m build
 
       - name: Publish
         run: |
-          poetry publish
+          twine publish ./dist/*
         env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}

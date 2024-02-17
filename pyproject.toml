@@ -1,19 +1,14 @@
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0", "setuptools"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
+[project]
 name = "reconner"
-version = "0.14.1"
+version = "0.15.0"
 description = "Recon NER, Debug and correct annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data."
-packages = [
-    { include = "recon" }
-]
-authors = ["Kabir Khan <kabirkhan1137@outlook.com>"]
+authors = [{ name = "Kabir Khan", email = "kabirkhan1137@outlook.com" }]
 readme = "README.md"
-documentation = "https://kabirkhan.github.io/recon"
-homepage = "https://kabirkhan.github.io/recon"
-repository = "https://github.com/kabirkhan/recon"
+requires-python = ">= 3.8"
 classifiers = [
     "Intended Audience :: Information Technology",
     "Intended Audience :: System Administrators",
@@ -33,49 +28,42 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "License :: OSI Approved :: MIT License"
 ]
+dependencies = [
+    "numpy >= 1.20.0",
+    "pydantic >= 2.0, <3.0",
+    "spacy >= 3.2.0, < 4.0",
+    "scipy >= 1.7.0, < 2.0",
+    "xxhash >= 3.0.0, < 4.0",
+    "radicli > 0.0.8, <0.1"
+]
+scripts = { recon = "recon.cli:main" }
 
-[tool.poetry.dependencies]
-python = ">= 3.8, < 3.12"
-click-completion = "*"
-colorama = "*"
-numpy = ">= 1.20.0"
-pydantic = ">= 2.0, <3.0"
-spacy = ">= 3.2.0, < 4.0"
-scipy = ">= 1.7.0, < 2.0"
-xxhash = ">= 3.0.0, < 4.0"
-radicli = ">0.0.8, <0.1"
+[project.urls]
+documentation = "https://kabirkhan.github.io/recon"
+homepage = "https://kabirkhan.github.io/recon"
 
-[tool.poetry.dev-dependencies]
-autoflake = "*"
-flake8 = ">=5.0"
-pytest = "*"
-pytest-cov = "*"
-pytest-xdist = "*"
-mypy = "*"
-black = "*"
-isort = "*"
-mkdocs = "*"
-mkdocs-material = "*"
-markdown-include = ">= 0.5.1, < 0.6.0"
-mkdocstrings-python = "*"
-pyright = "^1.1.303"
-ruff = "^0.0.261"
+[project.optional-dependencies]
+dev = [
+    "hatchling >= 1.21, <2.0",
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    "mkdocs",
+    "mkdocs-material",
+    "markdown-include >= 0.5.1, < 0.6.0",
+    "mkdocstrings-python",
+    "pyright >= 1.1.303, <1.3",
+    "ruff >= 0.1, <1.0"
+]
+hf = [
+    "datasets >= 2.0, <3.0"
+]
+plot = [
+    "seaborn >= 0.9, <1.0"
+]
 
-jupyterlab = { version = ">=3.0", optional = true }
-datasets = { version = ">= 2.0, <3.0", optional = true }
-seaborn = { version = ">= 0.9, <1.0", optional = true }
-
-[tool.poetry.extras]
-jupyter = ["jupyterlab", "ipywidgets"]
-hf = ["datasets"]
-plot = ["seaborn"]
-
-[tool.poetry.scripts]
-recon = "recon.cli:main"
-
-[tool.poetry.plugins."prodigy_recipes"]
-"recon.ner_correct" = "recon:prodigy_recipes.recon_ner_correct_v1"
-"recon.ner_merge" = "recon:prodigy_recipes.recon_ner_merge_v1"
+[tool.hatch.build.targets.wheel]
+packages = ["recon"]
 
 [tool.pyright]
 include = ["recon", "tests", "docs/src"]
@@ -85,7 +73,6 @@ useLibraryCodeForTypes = true
 
 [tool.ruff]
 line-length = 88
-
 # Exclude a variety of commonly ignored directories.
 exclude = [
     ".git",
@@ -96,16 +83,16 @@ exclude = [
     "dist",
     "recon/prodigy/recipes.py"
 ]
-
-extend-select = ["I001"]
 src = ["recon", "tests", "docs/src"]
+# Assume Python 3.11.
+target-version = "py311"
 
+[tool.ruff.lint]
+extend-select = ["I001"]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
-# Assume Python 3.10.
-target-version = "py310"
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 extra-standard-library = ["typing_extensions"]
 known-first-party = ["recon"]

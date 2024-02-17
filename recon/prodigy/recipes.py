@@ -16,9 +16,76 @@ import spacy
 from wasabi import msg
 from recon.dataset import Dataset
 from recon.insights import get_hardest_examples
-from recon.core import operation
+from recon.operations import operation
 from recon.recognizer import SpacyEntityRecognizer
+from recon.stats import get_ner_stats
 from recon.types import Example, HardestExample, Span
+
+from pathlib import Path
+
+
+
+@prodigy.recipe(
+    "recon.ner.correct.stats.v1",
+    # fmt: off
+    dataset=("Dataset to save annotations to", "positional", None, str),
+    spacy_model=("Loadable spaCy model for tokenization or blank:lang (e.g. blank:en)", "positional", None, str),
+    source=("Data to annotate (file path or '-' to read from standard input)", "positional", None, str),
+    loader=("Loader (guessed from file extension if not set)", "option", "lo", str),
+    label=("Comma-separated label(s) to annotate or text file with one label per line", "option", "l", get_labels),
+    exclude=("Comma-separated list of dataset IDs whose annotations to exclude", "option", "e", split_string),
+    # fmt: on
+)
+def recon_ner_correct_stats_v1(
+    dataset: str,
+    spacy_model: str,
+    source: Union[str, Iterable[dict]],
+    loader: Optional[str] = None,
+    label: Optional[List[str]] = None,
+    exclude: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    log("RECIPE: Starting recipe ner.manual", locals())
+    nlp = spacy.load(spacy_model)
+    labels = label  # comma-separated list or path to text file
+    if not labels:
+        labels = nlp.pipe_labels.get("ner", [])
+        if not labels:
+            msg.fail("No --label argument set and no labels found in model", exits=1)
+        msg.text(f"Using {len(labels)} labels from model: {', '.join(labels)}")
+    log(f"RECIPE: Annotating with {len(labels)} labels", labels)
+    stream = get_stream(
+        source, loader=loader, rehash=True, dedup=True, input_key="text"
+    )
+    # Add "tokens" key to the tasks, either with words or characters
+    stream = list(add_tokens(nlp, stream))
+    examples = [Example(**eg) for eg in stream]
+    stats = get_ner_stats(examples)
+
+    return {
+        "view_id": "blocks",
+        "dataset": dataset,
+        "stream": stream,
+        "exclude": exclude,
+        # "before_db": before_db,
+        "config": {
+            "lang": nlp.lang,
+            "labels": labels,
+            "exclude_by": "input",
+            "stats": stats,
+            "blocks": [
+                {"view_id": "ner_manual"},
+                {"view_id": "html", "html_template": (Path(__file__).parent / "static" / "stats.html").read_text()},
+            ],
+            "global_css_urls": [
+                "https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css"
+            ],
+            "javascript_urls": [
+                "https://cdn.tailwindcss.com/3.3.5"
+            ]
+        },
+    }
+
+
 
 
 @prodigy.recipe(

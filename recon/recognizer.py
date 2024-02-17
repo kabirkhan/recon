@@ -42,7 +42,7 @@ class EntityRecognizer:
         """
         raise NotImplementedError
 
-    def _evaluate(self, examples: List[Example]) -> Scores:
+    def _evaluate(self, __examples: List[Example]) -> Scores:
         raise NotImplementedError
 
     def evaluate(self, data: List[Example], verbose: bool = True) -> Scores:
@@ -104,7 +104,7 @@ class SpacyEntityRecognizer(EntityRecognizer):
 
         for pipe in ["ner", "entity_ruler"]:
             if self.nlp.has_pipe(pipe):
-                all_labels = all_labels | set(self.nlp.get_pipe(pipe).labels)
+                all_labels = all_labels | set(self.nlp.get_pipe(pipe).labels)  # type: ignore
 
         return sorted(list(all_labels))
 

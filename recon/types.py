@@ -13,12 +13,14 @@ from typing import (
     Protocol,
     Tuple,
     Union,
+    cast,
 )
 from typing_extensions import ParamSpec
 
 from pydantic import BaseModel, field_validator, model_validator
 from spacy import displacy
 from spacy.tokens import Doc
+from spacy.tokens import Span as SpacySpan
 from spacy.util import get_words_and_spaces
 from spacy.vocab import Vocab
 from wasabi import color
@@ -130,7 +132,9 @@ class Example(BaseModel):
         tokens = [token.text for token in self.tokens]
         words, spaces = get_words_and_spaces(tokens, self.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)
-        doc.set_ents([doc.char_span(s.start, s.end, label=s.label) for s in self.spans])
+        spans = [doc.char_span(s.start, s.end, label=s.label) for s in self.spans]
+
+        doc.set_ents(cast(List[SpacySpan], spans))
         return doc
 
     def show(
@@ -304,7 +308,7 @@ class AnnotationCount(BaseModel):
     count: int
     examples: List[Example]
 
-    def __repr_args__(self) -> 'ReprArgs':
+    def __repr_args__(self) -> "ReprArgs":
         return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
@@ -347,7 +351,7 @@ class PredictionError(BaseModel):
     def hash(self) -> int:
         return prediction_error_hash(self)
 
-    def __repr_args__(self) -> 'ReprArgs':
+    def __repr_args__(self) -> "ReprArgs":
         return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
@@ -369,9 +373,10 @@ class ExampleDiff(BaseModel):
         tokens = [token.text for token in combined.tokens]
         words, spaces = get_words_and_spaces(tokens, combined.text)
         doc = Doc(Vocab(), words=words, spaces=spaces)
-        doc.spans["ref"] = [
+        ref_spans = [
             doc.char_span(s.start, s.end, label=s.label) for s in combined.spans
         ]
+        doc.spans["ref"] = cast(List[SpacySpan], ref_spans)
         displacy.render(doc, style="span", jupyter=True, options={"spans_key": "ref"})
 
 
@@ -426,7 +431,7 @@ class EntityCoverage(BaseModel):
     def __hash__(self) -> int:
         return hash((self.text, self.label))
 
-    def __repr_args__(self) -> 'ReprArgs':
+    def __repr_args__(self) -> "ReprArgs":
         return [arg for arg in super().__repr_args__() if arg[0] != "examples"]
 
 
@@ -489,8 +494,7 @@ class Correction(BaseModel):
             else:
                 raise ValueError(
                     "Cannot parse corrections dict. Value must be either a str of the"
-                    " label "
-                    + "to change the annotation to (TO_LABEL) or a tuple of"
+                    " label " + "to change the annotation to (TO_LABEL) or a tuple of"
                     " (FROM_LABEL, TO_LABEL)"
                 )
             corrections.append(
