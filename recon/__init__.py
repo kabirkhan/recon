@@ -9,8 +9,9 @@ from recon.types import Example
 
 try:
     # This needs to be imported in order for the entry points to be loaded
-    from recon.prodigy import recipes as prodigy_recipes  # noqa: F401
-except ImportError:
+    from recon import prodigy
+except ImportError as e:
+    print("PRODIGY", e)
     pass
 
 
