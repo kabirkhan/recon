@@ -16,4 +16,4 @@ htmlcov
 examples/models/*
 examples/Untitled*.ipynb
 .env
-requirements*.txt
+requirements.txt
