@@ -1,0 +1,2739 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.">
+      
+      
+      
+        <link rel="canonical" href="https://kabirkhan.github.io/recon/api/operations/">
+      
+      
+        <link rel="prev" href="../loaders/">
+      
+      
+        <link rel="next" href="../stats/">
+      
+      
+      <link rel="icon" href="../../img/recon.svg">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
+    
+    
+      
+        <title>Operations - Recon</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e359304.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/termynal.css">
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+
+  <meta property="og:url" content="https://kabirkhan.github.io/recon/api/operations/">
+  
+    <meta property="og:title" content="Operations - Recon">
+  
+  <meta property="og:description" content="Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.">
+  <meta property="og:image" content="https://microsoft.github.io/reconner/img/recon.svg">
+  <meta property="og:image:alt" content="Recon NER">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@kabir_khan14">
+  <meta name="twitter:creator" content="@kabir_khan14">
+  
+    <meta property="twitter:title" content="Operations - Recon">
+  
+  <meta name="twitter:description" content="Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.">
+  <meta name="twitter:image" content="https://microsoft.github.io/reconner/img/recon.svg">
+  <meta name="twitter:image:alt" content="Recon NER">
+
+
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#recon.operations" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Recon" class="md-header__button md-logo" aria-label="Recon" data-md-component="logo">
+      
+  <img src="../../img/recon.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Recon
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Operations
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kabirkhan/recon" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kabirkhan/recon
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Recon" class="md-nav__button md-logo" aria-label="Recon" data-md-component="logo">
+      
+  <img src="../../img/recon.svg" alt="logo">
+
+    </a>
+    Recon
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kabirkhan/recon" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kabirkhan/recon
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Recon
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorial
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/loading_data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Loading Data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/ner_stats/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    NER Stats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Dataset
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Dataset
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/dataset_intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dataset Intro
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/dataset_mutate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Making changes to a Dataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/corpus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using a Corpus
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Fixing Conll 2003
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            Fixing Conll 2003
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/conll/loading/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Loading Data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/conll/stats/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced Stats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5_3" id="__nav_2_5_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Insights
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            Insights
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/conll/label_insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Label Disparities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/conll/model_insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Model Based Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/custom_entity_recognizer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Custom EntityRecognizer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../corpus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Corpus
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../corrections/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Corrections
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hashing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hashing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../loaders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Loaders
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Operations
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Operations
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recon.operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recon.operations.Operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recon.operations.Operation.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recon.operations.Operation.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recon.operations.operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      operation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="operation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recon.operations.operation.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recon.operations.operation.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recon.operations.op_iter" class="md-nav__link">
+    <span class="md-ellipsis">
+      op_iter
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stats/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../store/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Store
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tokenization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tokenization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Recognizers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_12">
+            <span class="md-nav__icon md-icon"></span>
+            Recognizers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recognizers/base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EntityRecognizer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recognizers/spacy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SpacyEntityRecognizer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../types/example/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../release-notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Notes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recon.operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recon.operations.Operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recon.operations.Operation.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recon.operations.Operation.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recon.operations.operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      operation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="operation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recon.operations.operation.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recon.operations.operation.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recon.operations.op_iter" class="md-nav__link">
+    <span class="md-ellipsis">
+      op_iter
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>Operations</h1>
+
+<p>Operations are functions that operate on either a list of the examples or a single example.
+If the function operates on a single example, Recon will take care of applying it to all examples in a dataset.</p>
+<p>The following operations are built into Recon</p>
+<!-- `recon.v1.filter_overlaps` -  -->
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>... full list of operations to come</p>
+</div>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="recon.operations"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="recon.operations.Operation" class="doc doc-heading">
+          <code>Operation</code>
+
+
+<a href="#recon.operations.Operation" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Operation class that takes care of calling and reporting
+the results of an operation on a Dataset</p>
+
+            <details class="quote">
+              <summary>Source code in <code>recon/operations.py</code></summary>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Operation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Operation class that takes care of calling and reporting</span>
+<span class="sd">    the results of an operation on a Dataset&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">pre</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PreProcessor</span><span class="p">],</span>
+        <span class="n">op</span><span class="p">:</span> <span class="n">OperationProtocol</span><span class="p">,</span>
+        <span class="n">handles_tokens</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">augmentation</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize an Operation instance</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Name of operation</span>
+<span class="sd">            pre (List[PreProcessor]): List of preprocessors to run</span>
+<span class="sd">            op (Op): Operation callable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">op</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handles_tokens</span> <span class="o">=</span> <span class="n">handles_tokens</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">augmentation</span> <span class="o">=</span> <span class="n">augmentation</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">initial_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OperationState</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs op on a dataset and records the results</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset (Dataset): Dataset to operate on</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if track_example is called in the op with no data</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            OperationResult: Container holding new data and the state of the Operation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">initial_state</span><span class="p">:</span>
+            <span class="n">initial_state</span> <span class="o">=</span> <span class="n">OperationState</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">initial_state</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="n">NOT_STARTED</span><span class="p">:</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
+
+        <span class="n">state</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+        <span class="k">def</span> <span class="nf">track_add_example</span><span class="p">(</span><span class="n">new_example</span><span class="p">:</span> <span class="n">Example</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Transformation</span><span class="p">(</span>
+                    <span class="n">example</span><span class="o">=</span><span class="nb">hash</span><span class="p">(</span><span class="n">new_example</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_ADDED</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">example_store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_example</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">track_remove_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Transformation</span><span class="p">(</span>
+                    <span class="n">prev_example</span><span class="o">=</span><span class="n">orig_example_hash</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_REMOVED</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">track_change_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">new_example</span><span class="p">:</span> <span class="n">Example</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Transformation</span><span class="p">(</span>
+                    <span class="n">prev_example</span><span class="o">=</span><span class="n">orig_example_hash</span><span class="p">,</span>
+                    <span class="n">example</span><span class="o">=</span><span class="nb">hash</span><span class="p">(</span><span class="n">new_example</span><span class="p">),</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_CHANGED</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">example_store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_example</span><span class="p">)</span>
+
+        <span class="n">has_tokens</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">tokens</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">([(</span><span class="n">s</span><span class="o">.</span><span class="n">token_start</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">token_end</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">spans</span><span class="p">]):</span>
+                <span class="n">has_tokens</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">has_tokens</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles_tokens</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="c1"># fmt: off</span>
+                <span class="s2">&quot;This dataset seems to have preset tokens. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Operation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not currently capable of &quot;</span>
+                <span class="s2">&quot;handling tokens and you will &quot;</span>
+                <span class="s2">&quot;need to reset tokenization after this operation. &quot;</span>
+                <span class="s2">&quot;Applying the `recon.add_tokens.v1` operation after this &quot;</span>
+                <span class="s2">&quot;operation is complete will get you back to a clean state.&quot;</span>
+                <span class="c1"># fmt: on</span>
+            <span class="p">)</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="n">NEEDS_TOKENIZATION</span>
+
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">)</span>
+        <span class="n">tmp_example</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">bound_args</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="n">tmp_example</span><span class="p">,</span> <span class="o">*</span><span class="n">state</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">state</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">bound_args</span><span class="o">.</span><span class="n">apply_defaults</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]</span>
+
+        <span class="n">new_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">disable</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">))</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">it</span> <span class="o">=</span> <span class="n">op_iter</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">orig_example_hash</span><span class="p">,</span> <span class="n">example</span><span class="p">,</span> <span class="n">preprocessed_outputs</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;preprocessed_outputs&quot;</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                    <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;preprocessed_outputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preprocessed_outputs</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="o">*</span><span class="n">bound_args</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">bound_args</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">track_remove_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">old_example_present</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">new_example</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+                        <span class="n">new_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_example</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">hash</span><span class="p">(</span><span class="n">new_example</span><span class="p">)</span> <span class="o">==</span> <span class="n">orig_example_hash</span><span class="p">:</span>
+                            <span class="n">old_example_present</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">track_add_example</span><span class="p">(</span><span class="n">new_example</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">old_example_present</span><span class="p">:</span>
+                        <span class="n">track_remove_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">Example</span><span class="p">)</span>
+                    <span class="n">new_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">hash</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">!=</span> <span class="n">orig_example_hash</span><span class="p">:</span>
+                        <span class="n">track_change_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">transformation_counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">transformations</span><span class="p">])</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">examples_added</span> <span class="o">=</span> <span class="n">transformation_counts</span><span class="p">[</span><span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_ADDED</span><span class="p">]</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">examples_removed</span> <span class="o">=</span> <span class="n">transformation_counts</span><span class="p">[</span>
+            <span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_REMOVED</span>
+        <span class="p">]</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">examples_changed</span> <span class="o">=</span> <span class="n">transformation_counts</span><span class="p">[</span>
+            <span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_CHANGED</span>
+        <span class="p">]</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="n">COMPLETED</span>
+        <span class="k">return</span> <span class="n">OperationResult</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">new_data</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">registry</span><span class="o">.</span><span class="n">operations</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="recon.operations.Operation.__call__" class="doc doc-heading">
+          <code class=" language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">initial_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#recon.operations.Operation.__call__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Runs op on a dataset and records the results</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>dataset</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="recon.Dataset" href="../dataset/#recon.dataset.Dataset">Dataset</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Dataset to operate on</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if track_example is called in the op with no data</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>OperationResult</code></td>          <td>
+                <code><span title="recon.types.OperationResult">OperationResult</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Container holding new data and the state of the Operation</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>recon/operations.py</code></summary>
+            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">initial_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OperationState</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs op on a dataset and records the results</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset (Dataset): Dataset to operate on</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if track_example is called in the op with no data</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        OperationResult: Container holding new data and the state of the Operation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">initial_state</span><span class="p">:</span>
+        <span class="n">initial_state</span> <span class="o">=</span> <span class="n">OperationState</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">initial_state</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="n">NOT_STARTED</span><span class="p">:</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
+
+    <span class="n">state</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="nf">track_add_example</span><span class="p">(</span><span class="n">new_example</span><span class="p">:</span> <span class="n">Example</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">Transformation</span><span class="p">(</span>
+                <span class="n">example</span><span class="o">=</span><span class="nb">hash</span><span class="p">(</span><span class="n">new_example</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_ADDED</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">example_store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_example</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">track_remove_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">Transformation</span><span class="p">(</span>
+                <span class="n">prev_example</span><span class="o">=</span><span class="n">orig_example_hash</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_REMOVED</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">track_change_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">new_example</span><span class="p">:</span> <span class="n">Example</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">Transformation</span><span class="p">(</span>
+                <span class="n">prev_example</span><span class="o">=</span><span class="n">orig_example_hash</span><span class="p">,</span>
+                <span class="n">example</span><span class="o">=</span><span class="nb">hash</span><span class="p">(</span><span class="n">new_example</span><span class="p">),</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_CHANGED</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">example_store</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_example</span><span class="p">)</span>
+
+    <span class="n">has_tokens</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">tokens</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">([(</span><span class="n">s</span><span class="o">.</span><span class="n">token_start</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">token_end</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">spans</span><span class="p">]):</span>
+            <span class="n">has_tokens</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="n">has_tokens</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles_tokens</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="c1"># fmt: off</span>
+            <span class="s2">&quot;This dataset seems to have preset tokens. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Operation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not currently capable of &quot;</span>
+            <span class="s2">&quot;handling tokens and you will &quot;</span>
+            <span class="s2">&quot;need to reset tokenization after this operation. &quot;</span>
+            <span class="s2">&quot;Applying the `recon.add_tokens.v1` operation after this &quot;</span>
+            <span class="s2">&quot;operation is complete will get you back to a clean state.&quot;</span>
+            <span class="c1"># fmt: on</span>
+        <span class="p">)</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="n">NEEDS_TOKENIZATION</span>
+
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">)</span>
+    <span class="n">tmp_example</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">bound_args</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="n">tmp_example</span><span class="p">,</span> <span class="o">*</span><span class="n">state</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">state</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">bound_args</span><span class="o">.</span><span class="n">apply_defaults</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]</span>
+
+    <span class="n">new_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">disable</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">))</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="n">op_iter</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">orig_example_hash</span><span class="p">,</span> <span class="n">example</span><span class="p">,</span> <span class="n">preprocessed_outputs</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;preprocessed_outputs&quot;</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;preprocessed_outputs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preprocessed_outputs</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="o">*</span><span class="n">bound_args</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">bound_args</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">track_remove_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">old_example_present</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">new_example</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+                    <span class="n">new_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_example</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">hash</span><span class="p">(</span><span class="n">new_example</span><span class="p">)</span> <span class="o">==</span> <span class="n">orig_example_hash</span><span class="p">:</span>
+                        <span class="n">old_example_present</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">track_add_example</span><span class="p">(</span><span class="n">new_example</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">old_example_present</span><span class="p">:</span>
+                    <span class="n">track_remove_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">Example</span><span class="p">)</span>
+                <span class="n">new_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hash</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">!=</span> <span class="n">orig_example_hash</span><span class="p">:</span>
+                    <span class="n">track_change_example</span><span class="p">(</span><span class="n">orig_example_hash</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">transformation_counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">transformations</span><span class="p">])</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">examples_added</span> <span class="o">=</span> <span class="n">transformation_counts</span><span class="p">[</span><span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_ADDED</span><span class="p">]</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">examples_removed</span> <span class="o">=</span> <span class="n">transformation_counts</span><span class="p">[</span>
+        <span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_REMOVED</span>
+    <span class="p">]</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">examples_changed</span> <span class="o">=</span> <span class="n">transformation_counts</span><span class="p">[</span>
+        <span class="n">TransformationType</span><span class="o">.</span><span class="n">EXAMPLE_CHANGED</span>
+    <span class="p">]</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="n">COMPLETED</span>
+    <span class="k">return</span> <span class="n">OperationResult</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">new_data</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="recon.operations.Operation.__init__" class="doc doc-heading">
+          <code class=" language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">handles_tokens</span><span class="p">,</span> <span class="n">augmentation</span><span class="p">)</span></code>
+
+<a href="#recon.operations.Operation.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Initialize an Operation instance</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Name of operation</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>pre</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[<span title="recon.preprocess.PreProcessor">PreProcessor</span>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of preprocessors to run</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>op</code></td>
+          <td>
+                <code>Op</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Operation callable</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>recon/operations.py</code></summary>
+            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">pre</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PreProcessor</span><span class="p">],</span>
+    <span class="n">op</span><span class="p">:</span> <span class="n">OperationProtocol</span><span class="p">,</span>
+    <span class="n">handles_tokens</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">augmentation</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an Operation instance</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Name of operation</span>
+<span class="sd">        pre (List[PreProcessor]): List of preprocessors to run</span>
+<span class="sd">        op (Op): Operation callable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">op</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">handles_tokens</span> <span class="o">=</span> <span class="n">handles_tokens</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">augmentation</span> <span class="o">=</span> <span class="n">augmentation</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="recon.operations.operation" class="doc doc-heading">
+          <code>operation</code>
+
+
+<a href="#recon.operations.operation" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Decorator for a Recon Operation. An Operation is python function that Recon
+uses will map over each example in a dataset, tracking changes made to examples
+by hash so dataset changes can back.
+An operation has 1 required positional argument called "example" with the
+"recon.types.Example" type.
+Any other arguments are allowed and can be provided by
+passing them to <code>Dataset.apply_</code></p>
+<p>Example operation:</p>
+<div class="highlight"><pre><span></span><code>@operation(&quot;my_custom_operation&quot;)
+def rename_labels(example: Example, *, my_kwarg1: str, my_kwarg2: str)
+</code></pre></div>
+
+            <details class="quote">
+              <summary>Source code in <code>recon/operations.py</code></summary>
+              <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">operation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for a Recon Operation. An Operation is python function that Recon</span>
+<span class="sd">    uses will map over each example in a dataset, tracking changes made to examples</span>
+<span class="sd">    by hash so dataset changes can back.</span>
+<span class="sd">    An operation has 1 required positional argument called &quot;example&quot; with the</span>
+<span class="sd">    &quot;recon.types.Example&quot; type.</span>
+<span class="sd">    Any other arguments are allowed and can be provided by</span>
+<span class="sd">    passing them to `Dataset.apply_`</span>
+
+<span class="sd">    Example operation:</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    @operation(&quot;my_custom_operation&quot;)</span>
+<span class="sd">    def rename_labels(example: Example, *, my_kwarg1: str, my_kwarg2: str)</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">pre</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PreProcessor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">handles_tokens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">factory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">augmentation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decorate an operation that makes some changes to a dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): Operation name.</span>
+<span class="sd">            pre (Union[List[str], List[PreProcessor]]): List of preprocessors to run</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handles_tokens</span> <span class="o">=</span> <span class="n">handles_tokens</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">augmentation</span> <span class="o">=</span> <span class="n">augmentation</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">OperationProtocol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationProtocol</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decorator for an operation.</span>
+<span class="sd">        The first arg to the op callable needs to be a example.</span>
+<span class="sd">        Recon will take care of applying it to a full Dataset</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            op (Op): First arg is the function to decorate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Op: The original function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pre</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PreProcessor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">preprocessor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">preprocessor</span> <span class="o">=</span> <span class="n">pre_registry</span><span class="o">.</span><span class="n">preprocessors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">PreProcessor</span><span class="p">)</span>
+            <span class="n">pre</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
+
+        <span class="n">registry</span><span class="o">.</span><span class="n">operations</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)(</span>
+            <span class="n">Operation</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles_tokens</span><span class="p">,</span> <span class="n">augmentation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">augmentation</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">op</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="recon.operations.operation.__call__" class="doc doc-heading">
+          <code class=" language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">op</span><span class="p">)</span></code>
+
+<a href="#recon.operations.operation.__call__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Decorator for an operation.
+The first arg to the op callable needs to be a example.
+Recon will take care of applying it to a full Dataset</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>op</code></td>
+          <td>
+                <code>Op</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>First arg is the function to decorate</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>Op</code></td>          <td>
+                <code><span title="recon.types.OperationProtocol">OperationProtocol</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The original function</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>recon/operations.py</code></summary>
+            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">OperationProtocol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationProtocol</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for an operation.</span>
+<span class="sd">    The first arg to the op callable needs to be a example.</span>
+<span class="sd">    Recon will take care of applying it to a full Dataset</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        op (Op): First arg is the function to decorate</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Op: The original function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pre</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PreProcessor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">preprocessor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">preprocessor</span> <span class="o">=</span> <span class="n">pre_registry</span><span class="o">.</span><span class="n">preprocessors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">PreProcessor</span><span class="p">)</span>
+        <span class="n">pre</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
+
+    <span class="n">registry</span><span class="o">.</span><span class="n">operations</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)(</span>
+        <span class="n">Operation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles_tokens</span><span class="p">,</span> <span class="n">augmentation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">augmentation</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">op</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="recon.operations.operation.__init__" class="doc doc-heading">
+          <code class=" language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="p">[],</span> <span class="n">handles_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">factory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">augmentation</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#recon.operations.operation.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Decorate an operation that makes some changes to a dataset.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Operation name.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>pre</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[str], <span title="typing.List">List</span>[<span title="recon.preprocess.PreProcessor">PreProcessor</span>]]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of preprocessors to run</p>
+            </div>
+          </td>
+          <td>
+                <code>[]</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>recon/operations.py</code></summary>
+            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span>
+<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">pre</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PreProcessor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="n">handles_tokens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">factory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">augmentation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorate an operation that makes some changes to a dataset.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Operation name.</span>
+<span class="sd">        pre (Union[List[str], List[PreProcessor]]): List of preprocessors to run</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">handles_tokens</span> <span class="o">=</span> <span class="n">handles_tokens</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">factory</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">augmentation</span> <span class="o">=</span> <span class="n">augmentation</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="recon.operations.op_iter" class="doc doc-heading">
+          <code class=" language-python"><span class="n">op_iter</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+<a href="#recon.operations.op_iter" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Iterate over list of examples for an operation
+yielding tuples of (example hash, example)</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[<span title="recon.types.Example">Example</span>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of examples to iterate</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>pre</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[<span title="recon.preprocess.PreProcessor">PreProcessor</span>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of preprocessors to run</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>verbose</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Show verbose output.</p>
+            </div>
+          </td>
+          <td>
+                <code>True</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Yields:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Iterator[Tuple[int, Example]]: Tuples of (example hash, example)</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>recon/operations.py</code></summary>
+            <div class="codehilite"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">op_iter</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Example</span><span class="p">],</span> <span class="n">pre</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PreProcessor</span><span class="p">],</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Example</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterate over list of examples for an operation</span>
+<span class="sd">    yielding tuples of (example hash, example)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (List[Example]): List of examples to iterate</span>
+<span class="sd">        pre (List[PreProcessor]): List of preprocessors to run</span>
+<span class="sd">        verbose (bool, optional): Show verbose output.</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        Iterator[Tuple[int, Example]]: Tuples of (example hash, example)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">Printer</span><span class="p">(</span><span class="n">no_print</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">hide_animation</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="n">preprocessed_outputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Example</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">processor</span> <span class="ow">in</span> <span class="n">pre</span><span class="p">:</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">=&gt; Running preprocessor </span><span class="si">{</span><span class="n">processor</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">processor_outputs</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">example</span><span class="p">,</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">processor_outputs</span><span class="p">),</span>
+            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+            <span class="n">disable</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">),</span>
+            <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">preprocessed_outputs</span><span class="p">[</span><span class="n">example</span><span class="p">][</span><span class="n">processor</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+    <span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">hash</span><span class="p">(</span><span class="n">example</span><span class="p">),</span> <span class="n">example</span><span class="p">,</span> <span class="n">preprocessed_outputs</span><span class="p">[</span><span class="n">example</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/kabirkhan/recon" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/kabir_khan14" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      
+        <script src="../../js/termynal.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js"></script>
+      
+        <script src="../../js/custom.js"></script>
+      
+    
+  </body>
+</html>

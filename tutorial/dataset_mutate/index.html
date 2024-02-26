@@ -1,0 +1,1593 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.">
+      
+      
+      
+        <link rel="canonical" href="https://kabirkhan.github.io/recon/tutorial/dataset_mutate/">
+      
+      
+        <link rel="prev" href="../dataset_intro/">
+      
+      
+        <link rel="next" href="../corpus/">
+      
+      
+      <link rel="icon" href="../../img/recon.svg">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
+    
+    
+      
+        <title>Making changes to a Dataset - Recon</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e359304.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/termynal.css">
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+
+  <meta property="og:url" content="https://kabirkhan.github.io/recon/tutorial/dataset_mutate/">
+  
+    <meta property="og:title" content="Making changes to a Dataset - Recon">
+  
+  <meta property="og:description" content="Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.">
+  <meta property="og:image" content="https://microsoft.github.io/reconner/img/recon.svg">
+  <meta property="og:image:alt" content="Recon NER">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@kabir_khan14">
+  <meta name="twitter:creator" content="@kabir_khan14">
+  
+    <meta property="twitter:title" content="Making changes to a Dataset - Recon">
+  
+  <meta name="twitter:description" content="Debug annotated Named Entity Recognition (NER) data for inconsitencies and get insights on improving the quality of your data.">
+  <meta name="twitter:image" content="https://microsoft.github.io/reconner/img/recon.svg">
+  <meta name="twitter:image:alt" content="Recon NER">
+
+
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#correcting-a-dataset" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Recon" class="md-header__button md-logo" aria-label="Recon" data-md-component="logo">
+      
+  <img src="../../img/recon.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Recon
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Making changes to a Dataset
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kabirkhan/recon" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kabirkhan/recon
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Recon" class="md-nav__button md-logo" aria-label="Recon" data-md-component="logo">
+      
+  <img src="../../img/recon.svg" alt="logo">
+
+    </a>
+    Recon
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kabirkhan/recon" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kabirkhan/recon
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Recon
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorial
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../loading_data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Loading Data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ner_stats/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    NER Stats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Dataset
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Dataset
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset_intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dataset Intro
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Making changes to a Dataset
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Making changes to a Dataset
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#correcting-a-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Correcting a Dataset
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tracking-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tracking operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dataset state
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../corpus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using a Corpus
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Fixing Conll 2003
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            Fixing Conll 2003
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conll/loading/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Loading Data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conll/stats/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced Stats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5_3" id="__nav_2_5_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Insights
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            Insights
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conll/label_insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Label Disparities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conll/model_insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Model Based Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom_entity_recognizer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Custom EntityRecognizer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/corpus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Corpus
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/corrections/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Corrections
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/dataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/hashing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hashing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/loaders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Loaders
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/operations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Operations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/stats/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/store/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Store
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tokenization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tokenization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/validation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Recognizers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_12">
+            <span class="md-nav__icon md-icon"></span>
+            Recognizers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/recognizers/base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EntityRecognizer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/recognizers/spacy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SpacyEntityRecognizer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/types/example/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Types
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../release-notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Notes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#correcting-a-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Correcting a Dataset
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tracking-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tracking operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dataset state
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>Making changes to a Dataset</h1>
+
+<p>Now that we have our data managed in a Recon <code>Dataset</code>, we can make corrections to our data automatically and Recon will take care of keeping track of all operations and transformations run on our data.</p>
+<p>The key is the <code>Dataset.apply_</code> funciton.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It's a common python convention that as far as I know was popularized by PyTorch to have a function return a value (i.e. <code>apply</code>) and a that same function name followed by an underscore (i.e. <code>apply_</code>) operate on that data inplace.</p>
+</div>
+<h2 id="correcting-a-dataset">Correcting a Dataset<a class="headerlink" href="#correcting-a-dataset" title="Permanent link">&para;</a></h2>
+<p><code>Dataset.apply_</code> requires a registered in-place operation that will run across all examples in the Dataset's data.</p>
+<p>Let's see an example.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">typer</span>
+
+<span class="kn">from</span> <span class="nn">recon</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">recon.stats</span> <span class="kn">import</span> <span class="n">get_ner_stats</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">data_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">from_disk</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATS BEFORE&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;============&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_ner_stats</span><span class="p">))</span>
+<span class="hll">
+</span>    <span class="n">ds</span><span class="o">.</span><span class="n">apply_</span><span class="p">(</span><span class="s2">&quot;recon.v1.upcase_labels&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATS AFTER&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;===========&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_ner_stats</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">typer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
+</code></pre></div>
+<div class="termy">
+
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>python<span class="w"> </span>main.py<span class="w"> </span>examples/data/skills/train.jsonl
+
+<span class="go">STATS BEFORE</span>
+<span class="go">============</span>
+<span class="go">{</span>
+<span class="go">    &quot;n_examples&quot;:106,</span>
+<span class="go">    &quot;n_examples_no_entities&quot;:29,</span>
+<span class="go">    &quot;n_annotations&quot;:243,</span>
+<span class="go">    &quot;n_annotations_per_type&quot;:{</span>
+<span class="go">        &quot;SKILL&quot;:197,</span>
+<span class="go">        &quot;PRODUCT&quot;:33,</span>
+<span class="go">        &quot;JOB_ROLE&quot;:10,</span>
+<span class="go">        &quot;skill&quot;:2,</span>
+<span class="go">        &quot;product&quot;:1</span>
+<span class="go">    }</span>
+<span class="go">}</span>
+<span class="go">STATS AFTER</span>
+<span class="go">===========</span>
+<span class="go">{</span>
+<span class="go">    &quot;n_examples&quot;:106,</span>
+<span class="go">    &quot;n_examples_no_entities&quot;:29,</span>
+<span class="go">    &quot;n_annotations&quot;:243,</span>
+<span class="go">    &quot;n_annotations_per_type&quot;:{</span>
+<span class="go">        &quot;SKILL&quot;:199,</span>
+<span class="go">        &quot;PRODUCT&quot;:34,</span>
+<span class="go">        &quot;JOB_ROLE&quot;:10</span>
+<span class="go">    }</span>
+<span class="go">}</span>
+</code></pre></div>
+</div>
+
+<p>Nice! We've easily applied the built-in "upcase_labels" function from Recon to fix our obvious mistakes.</p>
+<p>But that's not all...</p>
+<h2 id="tracking-operations">Tracking operations<a class="headerlink" href="#tracking-operations" title="Permanent link">&para;</a></h2>
+<p>It would be really easy to lose track of the operations run on our data if we ran a bunch of operations. Even with our single operation, we'd have to save a copy of the data before running the <code>upcase_labels</code> operation and drill into both versions of the dataset to identify which examples we actually changed. Recon takes care of this tracking for us.</p>
+<p>Let's extend our previous example by saving our new Dataset to disk using (conveniently) <code>Dataset.to_disk</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">typer</span>
+
+<span class="kn">from</span> <span class="nn">recon</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">recon.stats</span> <span class="kn">import</span> <span class="n">get_ner_stats</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">data_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">from_disk</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATS BEFORE&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;============&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_ner_stats</span><span class="p">))</span>
+
+    <span class="n">ds</span><span class="o">.</span><span class="n">apply_</span><span class="p">(</span><span class="s2">&quot;recon.v1.upcase_labels&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATS AFTER&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;===========&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_ner_stats</span><span class="p">))</span>
+<span class="hll">
+</span>    <span class="n">ds</span><span class="o">.</span><span class="n">to_disk</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">typer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
+</code></pre></div>
+<div class="termy">
+
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>python<span class="w"> </span>main.py<span class="w"> </span>examples/data/skills/train.jsonl<span class="w"> </span>examples/fixed_data/skills/train.jsonl
+
+<span class="go">STATS BEFORE</span>
+<span class="go">============</span>
+<span class="go">{</span>
+<span class="go">    &quot;n_examples&quot;:106,</span>
+<span class="go">    &quot;n_examples_no_entities&quot;:29,</span>
+<span class="go">    &quot;n_annotations&quot;:243,</span>
+<span class="go">    &quot;n_annotations_per_type&quot;:{</span>
+<span class="go">        &quot;SKILL&quot;:197,</span>
+<span class="go">        &quot;PRODUCT&quot;:33,</span>
+<span class="go">        &quot;JOB_ROLE&quot;:10,</span>
+<span class="go">        &quot;skill&quot;:2,</span>
+<span class="go">        &quot;product&quot;:1</span>
+<span class="go">    }</span>
+<span class="go">}</span>
+<span class="go">STATS AFTER</span>
+<span class="go">===========</span>
+<span class="go">{</span>
+<span class="go">    &quot;n_examples&quot;:106,</span>
+<span class="go">    &quot;n_examples_no_entities&quot;:29,</span>
+<span class="go">    &quot;n_annotations&quot;:243,</span>
+<span class="go">    &quot;n_annotations_per_type&quot;:{</span>
+<span class="go">        &quot;SKILL&quot;:199,</span>
+<span class="go">        &quot;PRODUCT&quot;:34,</span>
+<span class="go">        &quot;JOB_ROLE&quot;:10</span>
+<span class="go">    }</span>
+<span class="go">}</span>
+</code></pre></div>
+</div>
+
+<p>This should have the same console output as before.</p>
+<p>Let's investigate what Recon saved.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">typer</span>
+
+<span class="kn">from</span> <span class="nn">recon</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">recon.stats</span> <span class="kn">import</span> <span class="n">get_ner_stats</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">data_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">from_disk</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATS BEFORE&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;============&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_ner_stats</span><span class="p">))</span>
+<span class="hll">
+</span>    <span class="n">ds</span><span class="o">.</span><span class="n">apply_</span><span class="p">(</span><span class="s2">&quot;recon.v1.upcase_labels&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATS AFTER&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;===========&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_ner_stats</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">typer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
+</code></pre></div>
+<div class="termy">
+
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>ll<span class="w"> </span>-a<span class="w"> </span>examples/fixed_data/skills
+
+<span class="go">├── .recon</span>
+<span class="go">├── train.jsonl</span>
+
+<span class="go">// train.jsonl is just our serialized data from our train Dataset</span>
+<span class="go">// What&#39;s in .recon?</span>
+
+<span class="gp">$ </span>tree<span class="w"> </span>-a<span class="w"> </span>examples/fixed_data/skills/
+
+<span class="go">examples/fixed_data/skills/</span>
+<span class="go">├── .recon</span>
+<span class="go">│   ├── example_store.jsonl</span>
+<span class="go">│   └── train</span>
+<span class="go">│       └── state.json</span>
+<span class="go">└── train.jsonl</span>
+
+<span class="go">// Let&#39;s investigate the state.json for our train dataset.</span>
+
+<span class="gp">$ </span>cat<span class="w"> </span>examples/fixed_data/skills/.recon/train/state.json
+
+<span class="go">{</span>
+<span class="go">    &quot;name&quot;: &quot;train&quot;,</span>
+<span class="go">    &quot;commit_hash&quot;: &quot;375a4cdec36fa9e0efd1d7b2a02fb4287b99dbdc&quot;,</span>
+<span class="go">    &quot;operations&quot;: [</span>
+<span class="go">        {</span>
+<span class="go">            &quot;name&quot;:&quot;recon.v1.upcase_labels&quot;,</span>
+<span class="go">            &quot;args&quot;:[],</span>
+<span class="go">            &quot;kwargs&quot;:{},</span>
+<span class="go">            &quot;status&quot;:&quot;COMPLETED&quot;,</span>
+<span class="go">            &quot;ts&quot;:1586687281,</span>
+<span class="go">            &quot;examples_added&quot;:0,</span>
+<span class="go">            &quot;examples_removed&quot;:0,</span>
+<span class="go">            &quot;examples_changed&quot;:3,</span>
+<span class="go">            &quot;transformations&quot;:[</span>
+<span class="go">                {</span>
+<span class="go">                    &quot;prev_example&quot;:1923088532738022750,</span>
+<span class="go">                    &quot;example&quot;:1401028415299739275,</span>
+<span class="go">                    &quot;type&quot;:&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="go">                },</span>
+<span class="go">                {</span>
+<span class="go">                    &quot;prev_example&quot;:459906967662468309,</span>
+<span class="go">                    &quot;example&quot;:1525998324968157929,</span>
+<span class="go">                    &quot;type&quot;:&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="go">                },</span>
+<span class="go">                {</span>
+<span class="go">                    &quot;prev_example&quot;:200276835658424828,</span>
+<span class="go">                    &quot;example&quot;:407710308633891847,</span>
+<span class="go">                    &quot;type&quot;:&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="go">                }</span>
+<span class="go">            ]</span>
+<span class="go">        }</span>
+<span class="go">    ]</span>
+<span class="go">}</span>
+</code></pre></div>
+</div>
+
+<p>In the last command above you can see the output of what Recon saves when you call <code>Dataset.to_disk</code>.</p>
+<p>Let's dig into the saved state a bit more.</p>
+<h2 id="dataset-state">Dataset state<a class="headerlink" href="#dataset-state" title="Permanent link">&para;</a></h2>
+<p>The first property stored is the dataset name. Pretty self-explanatory.
+The second, <code>commit</code>, is a bit more complex.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>A core principal of Recon is that all the data types can be hashed deterministically. This means you'll get the same hash if across Python environments and sessions for each core data type including: Corpus, Dataset, Example, Span and Token.</p>
+</div>
+<p>The <code>commit</code> property is a SHA-1 hash of the dataset
+name combined with that hash of each example in the dataset.
+If you're familiar with how <a href="https://git-scm.com/">git</a> works the idea is pretty similar.</p>
+<p>The <code>commit</code> property of a dataset allows us to understand if a Dataset changes between operations.
+This can happen if you add new examples and want to rerun or run new operations later based on insights from that new data.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;commit_hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;375a4cdec36fa9e0efd1d7b2a02fb4287b99dbdc&quot;</span><span class="p">,</span>
+<span class="hll"><span class="w">    </span><span class="nt">&quot;operations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span class="w">        </span><span class="p">{</span>
+<span class="hll"><span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;recon.v1.upcase_labels&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:[],</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;kwargs&quot;</span><span class="p">:{},</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="mi">1586687281</span><span class="p">,</span>
+</span><span class="w">            </span><span class="nt">&quot;examples_added&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;examples_removed&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;examples_changed&quot;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;transformations&quot;</span><span class="p">:[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">1923088532738022750</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">1401028415299739275</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">459906967662468309</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">1525998324968157929</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">200276835658424828</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">407710308633891847</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The core of the stored state is the <code>operations</code> property. This operations property has all the information needed to both track and re-run an operation on a dataset.</p>
+<p>In the above state we have 1 operation since that's all we've run on our dataset so far.</p>
+<p>Each operation has a <code>name</code> (in this case <code>"recon.v1.upcase_labels"</code>) as well as any python <code>args</code> or <code>kwargs</code> run with the function. The <code>upcase_labels</code> operation has no required parameters so these are empty (we'll see some examples where these are not empty later in the tutorial).</p>
+<p>We also have a <code>status</code> (one of: NOT_STARTED, IN_PROGRESS, COMPLETED) and a <code>ts</code> (timestamp of when the operation was run).</p>
+<p>These attributes provide the base information to re-create the exact function call and provide the base information of the operation.</p>
+<p>The rest of the properties deal with transformation tracking.
+The <code>examples_added</code>, <code>examples_removed</code>, <code>examples_changed</code> give you a summary of the overall changes by the operation.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;commit_hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;375a4cdec36fa9e0efd1d7b2a02fb4287b99dbdc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;operations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;recon.v1.upcase_labels&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:[],</span>
+<span class="w">            </span><span class="nt">&quot;kwargs&quot;</span><span class="p">:{},</span>
+<span class="w">            </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="mi">1586687281</span><span class="p">,</span>
+<span class="hll"><span class="w">            </span><span class="nt">&quot;examples_added&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;examples_removed&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;examples_changed&quot;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span>
+</span><span class="w">            </span><span class="nt">&quot;transformations&quot;</span><span class="p">:[</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">1923088532738022750</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">1401028415299739275</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">459906967662468309</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">1525998324968157929</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">200276835658424828</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">407710308633891847</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Finally, the <code>transformations</code> property is the most useful for actually auditing and tracking your data changes.
+Each transformation has a <code>prev_example</code>, <code>example</code> and transformation <code>type</code>.</p>
+<p>The example properties contain the Example hash or the example before and after the transformation occured. This is really not useful by itself, but these hashes coincide to the hash -&gt; Example mappings in the example_store.jsonl file that Recon saves for you. The ExampleStore is a central store that keeps track of all examples you've ever had in your dataset. This way, we can always revert back or see a concrete comparison of what each operation added/removed/changed by resolving the transformations to their corresponding examples.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Having an ExampleStore is obviously more than doubling the storage required for your data but NER datasets are ususually not that big since they're hard to annotate. For reference, Recon has been tested on a Dataset of 200K examples with no issue.</p>
+</div>
+<p>The transformation <code>type</code> will always be one of (EXAMPLE_ADDED, EXAMPLE_REMOVED, or EXAMPLE_CHANGED).</p>
+<ul>
+<li>EXAMPLE_ADDED - In this case, the <code>prev_example</code> property will be <code>null</code> since we're just adding an example to our dataset.
+    This can happen if an operation returns more than one example for every example it sees. A good reference example is the <a href="link/to/split_sentences"><code>recon.v1.split_sentences</code></a> operation. This operation will find all the sentences in an example and split them out into separate examples.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>So if an example has 2 sentences, Recon will track this operation as removing the original example and adding 2 examples. You'll see those reflected in the transformations</p>
+</div>
+<ul>
+<li>EXAMPLE_REMOVED - By default, Recon removes Examples that have bad final annotations that can't be properly resolved to token boundaries. Good reference examples for this behavior are the operations <a href="link/to/fix_tokenization_and_spacing"><code>recon.v1.fix_tokenization_and_spacing</code></a> and <a href="link/to/add_tokens"><code>recon.v1.add_tokens</code></a></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;commit_hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;375a4cdec36fa9e0efd1d7b2a02fb4287b99dbdc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;operations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;recon.v1.upcase_labels&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:[],</span>
+<span class="w">            </span><span class="nt">&quot;kwargs&quot;</span><span class="p">:{},</span>
+<span class="w">            </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="mi">1586687281</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;examples_added&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;examples_removed&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;examples_changed&quot;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span>
+<span class="hll"><span class="w">            </span><span class="nt">&quot;transformations&quot;</span><span class="p">:[</span>
+</span><span class="w">                </span><span class="p">{</span>
+<span class="hll"><span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">1923088532738022750</span><span class="p">,</span>
+</span><span class="hll"><span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">1401028415299739275</span><span class="p">,</span>
+</span><span class="hll"><span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+</span><span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">459906967662468309</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">1525998324968157929</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;prev_example&quot;</span><span class="p">:</span><span class="mi">200276835658424828</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;example&quot;</span><span class="p">:</span><span class="mi">407710308633891847</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;EXAMPLE_CHANGED&quot;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/kabirkhan/recon" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/kabir_khan14" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      
+        <script src="../../js/termynal.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js"></script>
+      
+        <script src="../../js/custom.js"></script>
+      
+    
+  </body>
+</html>
