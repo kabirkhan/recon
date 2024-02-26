@@ -28,7 +28,7 @@ jobs:
         run: |
           uv venv .venv
           source .venv/bin/activate
-          uv pip install -r ./requirements-dev.txt
+          uv pip install -e --extra dev ./
 
       - name: Lint
         run: |
@@ -72,7 +72,7 @@ jobs:
         run: |
           uv venv .venv
           source .venv/bin/activate
-          uv pip install -r ./requirements-dev.txt
+          uv pip install -e --extra dev ./
 
       - name: test
         run: |

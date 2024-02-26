@@ -50,7 +50,7 @@ dev = [
     "pytest-xdist",
     "mkdocs",
     "mkdocs-material",
-    "markdown-include >= 0.5.1, < 0.6.0",
+    "mdx-include >=1.4.1,<2.0.0",
     "mkdocstrings-python",
     "pyright >= 1.1.303, <1.3",
     "ruff >= 0.1, <1.0"
